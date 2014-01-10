@@ -111,6 +111,10 @@ class WCS_Admin_Importer {
 		}
 	}
 
+	function format_data_from_csv( $data, $enc ) {
+		return ( $enc == 'UTF-8' ) ? $data : utf8_encode( $data );
+	}
+
 	/* Step 2: Once uploaded file is recognised, the admin will be required to map CSV columns to the required fields. */
 	function map_fields() {
 		$action = 'admin.php?page=import_subscription&amp;step=3&amp;';
