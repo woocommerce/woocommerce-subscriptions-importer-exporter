@@ -78,12 +78,36 @@ class WCS_Admin_Importer {
 	function handle_file() {
 		global $file;
 		$file = wp_import_handle_upload();
-
 		if( isset( $file['error'] ) ) {
 			$this->importer_error();
 		} else {
 			$this->id = $file['id'];
-			$this->map_fields();
+			$this->delimiter = ( ! empty( $_POST['delimiter'] ) ) ? stripslashes( trim( $_POST['delimiter'] ) ) : ',';
+
+			$file = get_attached_file( $this->id );
+
+			$enc = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
+			if ( $enc ) setlocale( LC_ALL, 'en_US.' . $enc );
+			@ini_set( 'auto_detect_line_endings', true );
+
+			echo $this->id;
+			// Get headers
+			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
+			$row = $raw_headers = array();
+
+			$header = fgetcsv( $handle, 0, $this->delimiter );
+			while ( ( $postmeta = fgetcsv( $handle, 0, $this->delimiter ) ) !== false ) {
+				foreach ( $header as $key => $heading ) {
+					if ( ! $heading ) continue;
+					$s_heading = strtolower( $heading );
+					$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? $this->format_data_from_csv( $postmeta[$key], $enc ) : '';
+					$raw_headers[ $s_heading ] = $heading;
+				}
+				break;
+			}
+			fclose( $handle );
+		}
+		$this->map_fields($row);
 		}
 	}
 
