@@ -130,13 +130,30 @@ class WCS_Admin_Importer {
 					</tr>
 				</thead>
 				<tbody>
+					<?php foreach( $row as $header => $example ) : ?>
 					<tr>
-						<td>
+						<td> <!-- Available mapping options -->
 							<select>
-								<option selected>Do not import</option>
+								<optgroup label="<?php _e( 'Subsciption Information', 'wcs_import'); ?>">
+									<option><?php _e( 'Do not import', 'wcs_import'); ?></option>
+									<option value="product_id" <?php selected( $header, 'product_id' ); ?>>product_id</option>
+									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>>customer_id</option>
+									<optgroup label="<?php _e( 'Other Customer Data', 'wcs_import' ); ?>">
+										<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
+										<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
+										<option value="customer_address" <?php selected( $header, 'customer_addresss' ); ?>>customer_address</option>
+									</optgroup>
+									<option value="status" <?php selected($header, 'status' ); ?>>status</option>
+									<option value="start_date" <?php selected( $header, 'start_date' ); ?>>start_date</option>
+									<option value="expiry_date" <?php selected( $header, 'expiry_date' ); ?>>expiry_date</option>
+									<option value="end_date" <?php selected( $header, 'end_date' ); ?>>end_date</option>
+								</optgroup>
 							</select>
 						</td>
+						<td width="25%"><?php echo $header; ?></td> <!-- Column deader from csv file -->
+						<td><code><?php if ( $example != '' ) echo esc_html( $example ); else echo '-'; ?></code></td>
 					</tr>
+					<?php endforeach; ?>
 				</tbody>
 			</table>
 			<p class="submit">
