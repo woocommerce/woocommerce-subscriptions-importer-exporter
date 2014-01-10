@@ -2,10 +2,11 @@
 global $file;
 class WCS_Admin_Importer {
 	var $id;
+	var $delimiter;
 
 	/* Displays header followed by the current pages content */
 	public function display_content() {
-		
+
 		$page = ( isset($_GET['step'] ) ) ? $_GET['step'] : 1;
 		switch( $page ) {
 		case 1 : //Step: Upload File
@@ -143,7 +144,7 @@ class WCS_Admin_Importer {
 										<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
 										<option value="customer_address" <?php selected( $header, 'customer_addresss' ); ?>>customer_address</option>
 									</optgroup>
-									<option value="status" <?php selected($header, 'status' ); ?>>status</option>
+									<option value="status" <?php selected( $header, 'status' ); ?>>status</option>
 									<option value="start_date" <?php selected( $header, 'start_date' ); ?>>start_date</option>
 									<option value="expiry_date" <?php selected( $header, 'expiry_date' ); ?>>expiry_date</option>
 									<option value="end_date" <?php selected( $header, 'end_date' ); ?>>end_date</option>
@@ -157,7 +158,7 @@ class WCS_Admin_Importer {
 				</tbody>
 			</table>
 			<p class="submit">
-					<input type="submit" class="button" value="<?php esc_attr_e( 'Submit' ); ?>" />
+				<input type="submit" class="button" value="<?php esc_attr_e( 'Submit' ); ?>" />
 			</p>
 		</form>
 		<?php
@@ -167,7 +168,7 @@ class WCS_Admin_Importer {
 	function confirmation() { 
 		global $file;
 		echo '<h3>' . __( 'Step 3: Confirmation', 'wcs_import' ) . '</h3>';
-	?>
+		?>
 		<table id="import-progress" class="widefat_importer widefat">
 			<thead>
 				<tr>
@@ -184,7 +185,6 @@ class WCS_Admin_Importer {
 			</tfoot>
 			<tbody></tbody>
 		</table><?php
-		
 	}
 
 	/* Handles displaying an error message throughout the process of importing subscriptions. */
