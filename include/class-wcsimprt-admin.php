@@ -1,12 +1,18 @@
 <?php
 global $file;
+
 class WCS_Admin_Importer {
 	var $id;
 	var $delimiter;
 
+	/* Class Constructor used for wp_ajax_( hook ) setup */
+	function __construct() {
+		add_action( 'wp_ajax_wcs_import_request', array($this, 'display_content'));
+	}
+
 	/* Displays header followed by the current pages content */
 	public function display_content() {
-
+		global $file;
 		$page = ( isset($_GET['step'] ) ) ? $_GET['step'] : 1;
 		switch( $page ) {
 		case 1 : //Step: Upload File
@@ -19,7 +25,11 @@ class WCS_Admin_Importer {
 			}
 			break;
 		case 3 :
-			$this->confirmation();
+			$this->confirmation_table();
+			$this->AJAX_start();
+			break;
+		case 4 : // called from ajax
+			$this->AJAX_request_handler();
 			break;
 		default : //default to home page
 			$this->upload_page();
@@ -33,8 +43,8 @@ class WCS_Admin_Importer {
 		$bytes = apply_filters( 'import_upload_size_limit', wp_max_upload_size() );
 		$size = size_format( $bytes );
 		$upload_dir = wp_upload_dir();
-		if ( ! empty( $upload_dir['error'] ) ) :
-			?><div class="error"><p><?php _e('Before you can upload your import file, you will need to fix the following error:'); ?></p>
+		if ( ! empty( $upload_dir['error'] ) ) : ?>
+			<div class="error"><p><?php _e('Before you can upload your import file, you will need to fix the following error:'); ?></p>
 			<p><strong><?php echo $upload_dir['error']; ?></strong></p></div><?php
 		else :
 			?>
@@ -108,7 +118,7 @@ class WCS_Admin_Importer {
 			}
 			fclose( $handle );
 		}
-		$this->map_fields($row);
+		$this->map_fields( $row );
 		}
 	}
 
@@ -117,11 +127,13 @@ class WCS_Admin_Importer {
 	}
 
 	/* Step 2: Once uploaded file is recognised, the admin will be required to map CSV columns to the required fields. */
-	function map_fields() {
+	function map_fields( $row ) {
 		$action = 'admin.php?page=import_subscription&amp;step=3&amp;';
 		?>
 		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs_import' ); ?></h3>
 		<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
+			<input type="hidden" name="file_id" value="<?php echo $this->id; ?>">
+			<input type="hidden" name="delimiter" value="<?php echo $this->delimiter; ?>">
 			<table class="widefat widefat_importer">
 				<thead>
 					<tr>
@@ -134,9 +146,9 @@ class WCS_Admin_Importer {
 					<?php foreach( $row as $header => $example ) : ?>
 					<tr>
 						<td> <!-- Available mapping options -->
-							<select>
+							<select name="mapto[<?php echo $header; ?>]">
 								<optgroup label="<?php _e( 'Subsciption Information', 'wcs_import'); ?>">
-									<option><?php _e( 'Do not import', 'wcs_import'); ?></option>
+									<option value="0"><?php _e( 'Do not import', 'wcs_import'); ?></option>
 									<option value="product_id" <?php selected( $header, 'product_id' ); ?>>product_id</option>
 									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>>customer_id</option>
 									<optgroup label="<?php _e( 'Other Customer Data', 'wcs_import' ); ?>">
@@ -163,9 +175,55 @@ class WCS_Admin_Importer {
 		</form>
 		<?php
 	}
-	
+
+	/* Sets up and sends the AJAX call awaiting the information to fill in the confirmation table. */
+	function AJAX_start() {
+		if( ! empty( $_POST['file_id'] ) ) {
+			$file = get_attached_file( $_POST['file_id'] );
+		}
+		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
+		?>
+		<script>
+			jQuery(document).ready(function($) {
+			var data = {
+				action:		'wcs_import_request',
+				mapping:	'<?php echo json_encode( $_POST['mapto'] ); ?>',
+				delimiter:	'<?php echo $delimiter; ?>',
+				file:		'<?php echo addslashes( $file ); ?>'
+			}
+
+			$.ajax({
+				url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4'), admin_url( 'admin-ajax.php' ) ) ; ?>',
+				type:	'POST',
+				data:	data,
+				success: function( response ) {
+					console.log(response);
+				}
+			});
+			console.log('<?php echo addslashes( $file ); ?>');
+			console.log('<?php echo json_encode( $_POST['mapto'] ); ?>');
+			console.log('<?php echo $delimiter; ?>');
+			});
+		</script>
+	<?php
+	}
+
+	/* AJAX request holding the file, delimiter and mapping information is sent to this function. */
+	function AJAX_request_handler() {
+		if ( ! current_user_can( 'manage_woocommerce' ) ){
+			error_log('invalid user');
+			die();
+		}
+
+		$file = $_POST['file'];
+		$mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
+		$delimiter = $_POST['delimiter'];
+
+		die(); // End
+	}
+
 	/* Step 3: Displays the information about to be uploaded and waits for confirmation by the admin. */
-	function confirmation() { 
+	function confirmation_table() { 
 		global $file;
 		echo '<h3>' . __( 'Step 3: Confirmation', 'wcs_import' ) . '</h3>';
 		?>

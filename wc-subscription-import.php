@@ -49,6 +49,5 @@ class WC_Subscription_Importer {
 		$wcs_importer->display_content();
 		echo '</div>';
 	}
-
 }
 ?>
