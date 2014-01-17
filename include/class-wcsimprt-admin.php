@@ -4,15 +4,13 @@ global $file;
 class WCS_Admin_Importer {
 	var $id;
 	var $delimiter;
-
-	/* Class Constructor used for wp_ajax_( hook ) setup */
-	function __construct() {
-		add_action( 'wp_ajax_wcs_import_request', array($this, 'display_content'));
-	}
+	var $import_results = array();
+	var $mapping;
 
 	/* Displays header followed by the current pages content */
 	public function display_content() {
 		global $file;
+		
 		$page = ( isset($_GET['step'] ) ) ? $_GET['step'] : 1;
 		switch( $page ) {
 		case 1 : //Step: Upload File
@@ -25,10 +23,8 @@ class WCS_Admin_Importer {
 			}
 			break;
 		case 3 :
-			$this->confirmation_table();
-			$this->AJAX_start();
-			break;
-		case 4 : // called from ajax
+			$this->check_mapping();
+		case 4 :
 			$this->AJAX_request_handler();
 			break;
 		default : //default to home page
@@ -101,7 +97,6 @@ class WCS_Admin_Importer {
 			if ( $enc ) setlocale( LC_ALL, 'en_US.' . $enc );
 			@ini_set( 'auto_detect_line_endings', true );
 
-			echo $this->id;
 			// Get headers
 			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
 			$row = $raw_headers = array();
@@ -176,33 +171,64 @@ class WCS_Admin_Importer {
 		<?php
 	}
 
+	/* Checks the mapping provides enough information to continue importing subscriptions */
+	function check_mapping() {
+		$this->mapping = array(
+			'product_id' => '',
+			'customer_id' => '',
+			'customer_email' => '',
+			'customer_username' => '',
+			'customer_address' => '',
+			'status' => '',
+			'start_date' => '',
+			'expiry_date' => '',
+			'end_date' => ''
+		);
+
+		$mapping = $_POST['mapto'];
+		// Doesnt yet handle multiple fields mapped to the same field
+		foreach( $this->mapping as $key => $value) {
+			$m_key = array_search( $key, $mapping );
+			if( $m_key ) {
+				$this->mapping[$key] = $m_key;
+			}
+		}
+		// Need to check for errors
+		$this->confirmation_table();
+		$this->AJAX_start();
+	}
+
 	/* Sets up and sends the AJAX call awaiting the information to fill in the confirmation table. */
 	function AJAX_start() {
 		if( ! empty( $_POST['file_id'] ) ) {
 			$file = get_attached_file( $_POST['file_id'] );
 		}
+		$request_limit = 15;
 		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
+		$num_ajax_requests = ( ! empty( $_POST['num_ajax'] ) ) ? $_POST['num_ajax'] : 1;
 		?>
 		<script>
 			jQuery(document).ready(function($) {
-			var data = {
-				action:		'wcs_import_request',
-				mapping:	'<?php echo json_encode( $_POST['mapto'] ); ?>',
-				delimiter:	'<?php echo $delimiter; ?>',
-				file:		'<?php echo addslashes( $file ); ?>'
-			}
+				/* AJAX Request to import subscriptions */
+					var data = {
+						action:		'wcs_import_request',
+						mapping:	'<?php echo json_encode( $this->mapping ); ?>',
+						delimiter:	'<?php echo $delimiter; ?>',
+						file:		'<?php echo addslashes( $file ); ?>',
+					}
 
-			$.ajax({
-				url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4'), admin_url( 'admin-ajax.php' ) ) ; ?>',
-				type:	'POST',
-				data:	data,
-				success: function( response ) {
-					console.log(response);
-				}
-			});
-			console.log('<?php echo addslashes( $file ); ?>');
-			console.log('<?php echo json_encode( $_POST['mapto'] ); ?>');
-			console.log('<?php echo $delimiter; ?>');
+					$.ajax({
+						url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4'), admin_url( 'admin-ajax.php' ) ) ; ?>',
+						type:	'POST',
+						data:	data,
+						success: function( response ) {
+							console.log(response);
+						}
+					});
+					console.log('<?php echo addslashes( $file ); ?>');
+					console.log('<?php echo json_encode( $_POST['mapto'] ); ?>');
+					console.log('<?php echo $delimiter; ?>');
+
 			});
 		</script>
 	<?php
@@ -214,12 +240,20 @@ class WCS_Admin_Importer {
 			error_log('invalid user');
 			die();
 		}
+		@set_time_limit(0);
+		@ob_flush();
+		@flush();
 
-		$file = $_POST['file'];
+		$file = stripslashes($_POST['file']);
 		$mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
 		$delimiter = $_POST['delimiter'];
 
-		die(); // End
+		$this->parser = new WCS_Import_Parser();
+		$this->results = $this->parser->import_data( $file, $delimiter, $mapping );
+		echo "<!--WC_START-->";
+		echo json_encode( $this->results );
+		echo "<!--WC_END-->";
+		exit; // End
 	}
 
 	/* Step 3: Displays the information about to be uploaded and waits for confirmation by the admin. */
