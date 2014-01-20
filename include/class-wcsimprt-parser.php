@@ -39,7 +39,7 @@ class WCS_Import_Parser {
 					$username = ( ! empty( $this->mapping['customer_username'] ) ) ? $row[$this->mapping['customer_username']] : '';
 					$address = ( ! empty( $this->mapping['customer_address'] ) ) ? $row[$this->mapping['customer_address']] : '';
 					$status = ( ! empty( $this->mapping['status'] ) ) ? $row[$this->mapping['status']] : 'pending';
-					$start_date = ( ! empty( $this->mapping['start_date'] ) ) ? $row[$this->mapping['start_date']] : ''; //default needs to be get_date();
+					$start_date = ( ! empty( $this->mapping['start_date'] ) ) ? $row[$this->mapping['start_date']] : '';
 					$expiry_date = ( ! empty( $this->mapping['expiry_date'] ) ) ? $row[$this->mapping['expiry_date']] : '';
 					$end_date = ( ! empty( $this->mapping['end_date'] ) ) ? $row[$this->mapping['expiry_date']] : '';
 
@@ -60,17 +60,21 @@ class WCS_Import_Parser {
 		$subscription = array();
 		// Check Product id a woocommerce product
 		if( ! ( $this->check_product( $prod ) ) ) {
-			$subscription['error_product'] = _e( 'The product_id is not a subscription product in your store.', 'wcs_import' );
+			$subscription['error_product'] = __( 'The product_id is not a subscription product in your store.', 'wcs_import' );
 		}
 
 		// Check customer id is valid or create one
-		$cust_id = $this->check_customer( $customer_id, $email, $username , $address )
-		
+		$cust_id = $this->check_customer( $customer_id, $email, $username , $address );
+
 		if ( empty( $cust_id ) ) {
 			// Error with customer information in line of csv
-			$subscription['error_customer'] = _e( 'An error occurred with the customer information provided.', ' wcs_import' );
+			$subscription['error_customer'] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
 		}
 
+		// Set defaults for empty fields
+		if( empty( $status ) ) {
+			$status = 'pending';
+		}
 		// Create the subscription - magic happens here
 
 		// Attache each subscription to the results array
@@ -78,8 +82,9 @@ class WCS_Import_Parser {
 	}
 
 	/* Check the product is a woocommerce product - an error status will show up on table if this is not the case. */
-	function check_product( $product_pid ) {
-		return true;
+	function check_product( $product_id ) {
+		$is_subscription = WC_Subscriptions_Product::is_subscription( $product_id );
+		return ( empty( $is_subscription) ) ? false : true;
 	}
 
 	/* Checks customer information and creates a new store customer when no customer Id has been given */
