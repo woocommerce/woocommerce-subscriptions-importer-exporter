@@ -6,6 +6,7 @@ class WCS_Admin_Importer {
 	var $delimiter;
 	var $import_results = array();
 	var $mapping;
+	var $file_url;
 
 	/* Displays header followed by the current pages content */
 	public function display_content() {
@@ -84,14 +85,23 @@ class WCS_Admin_Importer {
 
 	function handle_file() {
 		global $file;
-		$file = wp_import_handle_upload();
-		if( isset( $file['error'] ) ) {
-			$this->importer_error();
-		} else {
+		if ( empty( $_POST['file_url'] ) ) {
+			$file = wp_import_handle_upload();
+			if( isset( $file['error'] ) ) {
+				$this->importer_error();
+			}
 			$this->id = $file['id'];
-			$this->delimiter = ( ! empty( $_POST['delimiter'] ) ) ? stripslashes( trim( $_POST['delimiter'] ) ) : ',';
-
 			$file = get_attached_file( $this->id );
+		} else {
+			if ( file_exists( ABSPATH . $_POST['file_url'] ) ) {
+				$this->file_url = esc_attr( $_POST['file_url'] );
+				$file = ABSPATH . $this->file_url;
+			} else {
+				$this->importer_error();
+			}
+		}
+		if( $file ) {
+			$this->delimiter = ( ! empty( $_POST['delimiter'] ) ) ? stripslashes( trim( $_POST['delimiter'] ) ) : ',';
 
 			$enc = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
 			if ( $enc ) setlocale( LC_ALL, 'en_US.' . $enc );
@@ -99,21 +109,21 @@ class WCS_Admin_Importer {
 
 			// Get headers
 			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
-			$row = $raw_headers = array();
+				$row = $raw_headers = array();
 
-			$header = fgetcsv( $handle, 0, $this->delimiter );
-			while ( ( $postmeta = fgetcsv( $handle, 0, $this->delimiter ) ) !== false ) {
-				foreach ( $header as $key => $heading ) {
-					if ( ! $heading ) continue;
-					$s_heading = strtolower( $heading );
-					$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? $this->format_data_from_csv( $postmeta[$key], $enc ) : '';
-					$raw_headers[ $s_heading ] = $heading;
+				$header = fgetcsv( $handle, 0, $this->delimiter );
+				while ( ( $postmeta = fgetcsv( $handle, 0, $this->delimiter ) ) !== false ) {
+					foreach ( $header as $key => $heading ) {
+						if ( ! $heading ) continue;
+						$s_heading = strtolower( $heading );
+						$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? $this->format_data_from_csv( $postmeta[$key], $enc ) : '';
+						$raw_headers[ $s_heading ] = $heading;
+					}
+					break;
 				}
-				break;
+				fclose( $handle );
 			}
-			fclose( $handle );
-		}
-		$this->map_fields( $row );
+			$this->map_fields( $row );
 		}
 	}
 
@@ -128,6 +138,7 @@ class WCS_Admin_Importer {
 		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs_import' ); ?></h3>
 		<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
 			<input type="hidden" name="file_id" value="<?php echo $this->id; ?>">
+			<input type="hidden" name="file_url" value="<?php echo $this->file_url; ?>">
 			<input type="hidden" name="delimiter" value="<?php echo $this->delimiter; ?>">
 			<table class="widefat widefat_importer">
 				<thead>
@@ -200,8 +211,10 @@ class WCS_Admin_Importer {
 
 	/* Sets up and sends the AJAX call awaiting the information to fill in the confirmation table. */
 	function AJAX_start() {
-		if( ! empty( $_POST['file_id'] ) ) {
+		if( empty( $_POST['file_url'] ) ) {
 			$file = get_attached_file( $_POST['file_id'] );
+		} else {
+			$file = ABSPATH . $_POST['file_url'];
 		}
 		$request_limit = 15;
 		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
