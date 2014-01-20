@@ -81,7 +81,7 @@ class WCS_Import_Parser {
 		array_push( $this->results, $subscription ); // Test the data correctly adds to the array and is printed to the console
 	}
 
-	/* Check the product is a woocommerce product - an error status will show up on table if this is not the case. */
+	/* Check the product is a woocommerce subscription - an error status will show up on table if this is not the case. */
 	function check_product( $product_id ) {
 		$is_subscription = WC_Subscriptions_Product::is_subscription( $product_id );
 		return ( empty( $is_subscription) ) ? false : true;
