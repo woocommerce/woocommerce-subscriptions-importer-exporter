@@ -206,19 +206,54 @@ class WCS_Admin_Importer {
 		}
 		// Need to check for errors
 		$this->confirmation_table();
-		$this->AJAX_start();
+		$this->AJAX_setup();
 	}
 
-	/* Sets up and sends the AJAX call awaiting the information to fill in the confirmation table. */
-	function AJAX_start() {
+	/* Sets up the AJAX requests and calls import_AJAX_start( .. ) */
+	function AJAX_setup() {
+		$request_limit = 15; // May change
+		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
 		if( empty( $_POST['file_url'] ) ) {
 			$file = get_attached_file( $_POST['file_id'] );
 		} else {
 			$file = ABSPATH . $_POST['file_url'];
 		}
-		$request_limit = 15;
-		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
-		$num_ajax_requests = ( ! empty( $_POST['num_ajax'] ) ) ? $_POST['num_ajax'] : 1;
+
+		$enc = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
+		if ( $enc ) setlocale( LC_ALL, 'en_US.' . $enc );
+		@ini_set( 'auto_detect_line_endings', true );
+
+		$count = 0;
+		$total = 0;
+		$previous_pos = 0;
+		$position = 0;
+		
+		if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
+			while ( ( $postmeta = fgetcsv( $handle, 0, $delimiter ) ) !== FALSE ) {
+				$count++;
+				$total++;
+
+				if ( $count >= $request_limit ) {
+					$previous_pos = $position;
+					$position = ftell( $handle );
+					$count = 0;
+
+					// Import rows between $previous_position $position
+					$this->import_AJAX_start( $file, $delimiter, $previous_pos, $position );
+				}
+			}
+
+			// Account for the remainder
+			if ( $count > 0 ) {
+				//rows.push( [ <?php echo $position; , '' ] );
+				$this->import_AJAX_start( $file, $delimiter, $position, ftell( $handle ) );
+			}
+			fclose( $handle );
+		}
+	}
+
+	/* Sends the AJAX call and waits for the repsonse data to fill in the confirmation table. */
+	function import_AJAX_start( $file, $delimiter, $start_pos, $end_pos ) {
 		?>
 		<script>
 			jQuery(document).ready(function($) {
@@ -228,8 +263,10 @@ class WCS_Admin_Importer {
 						mapping:	'<?php echo json_encode( $this->mapping ); ?>',
 						delimiter:	'<?php echo $delimiter; ?>',
 						file:		'<?php echo addslashes( $file ); ?>',
+						start:		'<?php echo $start_pos; ?>',
+						end:		'<?php echo $end_pos; ?>'
 					}
-
+console.log(data);
 					$.ajax({
 						url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4'), admin_url( 'admin-ajax.php' ) ) ; ?>',
 						type:	'POST',
@@ -247,6 +284,11 @@ class WCS_Admin_Importer {
 	<?php
 	}
 
+	/* 
+	function get_num_rows( $file ) {
+	
+	}
+
 	/* AJAX request holding the file, delimiter and mapping information is sent to this function. */
 	function AJAX_request_handler() {
 		if ( ! current_user_can( 'manage_woocommerce' ) ){
@@ -260,9 +302,10 @@ class WCS_Admin_Importer {
 		$file = stripslashes($_POST['file']);
 		$mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
 		$delimiter = $_POST['delimiter'];
-
+		$start = ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0;
+		$end = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
 		$this->parser = new WCS_Import_Parser();
-		$this->results = $this->parser->import_data( $file, $delimiter, $mapping );
+		$this->results = $this->parser->import_data( $file, $delimiter, $mapping, $start, $end );
 		echo "<!--WC_START-->";
 		echo json_encode( $this->results );
 		echo "<!--WC_END-->";

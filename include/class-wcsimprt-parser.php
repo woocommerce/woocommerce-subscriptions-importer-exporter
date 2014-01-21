@@ -5,11 +5,15 @@ class WCS_Import_Parser {
 	var $delimiter;
 	var $mapping = array();
 	var $results = array();
+	var $start_pos;
+	var $end_pos;
 
-	function import_data( $file, $delimiter, $mapping ) {
+	function import_data( $file, $delimiter, $mapping, $start, $end ) {
 		$file_path = addslashes( $file );
 		$this->delimiter = $delimiter;
 		$this->mapping = $mapping;
+		$this->start_pos = $start;
+		$this->end_pos = $end;
 
 		$this->import_start( $file_path );
 		return $this->results;
@@ -24,8 +28,12 @@ class WCS_Import_Parser {
 		if ( $file ) {
 			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
 				$row = array();
-
 				$header = fgetcsv( $handle, 0, $this->delimiter );
+
+				if( $this->start_pos != 0 ) {
+					fseek( $handle, $this->start_pos );
+				}
+
 				while ( ( $postmeta = fgetcsv( $handle, 0, $this->delimiter ) ) !== false ) {
 					foreach ( $header as $key => $heading ) {
 						if ( ! $heading ) continue;
@@ -44,6 +52,9 @@ class WCS_Import_Parser {
 					$end_date = ( ! empty( $this->mapping['end_date'] ) ) ? $row[$this->mapping['expiry_date']] : '';
 
 					$this->import( $product_id, $cust_id, $email, $username, $address, $status, $start_date, $expiry_date, $end_date );
+					if( ftell( $handle ) >= $this->end_pos ) {
+						break;
+					}
 				}
 			fclose( $handle );
 			}
@@ -78,7 +89,7 @@ class WCS_Import_Parser {
 		// Create the subscription - magic happens here
 
 		// Attache each subscription to the results array
-		array_push( $this->results, $subscription ); // Test the data correctly adds to the array and is printed to the console
+		array_push( $this->results, $prod ); // Test the data correctly adds to the array and is printed to the console
 	}
 
 	/* Check the product is a woocommerce subscription - an error status will show up on table if this is not the case. */
