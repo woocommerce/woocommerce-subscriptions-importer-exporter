@@ -161,12 +161,28 @@ class WCS_Admin_Importer {
 										<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
 										<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
 										<option value="customer_address" <?php selected( $header, 'customer_addresss' ); ?>>customer_address</option>
+										<option value="billing_address_1" <?php selected( $header, 'billing_address_1' ); ?>>billing_address_1</option>
+										<option value="billing_address_2" <?php selected( $header, 'billing_address_2' ); ?>>billing_address_2</option>
+										<option value="billing_city" <?php selected( $header, 'billing_city' ); ?>>billing_city</option>
+										<option value="billing_state" <?php selected( $header, 'billing_state' ); ?>>billing_state</option>
+										<option value="billing_postcode" <?php selected( $header, 'billing_postcode' ); ?>>billing_postcode</option>
+										<option value="billing_country" <?php selected( $header, 'billing_country' ); ?>>billing_country</option>
+										<option value="billing_email" <?php selected( $header, 'billing_email' ); ?>>billing_email</option>
+										<option value="billing_phone" <?php selected( $header, 'billing_phone' ); ?>>billing_phone</option>
+										<option value="shipping_address_1" <?php selected( $header, 'shipping_address_1' ); ?>>shipping_address_1</option>
+										<option value="shipping_address_2" <?php selected( $header, 'shipping_address_2' ); ?>>shipping_address_2</option>
+										<option value="shipping_city" <?php selected( $header, 'shipping_city' ); ?>>shipping_city</option>
+										<option value="shipping_state" <?php selected( $header, 'shipping_state' ); ?>>shipping_state</option>
+										<option value="shipping_postcode" <?php selected( $header, 'shipping_postcode' ); ?>>shipping_postcode</option>
+										<option value="shipping_country" <?php selected( $header, 'shipping_country' ); ?>>shipping_country</option>
 									</optgroup>
 									<option value="status" <?php selected( $header, 'status' ); ?>>status</option>
 									<option value="start_date" <?php selected( $header, 'start_date' ); ?>>start_date</option>
 									<option value="expiry_date" <?php selected( $header, 'expiry_date' ); ?>>expiry_date</option>
 									<option value="end_date" <?php selected( $header, 'end_date' ); ?>>end_date</option>
 								</optgroup>
+								<option value="payment_method" <?php selected( $header, 'payment_method' ); ?>>payment_method</option>
+								<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
 							</select>
 						</td>
 						<td width="25%"><?php echo $header; ?></td> <!-- Column deader from csv file -->
@@ -189,11 +205,29 @@ class WCS_Admin_Importer {
 			'customer_id' => '',
 			'customer_email' => '',
 			'customer_username' => '',
-			'customer_address' => '',
+			'billing_address_1' => '',
+			'billing_address_2' => '',
+			'billing_city' => '',
+			"billing_state",
+			"billing_postcode",
+			"billing_country",
+			"billing_email",
+			"billing_phone",
+			"shipping_first_name",
+			"shipping_last_name",
+			"shipping_company",
+			"shipping_address_1",
+			"shipping_address_2",
+			"shipping_city",
+			"shipping_state",
+			"shipping_postcode",
+			"shipping_country",
 			'status' => '',
 			'start_date' => '',
 			'expiry_date' => '',
-			'end_date' => ''
+			'end_date' => '',
+			'payment_method' => '',
+			'shipping_method' => ''
 		);
 
 		$mapping = $_POST['mapto'];
