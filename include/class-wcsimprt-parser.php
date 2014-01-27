@@ -8,6 +8,41 @@ class WCS_Import_Parser {
 	var $start_pos;
 	var $end_pos;
 
+	function __construct() {
+		$this->order_meta_fields = array(
+			"order_shipping",
+			"order_shipping_tax",
+			"order_tax",
+			"cart_discount",
+			"order_discount",
+			"order_total",
+			"payment_method",
+			"shipping_method",
+			"customer_user",
+			"billing_first_name",
+			"billing_last_name",
+			"billing_company",
+			"billing_address_1",
+			"billing_address_2",
+			"billing_city",
+			"billing_state",
+			"billing_postcode",
+			"billing_country",
+			"billing_email",
+			"billing_phone",
+			"shipping_first_name",
+			"shipping_last_name",
+			"shipping_company",
+			"shipping_address_1",
+			"shipping_address_2",
+			"shipping_city",
+			"shipping_state",
+			"shipping_postcode",
+			"shipping_country",
+			"Download Permissions Granted",
+		);
+	}
+
 	function import_data( $file, $delimiter, $mapping, $start, $end ) {
 		$file_path = addslashes( $file );
 		$this->delimiter = $delimiter;
@@ -51,7 +86,8 @@ class WCS_Import_Parser {
 					$expiry_date = ( ! empty( $this->mapping['expiry_date'] ) ) ? $row[$this->mapping['expiry_date']] : '';
 					$end_date = ( ! empty( $this->mapping['end_date'] ) ) ? $row[$this->mapping['expiry_date']] : '';
 
-					$this->import( $product_id, $cust_id, $email, $username, $address, $status, $start_date, $expiry_date, $end_date );
+					// will move to just sending $row instead of listing all these variables
+					$this->import( $product_id, $cust_id, $email, $username, $address, $status, $start_date, $expiry_date, $end_date, $row );
 					if( ftell( $handle ) >= $this->end_pos ) {
 						break;
 					}
@@ -66,8 +102,10 @@ class WCS_Import_Parser {
 	}
 
 	/* Import Subscription */
-	function import($prod, $cust, $email, $user, $addr, $status, $start, $expiry, $end ) {
+	function import($prod, $cust, $email, $user, $addr, $status, $start, $expiry, $end, $row ) {
 		global $woocommerce;
+
+		$postmeta = array();
 		$subscription = array();
 		// Check Product id a woocommerce product
 		if( ! ( $this->check_product( $prod ) ) ) {
@@ -75,21 +113,45 @@ class WCS_Import_Parser {
 		}
 
 		// Check customer id is valid or create one
-		$cust_id = $this->check_customer( $customer_id, $email, $username , $address );
-
+		$cust_id = $this->check_customer( $cust, $email, $user , $addr );
 		if ( empty( $cust_id ) ) {
 			// Error with customer information in line of csv
 			$subscription['error_customer'] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
 		}
 
-		// Set defaults for empty fields
-		if( empty( $status ) ) {
-			$status = 'pending';
+		// skip importing rows without the required information
+		if( ! empty( $subscription['error_customer'] ) || ! empty( $subscription['error_product'] ) ) {
+			array_push($this->results, $subscription);
+			return;
 		}
-		// Create the subscription - magic happens here
 
-		// Attache each subscription to the results array
-		array_push( $this->results, $prod ); // Test the data correctly adds to the array and is printed to the console
+		// populate order meta data
+		foreach( $this->order_meta_fields as $column ) {
+			switch( $column ) {
+				case 'shipping_method':
+					break;
+				case 'payment_method':
+					// default
+					if( empty( $row[$this->mapping[$column]] ) ) {
+						$postmeta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
+					} else {
+						// other payment options meta data
+					}
+					break;
+				default:
+					$value = isset( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
+					if( empty( $value ) ) {
+						$metadata = get_user_meta( $cust_id, $column );
+						$value = ( ! empty( $metadata) ) ? $metadata : '';
+					}
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
+
+			}
+		}
+
+		$subscription[] = $postmeta;
+		// Attach information on each order to the results array
+		array_push( $this->results, $subscription ); // Test the data correctly adds to the array and is printed to the console
 	}
 
 	/* Check the product is a woocommerce subscription - an error status will show up on table if this is not the case. */
@@ -100,12 +162,26 @@ class WCS_Import_Parser {
 
 	/* Checks customer information and creates a new store customer when no customer Id has been given */
 	function check_customer( $customer_id, $email, $username, $address ) {
+		$found_customer = false;
 		if( empty( $customer_id ) ) {
+			// check for registered email if customer id is not set
+			if( ! $found_customer && is_email( $email ) ) {
+					// check by email
+					$found_customer = email_exists( $email );
+			// if customer still not found, check by username
+			} elseif( ! $found_customer && ! empty( $username ) ) {
+				$found_customer = username_exists( $username );
+			}
+
 			// try creating a customer from email, username and address information
-			return 1;
+			if( ! $found_customer && is_email( $email ) && ! empty( $username ) ) {
+				$found_customer = wp_create_user( $username, '1234', $email );
+			}
+			return $found_customer;
 		} else {
 			// check customer id
-			return $customer_id;
+			$found_customer = get_user_by( 'id', $customer_id );
+			return $found_customer;
 		}
 	}
 }
