@@ -7,8 +7,10 @@ class WCS_Import_Parser {
 	var $results = array();
 	var $start_pos;
 	var $end_pos;
+	var $available_gateways;
 
 	function __construct() {
+		// Order meta values
 		$this->order_meta_fields = array(
 			"order_shipping",
 			"order_shipping_tax",
@@ -44,11 +46,15 @@ class WCS_Import_Parser {
 	}
 
 	function import_data( $file, $delimiter, $mapping, $start, $end ) {
+		global $woocommerce;
 		$file_path = addslashes( $file );
 		$this->delimiter = $delimiter;
 		$this->mapping = $mapping;
 		$this->start_pos = $start;
 		$this->end_pos = $end;
+
+		// Get the stores available payment gateways
+		$this->available_gateways = $woocommerce->payment_gateways->get_available_payment_gateways();
 
 		$this->import_start( $file_path );
 		return $this->results;
@@ -129,29 +135,49 @@ class WCS_Import_Parser {
 		foreach( $this->order_meta_fields as $column ) {
 			switch( $column ) {
 				case 'shipping_method':
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => 'free_shipping' );
 					break;
 				case 'payment_method':
-					// default
-					if( empty( $row[$this->mapping[$column]] ) ) {
+					if( strtolower( $row[$this->mapping[$column]] ) == 'paypal' && ! empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
+						// Paypal
+					} else if( strtolower( $row[$this->mapping[$column]] ) == 'stripe' && ! empty( $row[$this->mapping['stripe_customer_id']] ) ) {
+						// Stripe
+					} else { // default to manual payment regardless
 						$postmeta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
-					} else {
-						// other payment options meta data
 					}
 					break;
 				default:
 					$value = isset( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
 					if( empty( $value ) ) {
 						$metadata = get_user_meta( $cust_id, $column );
-						$value = ( ! empty( $metadata) ) ? $metadata : '';
+						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
 					}
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
-
 			}
 		}
 
-		$subscription[] = $postmeta;
+		$order_data = array(
+				'post_date'     => date( 'Y-m-d H:i:s', time() ),
+				'post_type'     => 'shop_order',
+				'post_title'    => 'Order &ndash; ' . date( 'F j, Y @ h:i A', time() ),
+				'post_status'   => 'publish',
+				'ping_status'   => 'closed',
+				'post_author'   => 1,
+				'post_password' => uniqid( 'order_' ),  // Protects the post just in case
+		);
+
+		$order_id = wp_insert_post( $order_data );
+
+		foreach ( $postmeta as $meta ) {
+			update_post_meta( $order_id, $meta['key'], $meta['value'] );
+
+			if ( '_customer_user' == $meta['key'] && $meta['value'] ) {
+				update_user_meta( $meta['value'], "paying_customer", 1 );
+			}
+		}
+
 		// Attach information on each order to the results array
-		array_push( $this->results, $subscription ); // Test the data correctly adds to the array and is printed to the console
+		array_push( $this->results, $order_id ); // Test the data correctly adds to the array and is printed to the console
 	}
 
 	/* Check the product is a woocommerce subscription - an error status will show up on table if this is not the case. */
@@ -176,6 +202,7 @@ class WCS_Import_Parser {
 			// try creating a customer from email, username and address information
 			if( ! $found_customer && is_email( $email ) && ! empty( $username ) ) {
 				$found_customer = wp_create_user( $username, '1234', $email );
+				update_user_meta( $found_customer, 'billing_email', $meta_value );
 			}
 			return $found_customer;
 		} else {
