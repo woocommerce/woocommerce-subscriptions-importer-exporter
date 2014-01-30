@@ -161,6 +161,8 @@ class WCS_Admin_Importer {
 										<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
 										<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
 										<option value="customer_address" <?php selected( $header, 'customer_addresss' ); ?>>customer_address</option>
+										<option value="billing_first_name" <?php selected( $header, 'billing_first_name' ); ?>>billing_first_name</option>
+										<option value="billing_last_name" <?php selected( $header, 'billing_last_name' ); ?>>billing_last_name</option>
 										<option value="billing_address_1" <?php selected( $header, 'billing_address_1' ); ?>>billing_address_1</option>
 										<option value="billing_address_2" <?php selected( $header, 'billing_address_2' ); ?>>billing_address_2</option>
 										<option value="billing_city" <?php selected( $header, 'billing_city' ); ?>>billing_city</option>
@@ -205,23 +207,25 @@ class WCS_Admin_Importer {
 			'customer_id' => '',
 			'customer_email' => '',
 			'customer_username' => '',
+			'billing_first_name' => '',
+			'billing_last_name' => '',
 			'billing_address_1' => '',
 			'billing_address_2' => '',
 			'billing_city' => '',
-			"billing_state",
-			"billing_postcode",
-			"billing_country",
-			"billing_email",
-			"billing_phone",
-			"shipping_first_name",
-			"shipping_last_name",
-			"shipping_company",
-			"shipping_address_1",
-			"shipping_address_2",
-			"shipping_city",
-			"shipping_state",
-			"shipping_postcode",
-			"shipping_country",
+			"billing_state" => '',
+			"billing_postcode" => '',
+			"billing_country" => '',
+			"billing_email" => '',
+			"billing_phone" => '',
+			"shipping_first_name" => '',
+			"shipping_last_name" => '',
+			"shipping_company" => '',
+			"shipping_address_1" => '',
+			"shipping_address_2" => '',
+			"shipping_city" => '',
+			"shipping_state" => '',
+			"shipping_postcode" => '',
+			"shipping_country" => '',
 			'status' => '',
 			'start_date' => '',
 			'expiry_date' => '',

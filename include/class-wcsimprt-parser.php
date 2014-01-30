@@ -43,6 +43,30 @@ class WCS_Import_Parser {
 			"shipping_country",
 			"Download Permissions Granted",
 		);
+
+		// User meta data
+		$this->user_data_titles = array (
+			"billing_first_name",
+			"billing_last_name",
+			"billing_company",
+			"billing_address_1",
+			"billing_address_2",
+			"billing_city",
+			"billing_state",
+			"billing_postcode",
+			"billing_country",
+			"billing_email",
+			"billing_phone",
+			"shipping_first_name",
+			"shipping_last_name",
+			"shipping_company",
+			"shipping_address_1",
+			"shipping_address_2",
+			"shipping_city",
+			"shipping_state",
+			"shipping_postcode",
+			"shipping_country",
+		);
 	}
 
 	function import_data( $file, $delimiter, $mapping, $start, $end ) {
@@ -119,7 +143,7 @@ class WCS_Import_Parser {
 		}
 
 		// Check customer id is valid or create one
-		$cust_id = $this->check_customer( $cust, $email, $user , $addr );
+		$cust_id = $this->check_customer( $cust, $email, $user , $addr, $row );
 		if ( empty( $cust_id ) ) {
 			// Error with customer information in line of csv
 			$subscription['error_customer'] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
@@ -187,7 +211,7 @@ class WCS_Import_Parser {
 	}
 
 	/* Checks customer information and creates a new store customer when no customer Id has been given */
-	function check_customer( $customer_id, $email, $username, $address ) {
+	function check_customer( $customer_id, $email, $username, $address, $row ) {
 		$found_customer = false;
 		if( empty( $customer_id ) ) {
 			// check for registered email if customer id is not set
@@ -202,7 +226,18 @@ class WCS_Import_Parser {
 			// try creating a customer from email, username and address information
 			if( ! $found_customer && is_email( $email ) && ! empty( $username ) ) {
 				$found_customer = wp_create_user( $username, '1234', $email );
-				update_user_meta( $found_customer, 'billing_email', $meta_value );
+				// update user meta data
+				foreach( $this->user_data_titles as $key ) {
+					switch( $key ) {
+						case 'billing_email':
+							// user billing email if set in csv otherwise use the user's account email
+							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : $email;
+							break;
+						default:
+							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : '';
+							update_user_meta( $found_customer, $key, $meta_value );
+					}
+				}
 			}
 			return $found_customer;
 		} else {
