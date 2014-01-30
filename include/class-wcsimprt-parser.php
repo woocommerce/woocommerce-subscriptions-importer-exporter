@@ -232,6 +232,7 @@ class WCS_Import_Parser {
 						case 'billing_email':
 							// user billing email if set in csv otherwise use the user's account email
 							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : $email;
+							update_user_meta( $found_customer, $key, $meta_value );
 							break;
 						default:
 							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : '';
