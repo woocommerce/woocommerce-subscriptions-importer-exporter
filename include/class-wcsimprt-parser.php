@@ -252,10 +252,13 @@ class WCS_Import_Parser {
 				'expiry_date' => ( ! empty( $row[$this->mapping['expiry_date']] ) ) ? $row[$this->mapping['expiry_date']] : '',
 			);
 		WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
-		
-		$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $product->id );
-		WC_Subscriptions_Manager::activate_subscription( $cust_id, $sub_key );
-	
+
+		// Update the status of the subscription order
+		if( ! empty( $this->mapping['status'] ) && $row[$this->mapping['status']] ) {
+			WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['status']] ) );
+		} else {
+			WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
+		}
 
 		// Attach information on each order to the results array
 		array_push( $this->results, $order_id ); // Test the data correctly adds to the array and is printed to the console
