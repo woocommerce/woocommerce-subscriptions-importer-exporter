@@ -160,7 +160,6 @@ class WCS_Admin_Importer {
 									<optgroup label="<?php _e( 'Other Customer Data', 'wcs_import' ); ?>">
 										<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
 										<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
-										<option value="customer_address" <?php selected( $header, 'customer_addresss' ); ?>>customer_address</option>
 										<option value="billing_first_name" <?php selected( $header, 'billing_first_name' ); ?>>billing_first_name</option>
 										<option value="billing_last_name" <?php selected( $header, 'billing_last_name' ); ?>>billing_last_name</option>
 										<option value="billing_address_1" <?php selected( $header, 'billing_address_1' ); ?>>billing_address_1</option>
@@ -178,11 +177,25 @@ class WCS_Admin_Importer {
 										<option value="shipping_postcode" <?php selected( $header, 'shipping_postcode' ); ?>>shipping_postcode</option>
 										<option value="shipping_country" <?php selected( $header, 'shipping_country' ); ?>>shipping_country</option>
 									</optgroup>
-									<option value="status" <?php selected( $header, 'status' ); ?>>status</option>
-									<option value="start_date" <?php selected( $header, 'start_date' ); ?>>start_date</option>
-									<option value="expiry_date" <?php selected( $header, 'expiry_date' ); ?>>expiry_date</option>
-									<option value="end_date" <?php selected( $header, 'end_date' ); ?>>end_date</option>
+									<option value="subscription_status" <?php selected( $header, 'subscription_status' ); ?>>subscription_status</option>
+									<option value="subscription_start_date" <?php selected( $header, 'subscription_start_date' ); ?>>subscription_start_date</option>
+									<option value="subscription_expiry_date" <?php selected( $header, 'subscription_expiry_date' ); ?>>subscription_expiry_date</option>
+									<option value="subscription_end_date" <?php selected( $header, 'subscription_end_date' ); ?>>subscription_end_date</option>
 								</optgroup>
+								<option value="recurring_line_total" <?php selected( $header, 'recurring_line_total' ); ?>>recurring_line_total</option>
+								<option value="recurring_line_tax" <?php selected( $header, 'recurring_line_tax' ); ?>>recurring_line_tax</option>
+								<option value="recurring_line_subtotal" <?php selected( $header, 'recurring_line_subtotal' ); ?>>recurring_line_subtotal</option>
+								<option value="recurring_line_subtotal_tax" <?php selected( $header, 'recurring_line_subtotal_tax' ); ?>>recurring_line_subtotal_tax</option>
+								<option value="line_total" <?php selected( $header, 'line_total' ); ?>>line_total</option>
+								<option value="line_tax" <?php selected( $header, 'line_tax' ); ?>>line_tax</option>
+								<option value="line_subtotal" <?php selected( $header, 'line_subtotal' ); ?>>line_subtotal</option>
+								<option value="line_subtotal_tax" <?php selected( $header, 'line_subtotal_tax' ); ?>>line_subtotal_tax</option>
+								<option value="order_discount" <?php selected( $header, 'order_discount' ); ?>>order_discount</option>
+								<option value="cart_discount" <?php selected( $header, 'cart_discount' ); ?>>cart_discount</option>
+								<option value="order_shipping_tax" <?php selected( $header, 'order_shipping_tax' ); ?>>order_shipping_tax</option>
+								<option value="order_shipping" <?php selected( $header, 'order_shipping' ); ?>>order_shipping</option>
+								<option value="order_tax" <?php selected( $header, 'order_tax' ); ?>>order_tax</option>
+								<option value="order_total" <?php selected( $header, 'order_total' ); ?>>order_total</option>
 								<option value="payment_method" <?php selected( $header, 'payment_method' ); ?>>payment_method</option>
 								<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
 							</select>
@@ -202,36 +215,51 @@ class WCS_Admin_Importer {
 
 	/* Checks the mapping provides enough information to continue importing subscriptions */
 	function check_mapping() {
+		// Possible mapping options
 		$this->mapping = array(
-			'product_id' => '',
-			'customer_id' => '',
-			'customer_email' => '',
-			'customer_username' => '',
-			'billing_first_name' => '',
-			'billing_last_name' => '',
-			'billing_address_1' => '',
-			'billing_address_2' => '',
-			'billing_city' => '',
-			"billing_state" => '',
-			"billing_postcode" => '',
-			"billing_country" => '',
-			"billing_email" => '',
-			"billing_phone" => '',
-			"shipping_first_name" => '',
-			"shipping_last_name" => '',
-			"shipping_company" => '',
-			"shipping_address_1" => '',
-			"shipping_address_2" => '',
-			"shipping_city" => '',
-			"shipping_state" => '',
-			"shipping_postcode" => '',
-			"shipping_country" => '',
-			'status' => '',
-			'start_date' => '',
-			'expiry_date' => '',
-			'end_date' => '',
-			'payment_method' => '',
-			'shipping_method' => ''
+			'product_id'				  => '',
+			'customer_id' 				  => '',
+			'customer_email' 			  => '',
+			'customer_username' 		  => '',
+			'billing_first_name' 		  => '',
+			'billing_last_name' 		  => '',
+			'billing_address_1' 		  => '',
+			'billing_address_2' 		  => '',
+			'billing_city' 				  => '',
+			'billing_state' 			  => '',
+			'billing_postcode' 			  => '',
+			'billing_country' 			  => '',
+			'billing_email' 			  => '',
+			'billing_phone' 			  => '',
+			'shipping_first_name' 		  => '',
+			'shipping_last_name' 		  => '',
+			'shipping_company' 			  => '',
+			'shipping_address_1' 		  => '',
+			'shipping_address_2' 		  => '',
+			'shipping_city' 			  => '',
+			'shipping_state' 			  => '',
+			'shipping_postcode' 		  => '',
+			'shipping_country' 			  => '',
+			'subscription_status'		  => '',
+			'subscription_start_date' 	  => '',
+			'subscription_expiry_date'	  => '',
+			'subscription_end_date'		  => '',
+			'payment_method' 			  => '',
+			'shipping_method' 			  => '',
+			'recurring_line_total' 		  => '',
+			'recurring_line_tax' 		  => '',
+			'recurring_line_subtotal' 	  => '',
+			'recurring_line_subtotal_tax' => '',
+			'line_total' 				  => '',
+			'line_tax' 					  => '',
+			'line_subtotal' 			  => '',
+			'line_subtotal_tax' 		  => '',
+			'order_discount' 			  => '',
+			'cart_discount' 			  => '',
+			'order_shipping_tax' 		  => '',
+			'order_shipping'			  => '',
+			'order_tax'					  => '',
+			'order_total' 				  => '',
 		);
 
 		$mapping = $_POST['mapto'];
