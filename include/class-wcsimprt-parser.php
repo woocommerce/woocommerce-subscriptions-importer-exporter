@@ -117,14 +117,13 @@ class WCS_Import_Parser {
 					$cust_id = ( ! empty( $this->mapping['customer_id'] ) ) ? $row[$this->mapping['customer_id']] : '';
 					$email = ( ! empty( $this->mapping['customer_email'] ) ) ? $row[$this->mapping['customer_email']] : '';
 					$username = ( ! empty( $this->mapping['customer_username'] ) ) ? $row[$this->mapping['customer_username']] : '';
-					$address = ( ! empty( $this->mapping['customer_address'] ) ) ? $row[$this->mapping['customer_address']] : '';
-					$status = ( ! empty( $this->mapping['status'] ) ) ? $row[$this->mapping['status']] : 'pending';
-					$start_date = ( ! empty( $this->mapping['start_date'] ) ) ? $row[$this->mapping['start_date']] : '';
-					$expiry_date = ( ! empty( $this->mapping['expiry_date'] ) ) ? $row[$this->mapping['expiry_date']] : '';
-					$end_date = ( ! empty( $this->mapping['end_date'] ) ) ? $row[$this->mapping['expiry_date']] : '';
+					$status = ( ! empty( $this->mapping['subscription_status'] ) ) ? $row[$this->mapping['subscription_status']] : 'pending';
+					$start_date = ( ! empty( $this->mapping['subscription_start_date'] ) ) ? $row[$this->mapping['startsubscription_start_date_date']] : '';
+					$expiry_date = ( ! empty( $this->mapping['subscription_expiry_date'] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '';
+					$end_date = ( ! empty( $this->mapping['subscription_end_date'] ) ) ? $row[$this->mapping['subscription_end_date']] : '';
 
 					// will move to just sending $row instead of listing all these variables
-					$this->import( $product_id, $cust_id, $email, $username, $address, $status, $start_date, $expiry_date, $end_date, $row );
+					$this->import( $product_id, $cust_id, $email, $username, $status, $start_date, $expiry_date, $end_date, $row );
 					if( ftell( $handle ) >= $this->end_pos ) {
 						break;
 					}
@@ -139,7 +138,7 @@ class WCS_Import_Parser {
 	}
 
 	/* Import Subscription */
-	function import($prod, $cust, $email, $user, $addr, $status, $start, $expiry, $end, $row ) {
+	function import($prod, $cust, $email, $user, $status, $start, $expiry, $end, $row ) {
 		global $woocommerce;
 
 		$postmeta = array();
@@ -150,7 +149,7 @@ class WCS_Import_Parser {
 		}
 
 		// Check customer id is valid or create one
-		$cust_id = $this->check_customer( $cust, $email, $user , $addr, $row );
+		$cust_id = $this->check_customer( $cust, $email, $user, $row );
 		if ( empty( $cust_id ) ) {
 			// Error with customer information in line of csv
 			$subscription['error_customer'] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
@@ -236,28 +235,34 @@ class WCS_Import_Parser {
 				$value = ( ! empty( $row[$this->mapping[$metadata]] ) ) ? $row[$this->mapping[$metadata]] : 0;
 				wc_add_order_item_meta( $item_id, $metadata, $value );
 			}
-		}
 
-		// Store variation data in meta so admin can view it
-		/*if ( $values['variation'] && is_array( $values['variation'] ) )
-			foreach ( $values['variation'] as $key => $value )
-			wc_add_order_item_meta( $item_id, esc_attr( str_replace( 'attribute_', '', $key ) ), $value );*/
+			// Store variation data in meta so admin can view it
+			/*if ( $values['variation'] && is_array( $values['variation'] ) )
+				foreach ( $values['variation'] as $key => $value )
+				wc_add_order_item_meta( $item_id, esc_attr( str_replace( 'attribute_', '', $key ) ), $value );*/
 
-		// Add line item meta for backorder status
-		if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) )
-			wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
+			// Add line item meta for backorder status
+			if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) )
+				wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
 
-		$subscription_meta[] = array (
-				'start_date'  => ( $row[$this->mapping['start_date']] ) ? $row[$this->mapping['start_date']] : '',
-				'expiry_date' => ( ! empty( $row[$this->mapping['expiry_date']] ) ) ? $row[$this->mapping['expiry_date']] : '',
+			// Update the subscription meta data with values in $subscription_meta
+			$subscription_meta = array (
+					'start_date' 	=> ( ! empty( $row[$this->mapping['subscription_start_date']] ) ) ? $row[$this->mapping['subscription_start_date']] : '',
+					'expiry_date'	=> ( ! empty( $row[$this->mapping['subscription_expiry_date']] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '',
+					'end_date'		=> ( ! empty( $row[$this->mapping['subscription_end_date']] ) ) ? $row[$this->mapping['subscription_end_date']] : '',
 			);
-		WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
+			// Create pening Subscription
+			WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
+			// Add additional subscription meta data
+			$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $product->id );
+			WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
 
-		// Update the status of the subscription order
-		if( ! empty( $this->mapping['status'] ) && $row[$this->mapping['status']] ) {
-			WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['status']] ) );
-		} else {
-			WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
+			// Update the status of the subscription order
+			if( ! empty( $this->mapping['subscription_status'] ) && $row[$this->mapping['subscription_status']] ) {
+				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['subscription_status']] ) );
+			} else {
+				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
+			}
 		}
 
 		// Attach information on each order to the results array
@@ -271,7 +276,7 @@ class WCS_Import_Parser {
 	}
 
 	/* Checks customer information and creates a new store customer when no customer Id has been given */
-	function check_customer( $customer_id, $email, $username, $address, $row ) {
+	function check_customer( $customer_id, $email, $username, $row ) {
 		$found_customer = false;
 		if( empty( $customer_id ) ) {
 			// check for registered email if customer id is not set
