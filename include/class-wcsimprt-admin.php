@@ -198,6 +198,7 @@ class WCS_Admin_Importer {
 								<option value="order_total" <?php selected( $header, 'order_total' ); ?>>order_total</option>
 								<option value="payment_method" <?php selected( $header, 'payment_method' ); ?>>payment_method</option>
 								<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
+								<option value="stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
 							</select>
 						</td>
 						<td width="25%"><?php echo $header; ?></td> <!-- Column deader from csv file -->
@@ -260,6 +261,7 @@ class WCS_Admin_Importer {
 			'order_shipping'			  => '',
 			'order_tax'					  => '',
 			'order_total' 				  => '',
+			'stripe_customer_id'		  => '',
 		);
 
 		$mapping = $_POST['mapto'];

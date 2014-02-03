@@ -172,6 +172,12 @@ class WCS_Import_Parser {
 						// Paypal
 					} else if( strtolower( $row[$this->mapping[$column]] ) == 'stripe' && ! empty( $row[$this->mapping['stripe_customer_id']] ) ) {
 						// Stripe
+						$stripe_cust_id = $row[$this->mapping['stripe_customer_id']];
+						// $stripe_cust_id will be checked before this point to make sure it's not null
+						$postmeta[] = array( 'key' => '_' . $column, 'value' => 'stripe' );
+						$postmeta[] = array( 'key' => '_recurring_payment_method', 'value' => 'stripe' );
+						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => 'Electronic Transfer' );
+						$postmeta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
 					} else { // default to manual payment regardless
 						$postmeta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
 					}
