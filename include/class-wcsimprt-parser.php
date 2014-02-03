@@ -254,7 +254,7 @@ class WCS_Import_Parser {
 			// Create pening Subscription
 			WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
 			// Add additional subscription meta data
-			$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $product->id );
+			$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
 			WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
 
 			// Update the status of the subscription order
@@ -265,8 +265,17 @@ class WCS_Import_Parser {
 			}
 		}
 
-		// Attach information on each order to the results array
-		array_push( $this->results, $order_id ); // Test the data correctly adds to the array and is printed to the console
+		// Check if the subscription has been successfully added
+		$key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
+		$subscription_check = WC_Subscriptions_Manager::get_subscription_key( $key );
+		if( ! empty ( $subscription_check['order_id'] ) ) {
+			// successfully added subscription
+			// Attach information on each order to the results array
+			$subscription = array();
+			array_push( $this->results, $subscription );
+		}
+
+		
 	}
 
 	/* Check the product is a woocommerce subscription - an error status will show up on table if this is not the case. */
