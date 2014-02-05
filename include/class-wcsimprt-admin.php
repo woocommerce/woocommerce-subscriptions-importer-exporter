@@ -359,6 +359,7 @@ class WCS_Admin_Importer {
 							type:	'POST',
 							data:	data,
 							success: function( response ) {
+								console.log(response);
 								count++;
 								// Update confirmation table
 								check_completed();

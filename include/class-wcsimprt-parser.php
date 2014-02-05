@@ -282,11 +282,10 @@ class WCS_Import_Parser {
 
 		// Check if the subscription has been successfully added
 		$key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
-		$subscription_check = WC_Subscriptions_Manager::get_subscription_key( $key );
+		$subscription_check = WC_Subscriptions_Manager::get_subscription( $key );
 		if( ! empty ( $subscription_check['order_id'] ) ) {
 			// successfully added subscription
 			// Attach information on each order to the results array
-			$subscription = array();
 			array_push( $this->results, $subscription );
 		}
 
