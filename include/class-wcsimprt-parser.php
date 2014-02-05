@@ -8,6 +8,7 @@ class WCS_Import_Parser {
 	var $start_pos;
 	var $end_pos;
 	var $available_gateways;
+	var $available_shipping_methods;
 
 	function __construct() {
 		// Order meta values
@@ -86,6 +87,7 @@ class WCS_Import_Parser {
 
 		// Get the stores available payment gateways
 		$this->available_gateways = $woocommerce->payment_gateways->get_available_payment_gateways();
+		$this->available_shipping_methods  = $woocommerce->shipping->load_shipping_methods();
 
 		$this->import_start( $file_path );
 		return $this->results;
@@ -165,7 +167,13 @@ class WCS_Import_Parser {
 		foreach( $this->order_meta_fields as $column ) {
 			switch( $column ) {
 				case 'shipping_method':
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => 'free_shipping' );
+					$method = ( ! empty( $row[$this->mapping['shipping_method']] ) ) ? $row[$this->mapping['shipping_method']] : '';
+					$title = ( ! empty( $row[$this->mapping['shipping_method_title']] ) ) ? $row[$this->mapping['shipping_method_title']] : '';
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $method );
+					$postmeta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
+					if( empty( $method ) || empty( $title ) ) {
+						// set up warning message to show admin
+					}
 					break;
 				case 'payment_method':
 					if( strtolower( $row[$this->mapping[$column]] ) == 'paypal' && ! empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
@@ -173,8 +181,10 @@ class WCS_Import_Parser {
 					} else if( strtolower( $row[$this->mapping[$column]] ) == 'stripe' && ! empty( $row[$this->mapping['stripe_customer_id']] ) ) {
 						// Stripe
 						$stripe_cust_id = $row[$this->mapping['stripe_customer_id']];
+						$title = ( ! empty( $row[$this->mapping['payment_method_title']] ) ) ? $row[$this->mapping['payment_method_title']] : '';
 						// $stripe_cust_id will be checked before this point to make sure it's not null
 						$postmeta[] = array( 'key' => '_' . $column, 'value' => 'stripe' );
+						$postmeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
 						$postmeta[] = array( 'key' => '_recurring_payment_method', 'value' => 'stripe' );
 						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => 'Electronic Transfer' );
 						$postmeta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
@@ -183,7 +193,6 @@ class WCS_Import_Parser {
 					}
 					break;
 				case 'customer_user':
-
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $cust_id);
 					break;
 				default:
@@ -220,36 +229,36 @@ class WCS_Import_Parser {
 		$_product = get_product( $prod );
 
 		// Add line item
-		$item_id = wc_add_order_item( $order_id, array(
+		$item_id = woocommerce_add_order_item( $order_id, array(
 			'order_item_name' => $_product->get_title(),
 			'order_item_type' => 'line_item'
 		) );
 
 		// Add line item meta
 		if ( $item_id ) {
-			wc_add_order_item_meta( $item_id, '_qty', apply_filters( 'woocommerce_stock_amount', 1 ) );
-			wc_add_order_item_meta( $item_id, '_tax_class', $_product->get_tax_class() );
-			wc_add_order_item_meta( $item_id, '_product_id', $_product->id );
-			wc_add_order_item_meta( $item_id, '_variation_id', '');
-			wc_add_order_item_meta( $item_id, '_line_subtotal', '' );
-			wc_add_order_item_meta( $item_id, '_line_total', '' );
-			wc_add_order_item_meta( $item_id, '_line_tax', '' );
-			wc_add_order_item_meta( $item_id, '_line_subtotal_tax', '' );
+			woocommerce_add_order_item_meta( $item_id, '_qty', apply_filters( 'woocommerce_stock_amount', 1 ) );
+			woocommerce_add_order_item_meta( $item_id, '_tax_class', $_product->get_tax_class() );
+			woocommerce_add_order_item_meta( $item_id, '_product_id', $_product->id );
+			woocommerce_add_order_item_meta( $item_id, '_variation_id', '');
+			woocommerce_add_order_item_meta( $item_id, '_line_subtotal', '' );
+			woocommerce_add_order_item_meta( $item_id, '_line_total', '' );
+			woocommerce_add_order_item_meta( $item_id, '_line_tax', '' );
+			woocommerce_add_order_item_meta( $item_id, '_line_subtotal_tax', '' );
 
 			// add the additional subscription meta data to the order
 			foreach( $this->order_item_meta_fields as $metadata ) {
 				$value = ( ! empty( $row[$this->mapping[$metadata]] ) ) ? $row[$this->mapping[$metadata]] : 0;
-				wc_add_order_item_meta( $item_id, $metadata, $value );
+				woocommerce_add_order_item_meta( $item_id, $metadata, $value );
 			}
 
 			// Store variation data in meta so admin can view it
 			/*if ( $values['variation'] && is_array( $values['variation'] ) )
 				foreach ( $values['variation'] as $key => $value )
-				wc_add_order_item_meta( $item_id, esc_attr( str_replace( 'attribute_', '', $key ) ), $value );*/
+				woocommerce_add_order_item_meta( $item_id, esc_attr( str_replace( 'attribute_', '', $key ) ), $value );*/
 
 			// Add line item meta for backorder status
 			if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) )
-				wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
+				woocommerce_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
 
 			// Update the subscription meta data with values in $subscription_meta
 			$subscription_meta = array (
@@ -281,7 +290,6 @@ class WCS_Import_Parser {
 			array_push( $this->results, $subscription );
 		}
 
-		
 	}
 
 	/* Check the product is a woocommerce subscription - an error status will show up on table if this is not the case. */
