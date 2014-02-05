@@ -280,6 +280,7 @@ class WCS_Admin_Importer {
 	/* Sets up the AJAX requests and calls import_AJAX_start( .. ) */
 	function AJAX_setup() {
 		$request_limit = 15; // May change
+		$file_positions = array();
 		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
 		if( empty( $_POST['file_url'] ) ) {
 			$file = get_attached_file( $_POST['file_id'] );
@@ -299,50 +300,74 @@ class WCS_Admin_Importer {
 		if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
 			while ( ( $postmeta = fgetcsv( $handle, 0, $delimiter ) ) !== FALSE ) {
 				$count++;
-				$total++;
 
 				if ( $count >= $request_limit ) {
 					$previous_pos = $position;
 					$position = ftell( $handle );
 					$count = 0;
-
+					$total++;
 					// Import rows between $previous_position $position
-					$this->import_AJAX_start( $file, $delimiter, $previous_pos, $position );
+					$file_positions[] = $previous_pos;
+					$file_positions[] = $position;
+					//$this->import_AJAX_start( $file, $delimiter, $previous_pos, $position );
 				}
 			}
 
 			// Account for the remainder
 			if ( $count > 0 ) {
 				//rows.push( [ <?php echo $position; , '' ] );
-				$this->import_AJAX_start( $file, $delimiter, $position, ftell( $handle ) );
+				$total++;
+				//$this->import_AJAX_start( $file, $delimiter, $position, ftell( $handle ) );
+				$file_positions[] = $position;
+				$file_positions[] = ftell( $handle );
 			}
 			fclose( $handle );
 		}
+		$this->import_AJAX_start( $file, $delimiter, $file_positions, $total );
 	}
 
 	/* Sends the AJAX call and waits for the repsonse data to fill in the confirmation table. */
-	function import_AJAX_start( $file, $delimiter, $start_pos, $end_pos ) {
+	function import_AJAX_start( $file, $delimiter, $file_positions, $total ) {
+		$array = json_encode($file_positions);
 		?>
 		<script>
 			jQuery(document).ready(function($) {
 				/* AJAX Request to import subscriptions */
-					var data = {
-						action:		'wcs_import_request',
-						mapping:	'<?php echo json_encode( $this->mapping ); ?>',
-						delimiter:	'<?php echo $delimiter; ?>',
-						file:		'<?php echo addslashes( $file ); ?>',
-						start:		'<?php echo $start_pos; ?>',
-						end:		'<?php echo $end_pos; ?>'
+					var positions = <?php echo $array; ?>;
+					var total = <?php echo $total; ?>;
+					var count = 0;
+					for( var i = 0; i < positions.length; i+=2 ) {
+						AJAX_import( positions[i], positions[i+1] );
 					}
-console.log(data);
-					$.ajax({
-						url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4'), admin_url( 'admin-ajax.php' ) ) ; ?>',
-						type:	'POST',
-						data:	data,
-						success: function( response ) {
-							console.log(response);
+
+					function AJAX_import( start_pos, end_pos ) {
+						var data = {
+							action:		'wcs_import_request',
+							mapping:	'<?php echo json_encode( $this->mapping ); ?>',
+							delimiter:	'<?php echo $delimiter; ?>',
+							file:		'<?php echo addslashes( $file ); ?>',
+							start:		start_pos,
+							end:		end_pos,
 						}
-					});
+
+						$.ajax({
+							url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4'), admin_url( 'admin-ajax.php' ) ) ; ?>',
+							type:	'POST',
+							data:	data,
+							success: function( response ) {
+								count++;
+								// Update confirmation table
+								check_completed();
+							}
+						});
+					}
+
+					/* Check the number of requests has been completed */
+					function check_completed() {
+						if( count >= total ) {
+							console.log('request completed');
+						}
+					}
 					console.log('<?php echo addslashes( $file ); ?>');
 					console.log('<?php echo json_encode( $_POST['mapto'] ); ?>');
 					console.log('<?php echo $delimiter; ?>');
