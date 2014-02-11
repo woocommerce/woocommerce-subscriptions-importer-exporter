@@ -362,6 +362,38 @@ class WCS_Admin_Importer {
 								console.log(response);
 								count++;
 								// Update confirmation table
+								// Get the valid JSON only from the returned string
+								if ( response.indexOf("<!--WC_START-->") >= 0 ) {
+									response = response.split("<!--WC_START-->")[1]; // Strip off before after WC_START
+								}
+								if ( response.indexOf("<!--WC_END-->") >= 0 ) {
+									response = response.split("<!--WC_END-->")[0]; // Strip off anything after WC_END
+								}
+								// Parse
+								var results = $.parseJSON( response );
+								for( var i = 0; i < results.length; i++ ){
+									var warnings = results[i].warning;
+									$('#import-progress tbody').append( '<tr>' );
+									if( warnings.length > 0 ) {
+										$('#import-progress tbody').append( '<td class="row">' + results[i].status + ' ( !! )</td>' );
+									} else {
+										$('#import-progress tbody').append( '<td class="row">' + results[i].status + '</td>' );
+									}
+									$('#import-progress tbody').append( '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>');
+									$('#import-progress tbody').append( '<td class="row">' + results[i].item + ' ( #' + results[i].item_id + ' )</td>' );
+									$('#import-progress tbody').append( '<td class="row">' + results[i].username + ' ( #' + results[i].user_id + ' )</td>' );
+									$('#import-progress tbody').append( '<td class="row">' + results[i].subscription_status + '</td>' );
+									$('#import-progress tbody').append( '<td class="row">' + warnings.length + '</td></tr>' );
+
+									// Display Warnings
+									if( warnings.length > 0 ) {
+										var warningString = 'Warning/s:';
+										for( var x = 0; x < warnings.length; x++ ) {
+											warningString += ' - ' + warnings[x];
+										}
+										$('#import-progress tbody').append( '<tr><td colspan="6"><strong>' + warningString + '</strong></td></tr>');
+									}
+								}
 								check_completed();
 							}
 						});
@@ -413,20 +445,22 @@ class WCS_Admin_Importer {
 	/* Step 3: Displays the information about to be uploaded and waits for confirmation by the admin. */
 	function confirmation_table() { 
 		global $file;
-		echo '<h3>' . __( 'Step 3: Confirmation', 'wcs_import' ) . '</h3>';
+		echo '<h3>' . __( 'Step 3: File Stage', 'wcs_import' ) . '</h3>';
 		?>
 		<table id="import-progress" class="widefat_importer widefat">
 			<thead>
 				<tr>
-					<th class="status">&nbsp;</th>
-					<th class="row"><?php _e( 'Row', 'wcs_import' ); ?></th>
-					<th><?php _e( 'Subscription', 'wcs_import' ); ?></th>
-					<th class="reason"><?php _e( 'Status Msg', 'wcs_import' ); ?></th>
+					<th class="row"><?php _e( 'Upload Status', 'wcs_import' ); ?></th>
+					<th class="row"><?php _e( 'Order #', 'wcs_import' ); ?></th>
+					<th class="row"><?php _e( 'Subscription', 'wcs_import' ); ?></th>
+					<th class="row"><?php _e( 'User Name', 'wcs_import' ); ?></th>
+					<th class="row"><?php _e( 'Subscription Status', 'wcs_import' ); ?></th>
+					<th class="row"><?php _e( 'Number of Warnings', 'wcs_import' ); ?></th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr class="importer-loading">
-					<td colspan="5"></td>
+					<td colspan="6"></td>
 				</tr>
 			</tfoot>
 			<tbody></tbody>

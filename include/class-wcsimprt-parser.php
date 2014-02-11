@@ -115,17 +115,8 @@ class WCS_Import_Parser {
 						$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? $this->format_data_from_csv( $postmeta[$key], $enc ) : '';
 					}
 
-					$product_id = $row[$this->mapping['product_id']];
-					$cust_id = ( ! empty( $this->mapping['customer_id'] ) ) ? $row[$this->mapping['customer_id']] : '';
-					$email = ( ! empty( $this->mapping['customer_email'] ) ) ? $row[$this->mapping['customer_email']] : '';
-					$username = ( ! empty( $this->mapping['customer_username'] ) ) ? $row[$this->mapping['customer_username']] : '';
-					$status = ( ! empty( $this->mapping['subscription_status'] ) ) ? $row[$this->mapping['subscription_status']] : 'pending';
-					$start_date = ( ! empty( $this->mapping['subscription_start_date'] ) ) ? $row[$this->mapping['startsubscription_start_date_date']] : '';
-					$expiry_date = ( ! empty( $this->mapping['subscription_expiry_date'] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '';
-					$end_date = ( ! empty( $this->mapping['subscription_end_date'] ) ) ? $row[$this->mapping['subscription_end_date']] : '';
-
 					// will move to just sending $row instead of listing all these variables
-					$this->import( $product_id, $cust_id, $email, $username, $status, $start_date, $expiry_date, $end_date, $row );
+					$this->import( $row );
 					if( ftell( $handle ) >= $this->end_pos ) {
 						break;
 					}
@@ -140,25 +131,31 @@ class WCS_Import_Parser {
 	}
 
 	/* Import Subscription */
-	function import($prod, $cust, $email, $user, $status, $start, $expiry, $end, $row ) {
+	function import( $row ) {
 		global $woocommerce;
 
 		$postmeta = array();
 		$subscription = array();
+		$subscription['warning'] = array();
 		// Check Product id a woocommerce product
-		if( ! ( $this->check_product( $prod ) ) ) {
+		if( ! ( $this->check_product( $row[$this->mapping['product_id']] ) ) ) {
 			$subscription['error_product'] = __( 'The product_id is not a subscription product in your store.', 'wcs_import' );
 		}
 
 		// Check customer id is valid or create one
-		$cust_id = $this->check_customer( $cust, $email, $user, $row );
+		$cust_id = $this->check_customer( $row );
 		if ( empty( $cust_id ) ) {
 			// Error with customer information in line of csv
 			$subscription['error_customer'] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
+		} else {
+			$customer = get_user_by( 'id', $cust_id );
+			$subscription['user_id'] = $customer->ID;
+			$subscription['username'] = $customer->user_login;
 		}
 
 		// skip importing rows without the required information
 		if( ! empty( $subscription['error_customer'] ) || ! empty( $subscription['error_product'] ) ) {
+			$subscription['status'] = __( 'error', 'wcs_import' );
 			array_push($this->results, $subscription);
 			return;
 		}
@@ -172,7 +169,8 @@ class WCS_Import_Parser {
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $method );
 					$postmeta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
 					if( empty( $method ) || empty( $title ) ) {
-						// set up warning message to show admin
+						// set up warning message to show admin -  Do i need be more specific??
+						$subscription['warning'][] = __( 'Shipping method and/or title for the order has been set to empty', 'wcs_import' );
 					}
 					break;
 				case 'payment_method':
@@ -190,6 +188,7 @@ class WCS_Import_Parser {
 						$postmeta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
 					} else { // default to manual payment regardless
 						$postmeta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
+						$subscription['warning'][] = __( 'No recognisable payment method has been specified therefore default payment method being used.', 'wcs_import' );
 					}
 					break;
 				case 'customer_user':
@@ -226,39 +225,34 @@ class WCS_Import_Parser {
 		}
 
 		// Add product to the order
-		$_product = get_product( $prod );
-
+		$_product = get_product( $row[$this->mapping['product_id']] );
+		$subscription['item'] = __( $_product->get_title(), 'wcs_import' );
 		// Add line item
-		$item_id = woocommerce_add_order_item( $order_id, array(
+		$item_id = wc_add_order_item( $order_id, array(
 			'order_item_name' => $_product->get_title(),
 			'order_item_type' => 'line_item'
 		) );
 
 		// Add line item meta
 		if ( $item_id ) {
-			woocommerce_add_order_item_meta( $item_id, '_qty', apply_filters( 'woocommerce_stock_amount', 1 ) );
-			woocommerce_add_order_item_meta( $item_id, '_tax_class', $_product->get_tax_class() );
-			woocommerce_add_order_item_meta( $item_id, '_product_id', $_product->id );
-			woocommerce_add_order_item_meta( $item_id, '_variation_id', '');
-			woocommerce_add_order_item_meta( $item_id, '_line_subtotal', '' );
-			woocommerce_add_order_item_meta( $item_id, '_line_total', '' );
-			woocommerce_add_order_item_meta( $item_id, '_line_tax', '' );
-			woocommerce_add_order_item_meta( $item_id, '_line_subtotal_tax', '' );
+			wc_add_order_item_meta( $item_id, '_qty', apply_filters( 'woocommerce_stock_amount', 1 ) );
+			wc_add_order_item_meta( $item_id, '_tax_class', $_product->get_tax_class() );
+			wc_add_order_item_meta( $item_id, '_product_id', $_product->id );
+			wc_add_order_item_meta( $item_id, '_variation_id', ( ! empty ($_product->variation_id ) ) ? $_product->variation_id : '');
+			wc_add_order_item_meta( $item_id, '_line_subtotal', '' );
+			wc_add_order_item_meta( $item_id, '_line_total', '' );
+			wc_add_order_item_meta( $item_id, '_line_tax', '' );
+			wc_add_order_item_meta( $item_id, '_line_subtotal_tax', '' );
 
 			// add the additional subscription meta data to the order
 			foreach( $this->order_item_meta_fields as $metadata ) {
 				$value = ( ! empty( $row[$this->mapping[$metadata]] ) ) ? $row[$this->mapping[$metadata]] : 0;
-				woocommerce_add_order_item_meta( $item_id, $metadata, $value );
+				wc_add_order_item_meta( $item_id, $metadata, $value );
 			}
-
-			// Store variation data in meta so admin can view it
-			/*if ( $values['variation'] && is_array( $values['variation'] ) )
-				foreach ( $values['variation'] as $key => $value )
-				woocommerce_add_order_item_meta( $item_id, esc_attr( str_replace( 'attribute_', '', $key ) ), $value );*/
 
 			// Add line item meta for backorder status
 			if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) )
-				woocommerce_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
+				wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
 
 			// Update the subscription meta data with values in $subscription_meta
 			$subscription_meta = array (
@@ -277,15 +271,23 @@ class WCS_Import_Parser {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['subscription_status']] ) );
 			} else {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
+				$subscription['warning'][] = __( 'Used default subscription status as none was given.', 'wcs_import' );
 			}
 		}
 
 		// Check if the subscription has been successfully added
 		$key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
 		$subscription_check = WC_Subscriptions_Manager::get_subscription( $key );
-		if( ! empty ( $subscription_check['order_id'] ) ) {
+		if( ! empty ( $subscription_check['order_id'] ) && ! empty ( $subscription_check['product_id'] ) ) {
 			// successfully added subscription
 			// Attach information on each order to the results array
+			$subscription['status'] = __( 'success', 'wcs_import' );
+			$subscription['order'] = $subscription_check['order_id'];
+			$subscription['subscription_status'] = $subscription_check['status'];
+			$subscription['item_id'] = ( ! empty ( $subscription_check['variation_id'] ) ) ? $subcription_check['variation_id'] : $subscription_check['product_id'];
+			array_push( $this->results, $subscription );
+		} else {
+			$subscription['status'] = __( 'failed', 'wcs_import' );
 			array_push( $this->results, $subscription );
 		}
 
@@ -298,13 +300,16 @@ class WCS_Import_Parser {
 	}
 
 	/* Checks customer information and creates a new store customer when no customer Id has been given */
-	function check_customer( $customer_id, $email, $username, $row ) {
+	function check_customer( $row ) {
+		$customer_email = ( ! empty ( $row[$this->mapping['customer_email']] ) ) ? $row[$this->mapping['customer_email']] : '';
+		$username = ( ! empty ( $row[$this->mapping['customer_username']] ) ) ? $row[$this->maapping['customer_username']] : '';
+		$customer_id = ( ! empty( $row[$this->mapping['customer_id']] ) ) ? $row[$this->mapping['customer_id']] : '';
 		$found_customer = false;
 		if( empty( $customer_id ) ) {
 			// check for registered email if customer id is not set
-			if( ! $found_customer && is_email( $email ) ) {
+			if( ! $found_customer && is_email( $customer_email ) ) {
 					// check by email
-					$found_customer = email_exists( $email );
+					$found_customer = email_exists( $customer_email );
 			// if customer still not found, check by username
 			} elseif( ! $found_customer && ! empty( $username ) ) {
 				$found_customer = username_exists( $username );
