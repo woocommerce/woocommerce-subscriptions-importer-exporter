@@ -70,10 +70,14 @@ class WCS_Import_Parser {
 		);
 
 		$this->order_item_meta_fields = array (
-			"_recurring_line_total",
-			"_recurring_line_tax",
-			"_recurring_line_subtotal",
-			"_recurring_line_subtotal_tax",
+			"recurring_line_total",
+			"recurring_line_tax",
+			"recurring_line_subtotal",
+			"recurring_line_subtotal_tax",
+			"line_subtotal",
+			"line_total",
+			"line_tax",
+			"line_subtotal_tax",
 		);
 	}
 
@@ -160,6 +164,10 @@ class WCS_Import_Parser {
 			return;
 		}
 
+		// Get product object - checked validity @ L141
+		$_product = get_product( $row[$this->mapping['product_id']] );
+		$subscription['item'] = __( $_product->get_title(), 'wcs_import' );
+
 		// populate order meta data
 		foreach( $this->order_meta_fields as $column ) {
 			switch( $column ) {
@@ -176,6 +184,13 @@ class WCS_Import_Parser {
 				case 'payment_method':
 					if( strtolower( $row[$this->mapping[$column]] ) == 'paypal' && ! empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
 						// Paypal
+						$paypal_sub_id = $row[$this->mapping['paypal_subscriber_id']];
+						$title = ( ! empty( $row[$this->mapping['payment_method_title']] ) ) ? $row[$this->mapping['payment_method_title']] : '';
+						$postmeta[] = array( 'key' => '_' . $column, 'value' => 'paypal' );
+						$postmeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
+						$postmeta[] = array( 'key' => '_recurring_payment_method', 'value' => 'paypal' );
+						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => 'Paypal Transfer' );
+						$postmeta[] = array( 'key' => '_paypal_subscriber_id', 'value' => $paypal_sub_id );
 					} else if( strtolower( $row[$this->mapping[$column]] ) == 'stripe' && ! empty( $row[$this->mapping['stripe_customer_id']] ) ) {
 						// Stripe
 						$stripe_cust_id = $row[$this->mapping['stripe_customer_id']];
@@ -184,7 +199,7 @@ class WCS_Import_Parser {
 						$postmeta[] = array( 'key' => '_' . $column, 'value' => 'stripe' );
 						$postmeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
 						$postmeta[] = array( 'key' => '_recurring_payment_method', 'value' => 'stripe' );
-						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => 'Electronic Transfer' );
+						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => 'Stripe Transfer' );
 						$postmeta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
 					} else { // default to manual payment regardless
 						$postmeta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
@@ -193,6 +208,11 @@ class WCS_Import_Parser {
 					break;
 				case 'customer_user':
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $cust_id);
+					break;
+				case 'order_total':
+				case 'order_recurring_total':
+					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : $_product->subscription_price;
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				default:
 					$value = isset( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
@@ -224,9 +244,6 @@ class WCS_Import_Parser {
 			}
 		}
 
-		// Add product to the order
-		$_product = get_product( $row[$this->mapping['product_id']] );
-		$subscription['item'] = __( $_product->get_title(), 'wcs_import' );
 		// Add line item
 		$item_id = wc_add_order_item( $order_id, array(
 			'order_item_name' => $_product->get_title(),
@@ -239,15 +256,11 @@ class WCS_Import_Parser {
 			wc_add_order_item_meta( $item_id, '_tax_class', $_product->get_tax_class() );
 			wc_add_order_item_meta( $item_id, '_product_id', $_product->id );
 			wc_add_order_item_meta( $item_id, '_variation_id', ( ! empty ($_product->variation_id ) ) ? $_product->variation_id : '');
-			wc_add_order_item_meta( $item_id, '_line_subtotal', '' );
-			wc_add_order_item_meta( $item_id, '_line_total', '' );
-			wc_add_order_item_meta( $item_id, '_line_tax', '' );
-			wc_add_order_item_meta( $item_id, '_line_subtotal_tax', '' );
 
 			// add the additional subscription meta data to the order
 			foreach( $this->order_item_meta_fields as $metadata ) {
 				$value = ( ! empty( $row[$this->mapping[$metadata]] ) ) ? $row[$this->mapping[$metadata]] : 0;
-				wc_add_order_item_meta( $item_id, $metadata, $value );
+				wc_add_order_item_meta( $item_id, '_' . $metadata, $value );
 			}
 
 			// Add line item meta for backorder status
