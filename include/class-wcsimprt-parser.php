@@ -274,7 +274,6 @@ class WCS_Import_Parser {
 					'expiry_date'	=> ( ! empty( $row[$this->mapping['subscription_expiry_date']] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '',
 					'end_date'		=> ( ! empty( $row[$this->mapping['subscription_end_date']] ) ) ? $row[$this->mapping['subscription_end_date']] : '',
 			);
-
 			// Create pening Subscription
 			WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
 			// Add additional subscription meta data
@@ -320,8 +319,9 @@ class WCS_Import_Parser {
 	/* Checks customer information and creates a new store customer when no customer Id has been given */
 	function check_customer( $row ) {
 		$customer_email = ( ! empty ( $row[$this->mapping['customer_email']] ) ) ? $row[$this->mapping['customer_email']] : '';
-		$username = ( ! empty ( $row[$this->mapping['customer_username']] ) ) ? $row[$this->maapping['customer_username']] : '';
+		$username = ( ! empty ( $row[$this->mapping['customer_username']] ) ) ? $row[$this->mapping['customer_username']] : '';
 		$customer_id = ( ! empty( $row[$this->mapping['customer_id']] ) ) ? $row[$this->mapping['customer_id']] : '';
+
 		$found_customer = false;
 		if( empty( $customer_id ) ) {
 			// check for registered email if customer id is not set
@@ -334,14 +334,14 @@ class WCS_Import_Parser {
 			}
 
 			// try creating a customer from email, username and address information
-			if( ! $found_customer && is_email( $email ) && ! empty( $username ) ) {
-				$found_customer = wp_create_user( $username, '1234', $email );
+			if( ! $found_customer && is_email( $customer_email ) && ! empty( $username ) ) {
+				$found_customer = wp_create_user( $username, '1234', $customer_email );
 				// update user meta data
 				foreach( $this->user_data_titles as $key ) {
 					switch( $key ) {
 						case 'billing_email':
 							// user billing email if set in csv otherwise use the user's account email
-							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : $email;
+							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : $customer_email;
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
 						default:
