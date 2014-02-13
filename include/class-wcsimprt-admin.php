@@ -306,6 +306,7 @@ class WCS_Admin_Importer {
 		$position = 0;
 		
 		if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
+			$row = $raw_headers = array();
 			while ( ( $postmeta = fgetcsv( $handle, 0, $delimiter ) ) !== FALSE ) {
 				$count++;
 
@@ -330,8 +331,16 @@ class WCS_Admin_Importer {
 				$file_positions[] = ftell( $handle );
 			}
 			fclose( $handle );
-		}
-		$this->import_AJAX_start( $file, $delimiter, $file_positions, $total );
+		} ?>
+		<script>
+				if (confirm("Are you sure you want to continue?")){
+					//<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total ); ?>;
+					console.log("access");
+				} else {
+					console.log("exiting");
+				}
+		</script>
+<?php
 	}
 
 	/* Sends the AJAX call and waits for the repsonse data to fill in the confirmation table. */
