@@ -289,6 +289,7 @@ class WCS_Admin_Importer {
 	function AJAX_setup() {
 		$request_limit = 15; // May change
 		$file_positions = array();
+		$payment_method_error = array();
 		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
 		if( empty( $_POST['file_url'] ) ) {
 			$file = get_attached_file( $_POST['file_id'] );
@@ -307,8 +308,21 @@ class WCS_Admin_Importer {
 		
 		if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
 			$row = $raw_headers = array();
+
+			$header = fgetcsv( $handle, 0, $delimiter );
 			while ( ( $postmeta = fgetcsv( $handle, 0, $delimiter ) ) !== FALSE ) {
 				$count++;
+				foreach ( $header as $key => $heading ) {
+					if ( ! $heading ) continue;
+					$s_heading = strtolower( $heading );
+					$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? $this->format_data_from_csv( $postmeta[$key], $enc ) : '';
+				}
+
+				if( strtolower( $row[$this->mapping['payment_method']] ) == 'stripe' && empty( $row[$this->mapping['stripe_customer_id']] ) ) {
+					$payment_method_error[] = Array( 'Stripe', 'stripe_customer_id' );
+				} else if ( strtolower( $row[$this->mapping['payment_method']] ) == 'paypal' && empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
+					$payment_method_error[] = Array( 'Paypal', 'paypal_subscriber_id' );
+				}
 
 				if ( $count >= $request_limit ) {
 					$previous_pos = $position;
@@ -333,12 +347,18 @@ class WCS_Admin_Importer {
 			fclose( $handle );
 		} ?>
 		<script>
-				if (confirm("Are you sure you want to continue?")){
-					//<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total ); ?>;
-					console.log("access");
-				} else {
-					console.log("exiting");
-				}
+				jQuery(document).ready(function($) {
+					if ( <?php echo count( $payment_method_error ); ?> > 0 ) {
+						if (confirm("Are you sure you want to continue?")){
+							<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total ); ?>
+							console.log("continue with import");
+						} else {
+							console.log("Exit before importing subscriptions");
+						}
+					} else {
+						<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total ); ?>
+					}
+				});
 		</script>
 <?php
 	}
@@ -347,7 +367,6 @@ class WCS_Admin_Importer {
 	function import_AJAX_start( $file, $delimiter, $file_positions, $total ) {
 		$array = json_encode($file_positions);
 		?>
-		<script>
 			jQuery(document).ready(function($) {
 				/* AJAX Request to import subscriptions */
 					var positions = <?php echo $array; ?>;
@@ -423,7 +442,6 @@ class WCS_Admin_Importer {
 					console.log('<?php echo $delimiter; ?>');
 
 			});
-		</script>
 	<?php
 	}
 
