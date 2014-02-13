@@ -11,7 +11,7 @@ class WCS_Admin_Importer {
 	/* Displays header followed by the current pages content */
 	public function display_content() {
 		global $file;
-		
+	
 		$page = ( isset($_GET['step'] ) ) ? $_GET['step'] : 1;
 		switch( $page ) {
 		case 1 : //Step: Upload File
@@ -269,7 +269,7 @@ class WCS_Admin_Importer {
 			'stripe_customer_id'		  => '',
 			'paypal_subscriber_id'		  => '',
 			'payment_method_title'		  => '',
-			
+		
 		);
 
 		$mapping = $_POST['mapto'];
@@ -289,7 +289,7 @@ class WCS_Admin_Importer {
 	function AJAX_setup() {
 		$request_limit = 15; // May change
 		$file_positions = array();
-		$payment_method_error = array();
+		$payment_method_error = $payment_meta_error = array();
 		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
 		if( empty( $_POST['file_url'] ) ) {
 			$file = get_attached_file( $_POST['file_id'] );
@@ -305,7 +305,7 @@ class WCS_Admin_Importer {
 		$total = 0;
 		$previous_pos = 0;
 		$position = 0;
-		
+
 		if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
 			$row = $raw_headers = array();
 
@@ -319,9 +319,11 @@ class WCS_Admin_Importer {
 				}
 
 				if( strtolower( $row[$this->mapping['payment_method']] ) == 'stripe' && empty( $row[$this->mapping['stripe_customer_id']] ) ) {
-					$payment_method_error[] = Array( 'Stripe', 'stripe_customer_id' );
+					$payment_method_error[] = 'Stripe';
+					$payment_meta_error[] = 'stripe_customer_id';
 				} else if ( strtolower( $row[$this->mapping['payment_method']] ) == 'paypal' && empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
-					$payment_method_error[] = Array( 'Paypal', 'paypal_subscriber_id' );
+					$payment_method_error[] = 'Paypal';
+					$payment_meta_error[] = 'paypal_subscriber_id';
 				}
 
 				if ( $count >= $request_limit ) {
@@ -349,7 +351,7 @@ class WCS_Admin_Importer {
 		<script>
 				jQuery(document).ready(function($) {
 					if ( <?php echo count( $payment_method_error ); ?> > 0 ) {
-						if (confirm("Are you sure you want to continue?")){
+						if (confirm("You're importing subscriptions for [" + <?php echo json_encode( $payment_method_error ); ?> + "] without specifying [ " + <?php echo json_encode( $payment_meta_error ); ?> + " ]. This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?")){
 							<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total ); ?>
 							console.log("continue with import");
 						} else {
@@ -443,11 +445,6 @@ class WCS_Admin_Importer {
 
 			});
 	<?php
-	}
-
-	/* 
-	function get_num_rows( $file ) {
-	
 	}
 
 	/* AJAX request holding the file, delimiter and mapping information is sent to this function. */
