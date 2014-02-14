@@ -287,7 +287,7 @@ class WCS_Admin_Importer {
 
 	/* Sets up the AJAX requests and calls import_AJAX_start( .. ) */
 	function AJAX_setup() {
-		$request_limit = 15; // May change
+		$request_limit = 3; // May change
 		$file_positions = array();
 		$payment_method_error = $payment_meta_error = array();
 		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
@@ -436,7 +436,8 @@ class WCS_Admin_Importer {
 					/* Check the number of requests has been completed */
 					function check_completed() {
 						if( count >= total ) {
-							console.log('request completed');
+							$('.importer-loading').addClass('finished').removeClass('importer-loading');
+							$('.finished').html('<td colspan="6" class="row">Finished Importing</td>');
 						}
 					}
 					console.log('<?php echo addslashes( $file ); ?>');
