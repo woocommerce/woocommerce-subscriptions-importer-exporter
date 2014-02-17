@@ -24,6 +24,8 @@ class WC_Subscription_Importer {
 		add_action( 'admin_menu', 'WC_Subscription_Importer::add_sub_menu', 10 );
 		add_action( 'admin_init', 'WC_Subscription_Importer::add_import_tool' );
 		add_action( 'wp_ajax_wcs_import_request', array($wcs_importer, 'display_content'));
+
+		define( 'WCS_DEBUG', true );
 	}
 
 	/* Add menu item under Woocommerce > Subscription CSV Import Suite */

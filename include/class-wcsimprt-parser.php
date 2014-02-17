@@ -160,7 +160,8 @@ class WCS_Import_Parser {
 
 		// skip importing rows without the required information
 		if( ! empty( $subscription['error_customer'] ) || ! empty( $subscription['error_product'] ) ) {
-			$subscription['status'] = __( 'error', 'wcs_import' );
+			$subscription['status'] = __( 'failed', 'wcs_import' );
+			$subscription['data'] = $row;
 			array_push($this->results, $subscription);
 			return;
 		}

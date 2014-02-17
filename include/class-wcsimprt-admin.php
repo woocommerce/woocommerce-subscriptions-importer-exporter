@@ -353,7 +353,6 @@ class WCS_Admin_Importer {
 					if ( <?php echo count( $payment_method_error ); ?> > 0 ) {
 						if (confirm("You're importing subscriptions for [" + <?php echo json_encode( $payment_method_error ); ?> + "] without specifying [ " + <?php echo json_encode( $payment_meta_error ); ?> + " ]. This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?")){
 							<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total ); ?>
-							console.log("continue with import");
 						} else {
 							console.log("Exit before importing subscriptions");
 						}
@@ -406,26 +405,33 @@ class WCS_Admin_Importer {
 								// Parse
 								var results = $.parseJSON( response );
 								for( var i = 0; i < results.length; i++ ){
-									var warnings = results[i].warning;
-									$('#import-progress tbody').append( '<tr>' );
-									if( warnings.length > 0 ) {
-										$('#import-progress tbody').append( '<td class="row">' + results[i].status + ' ( !! )</td>' );
-									} else {
-										$('#import-progress tbody').append( '<td class="row">' + results[i].status + '</td>' );
-									}
-									$('#import-progress tbody').append( '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>');
-									$('#import-progress tbody').append( '<td class="row">' + results[i].item + ' ( #' + results[i].item_id + ' )</td>' );
-									$('#import-progress tbody').append( '<td class="row">' + results[i].username + ' ( #' + results[i].user_id + ' )</td>' );
-									$('#import-progress tbody').append( '<td class="row">' + results[i].subscription_status + '</td>' );
-									$('#import-progress tbody').append( '<td class="row">' + warnings.length + '</td></tr>' );
-
-									// Display Warnings
-									if( warnings.length > 0 ) {
-										var warningString = 'Warning/s:';
-										for( var x = 0; x < warnings.length; x++ ) {
-											warningString += ' - ' + warnings[x];
+									if( results[i].status == 'success' ) {
+										var warnings = results[i].warning;
+										$('#import-progress tbody').append( '<tr>' );
+										if( warnings.length > 0 ) {
+											$('#import-progress tbody').append( '<td class="row">' + results[i].status + ' ( !! )</td>' );
+										} else {
+											$('#import-progress tbody').append( '<td class="row">' + results[i].status + '</td>' );
 										}
-										$('#import-progress tbody').append( '<tr><td colspan="6"><strong>' + warningString + '</strong></td></tr>');
+										$('#import-progress tbody').append( '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>');
+										$('#import-progress tbody').append( '<td class="row">' + results[i].item + ' ( #' + results[i].item_id + ' )</td>' );
+										$('#import-progress tbody').append( '<td class="row">' + results[i].username + ' ( #' + results[i].user_id + ' )</td>' );
+										$('#import-progress tbody').append( '<td class="row">' + results[i].subscription_status + '</td>' );
+										$('#import-progress tbody').append( '<td class="row">' + warnings.length + '</td></tr>' );
+
+										// Display Warnings
+										if( warnings.length > 0 ) {
+											var warningString = 'Warning/s:';
+											for( var x = 0; x < warnings.length; x++ ) {
+												warningString += ' - ' + warnings[x];
+											}
+											$('#import-progress tbody').append( '<tr><td colspan="6"><strong>' + warningString + '</strong></td></tr>');
+										}
+									} else {
+										$('#import-progress tbody').append( '<tr>' );
+										$('#import-progress tbody').append( '<td class="row">' + results[i].status + '</td>');
+										$('#import-progress tbody').append( '<td></td>');
+										$('#import-progress tbody').append( '</tr>' );
 									}
 								}
 								check_completed();
@@ -438,14 +444,13 @@ class WCS_Admin_Importer {
 						if( count >= total ) {
 							$('.importer-loading').addClass('finished').removeClass('importer-loading');
 							$('.finished').html('<td colspan="6" class="row">Finished Importing</td>');
+
+							$('.wrap').append('<p><?php _e( 'All done!', 'wcs_import' );?> <a href="<?php echo admin_url( 'edit.php?post_type=shop_order' ); ?>"><?php _e( 'View Orders', 'wcs_import' ); ?></a> or <a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>">Import another file</a> </p>');
 						}
 					}
-					console.log('<?php echo addslashes( $file ); ?>');
-					console.log('<?php echo json_encode( $_POST['mapto'] ); ?>');
-					console.log('<?php echo $delimiter; ?>');
-
 			});
 	<?php
+
 	}
 
 	/* AJAX request holding the file, delimiter and mapping information is sent to this function. */
@@ -465,9 +470,9 @@ class WCS_Admin_Importer {
 		$end = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
 		$this->parser = new WCS_Import_Parser();
 		$this->results = $this->parser->import_data( $file, $delimiter, $mapping, $start, $end );
-		echo "<!--WC_START-->";
-		echo json_encode( $this->results );
-		echo "<!--WC_END-->";
+		echo '<div style="display:none;">';
+		echo "<!--WC_START-->" . json_encode( $this->results ) . "<!--WC_END-->";
+		echo '</div>';
 		exit; // End
 	}
 
@@ -500,10 +505,10 @@ class WCS_Admin_Importer {
 	function importer_error() {
 		global $file;
 		?>
-		<h3>Error</h3>
-		<p>Error: <?php _e($file['error']); ?></p>
+		<h3>Error while uploading File</h3>
+		<p>Error message: <?php _e($file['error']); ?></p>
+		<p><a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Import another file', 'wcs_import' ); ?></a></p>
 		<?php
-		// Unfinished. Doesnt show anything but error message
 	}
 }
 ?>
