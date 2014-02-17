@@ -9,6 +9,7 @@ class WCS_Import_Parser {
 	var $end_pos;
 	var $available_gateways;
 	var $available_shipping_methods;
+	var $starting_row_number;
 
 	function __construct() {
 		// Order meta values
@@ -82,13 +83,14 @@ class WCS_Import_Parser {
 		);
 	}
 
-	function import_data( $file, $delimiter, $mapping, $start, $end ) {
+	function import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num ) {
 		global $woocommerce;
 		$file_path = addslashes( $file );
 		$this->delimiter = $delimiter;
 		$this->mapping = $mapping;
 		$this->start_pos = $start;
 		$this->end_pos = $end;
+		$this->starting_row_number = $starting_row_num;
 
 		// Get the stores available payment gateways
 		$this->available_gateways = $woocommerce->payment_gateways->get_available_payment_gateways();
@@ -121,6 +123,7 @@ class WCS_Import_Parser {
 					}
 
 					// will move to just sending $row instead of listing all these variables
+					$this->starting_row_number++;
 					$this->import( $row );
 					if( ftell( $handle ) >= $this->end_pos ) {
 						break;
@@ -141,17 +144,17 @@ class WCS_Import_Parser {
 
 		$postmeta = array();
 		$subscription = array();
-		$subscription['warning'] = array();
+		$subscription['warning'] = $subscription['error'] = array();
 		// Check Product id a woocommerce product
 		if( ! ( $this->check_product( $row[$this->mapping['product_id']] ) ) ) {
-			$subscription['error_product'] = __( 'The product_id is not a subscription product in your store.', 'wcs_import' );
+			$subscription['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs_import' );
 		}
 
 		// Check customer id is valid or create one
 		$cust_id = $this->check_customer( $row );
 		if ( empty( $cust_id ) ) {
 			// Error with customer information in line of csv
-			$subscription['error_customer'] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
+			$subscription['error'][] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
 		} else {
 			$customer = get_user_by( 'id', $cust_id );
 			$subscription['user_id'] = $customer->ID;
@@ -159,9 +162,9 @@ class WCS_Import_Parser {
 		}
 
 		// skip importing rows without the required information
-		if( ! empty( $subscription['error_customer'] ) || ! empty( $subscription['error_product'] ) ) {
+		if( ! empty( $subscription['error'] ) ) {
 			$subscription['status'] = __( 'failed', 'wcs_import' );
-			$subscription['data'] = $row;
+			$subscription['row_number'] = $this->starting_row_number;
 			array_push($this->results, $subscription);
 			return;
 		}

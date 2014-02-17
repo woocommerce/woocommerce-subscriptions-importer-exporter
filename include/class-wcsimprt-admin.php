@@ -288,7 +288,7 @@ class WCS_Admin_Importer {
 	/* Sets up the AJAX requests and calls import_AJAX_start( .. ) */
 	function AJAX_setup() {
 		$request_limit = 3; // May change
-		$file_positions = array();
+		$file_positions = $row_start = array();
 		$payment_method_error = $payment_meta_error = array();
 		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
 		if( empty( $_POST['file_url'] ) ) {
@@ -305,6 +305,7 @@ class WCS_Admin_Importer {
 		$total = 0;
 		$previous_pos = 0;
 		$position = 0;
+		$row_start[] = 1;
 
 		if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
 			$row = $raw_headers = array();
@@ -329,6 +330,8 @@ class WCS_Admin_Importer {
 				if ( $count >= $request_limit ) {
 					$previous_pos = $position;
 					$position = ftell( $handle );
+					$row_start[] = end( $row_start ) + $count;
+					reset( $row_start );
 					$count = 0;
 					$total++;
 					// Import rows between $previous_position $position
@@ -347,17 +350,18 @@ class WCS_Admin_Importer {
 				$file_positions[] = ftell( $handle );
 			}
 			fclose( $handle );
-		} ?>
+		} 
+		?>
 		<script>
 				jQuery(document).ready(function($) {
 					if ( <?php echo count( $payment_method_error ); ?> > 0 ) {
 						if (confirm("You're importing subscriptions for [" + <?php echo json_encode( $payment_method_error ); ?> + "] without specifying [ " + <?php echo json_encode( $payment_meta_error ); ?> + " ]. This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?")){
-							<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total ); ?>
+							<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
 						} else {
 							console.log("Exit before importing subscriptions");
 						}
 					} else {
-						<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total ); ?>
+						<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
 					}
 				});
 		</script>
@@ -365,19 +369,21 @@ class WCS_Admin_Importer {
 	}
 
 	/* Sends the AJAX call and waits for the repsonse data to fill in the confirmation table. */
-	function import_AJAX_start( $file, $delimiter, $file_positions, $total ) {
+	function import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ) {
 		$array = json_encode($file_positions);
+		$starting_row_number = json_encode( $row_start );
 		?>
 			jQuery(document).ready(function($) {
 				/* AJAX Request to import subscriptions */
 					var positions = <?php echo $array; ?>;
 					var total = <?php echo $total; ?>;
+					var starting_row_number = <?php echo $starting_row_number; ?>;
 					var count = 0;
 					for( var i = 0; i < positions.length; i+=2 ) {
-						AJAX_import( positions[i], positions[i+1] );
+						AJAX_import( positions[i], positions[i+1], starting_row_number[i/2] );
 					}
 
-					function AJAX_import( start_pos, end_pos ) {
+					function AJAX_import( start_pos, end_pos, row_start ) {
 						var data = {
 							action:		'wcs_import_request',
 							mapping:	'<?php echo json_encode( $this->mapping ); ?>',
@@ -385,6 +391,7 @@ class WCS_Admin_Importer {
 							file:		'<?php echo addslashes( $file ); ?>',
 							start:		start_pos,
 							end:		end_pos,
+							row_num:	row_start,
 						}
 
 						$.ajax({
@@ -429,9 +436,15 @@ class WCS_Admin_Importer {
 										}
 									} else {
 										$('#import-progress tbody').append( '<tr>' );
-										$('#import-progress tbody').append( '<td class="row">' + results[i].status + '</td>');
-										$('#import-progress tbody').append( '<td></td>');
+										$('#import-progress tbody').append( '<td class="row" colspan="2"> Row #' + results[i].row_number + ' from CSV ' + results[i].status + ' with ' + results[i].error.length + ( ( results[i].error.length == 0 || results[i].error.length > 1 ) ? ' errors' : ' error') + '</td>');
 										$('#import-progress tbody').append( '</tr>' );
+										
+										// Display Error
+										var errorString = 'Error Details: ';
+										for( var x = 0; x < results[i].error.length; x++ ){
+											errorString += ' - ' + results[i].error[x] + '';
+										}
+										$('#import-progress tbody').append( '<tr><td colspan="6"><strong>' + errorString + '</strong></td></tr>');
 									}
 								}
 								check_completed();
@@ -468,8 +481,9 @@ class WCS_Admin_Importer {
 		$delimiter = $_POST['delimiter'];
 		$start = ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0;
 		$end = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
+		$starting_row_num = absint( $_POST['row_num'] );
 		$this->parser = new WCS_Import_Parser();
-		$this->results = $this->parser->import_data( $file, $delimiter, $mapping, $start, $end );
+		$this->results = $this->parser->import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num );
 		echo '<div style="display:none;">';
 		echo "<!--WC_START-->" . json_encode( $this->results ) . "<!--WC_END-->";
 		echo '</div>';
