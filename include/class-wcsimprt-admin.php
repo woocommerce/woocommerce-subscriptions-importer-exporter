@@ -412,39 +412,43 @@ class WCS_Admin_Importer {
 								// Parse
 								var results = $.parseJSON( response );
 								for( var i = 0; i < results.length; i++ ){
+									var table_data = '';
 									if( results[i].status == 'success' ) {
 										var warnings = results[i].warning;
-										$('#import-progress tbody').append( '<tr>' );
+										
 										if( warnings.length > 0 ) {
-											$('#import-progress tbody').append( '<td class="row">' + results[i].status + ' ( !! )</td>' );
+											table_data += '<td class="row" rowspan="2"><strong>' + results[i].status + ' ( !! )</strong></td>';
+											table_data += '<td class="row" style="padding-bottom:0px;"><div class="warning">' + ( results[i].order != null  ? results[i].order : '-' ) + '</div></td>';
 										} else {
-											$('#import-progress tbody').append( '<td class="row">' + results[i].status + '</td>' );
+											table_data += '<td class="row updated">' + results[i].status + '</td>';
+											table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
 										}
-										$('#import-progress tbody').append( '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>');
-										$('#import-progress tbody').append( '<td class="row">' + results[i].item + ' ( #' + results[i].item_id + ' )</td>' );
-										$('#import-progress tbody').append( '<td class="row">' + results[i].username + ' ( #' + results[i].user_id + ' )</td>' );
-										$('#import-progress tbody').append( '<td class="row">' + results[i].subscription_status + '</td>' );
-										$('#import-progress tbody').append( '<td class="row">' + warnings.length + '</td></tr>' );
+										
+										table_data += '<td class="row">' + results[i].item + ' ( #' + results[i].item_id + ' )</td>';
+										table_data += '<td class="row">' + results[i].username + ' ( #' + results[i].user_id + ' )</td>';
+										table_data += '<td class="row">' + results[i].subscription_status + '</td>';
+										table_data += '<td class="row">' + warnings.length + '</td>';
+
+										$('#import-progress tbody').append( '<tr>' + table_data + '</tr>' );
 
 										// Display Warnings
 										if( warnings.length > 0 ) {
-											var warningString = 'Warning/s:';
+											var warningString = ( ( warnings.length > 1 ) ? 'Warnings: ' : 'Warning: ' );
 											for( var x = 0; x < warnings.length; x++ ) {
-												warningString += ' - ' + warnings[x];
+												warningString += warnings[x];
 											}
-											$('#import-progress tbody').append( '<tr><td colspan="6"><strong>' + warningString + '</strong></td></tr>');
+											$('#import-progress tbody').append( '<tr><td colspan="5" style="padding-top:0px;"><div class="warning">' + warningString + '</div></td></tr>');
 										}
 									} else {
-										$('#import-progress tbody').append( '<tr>' );
-										$('#import-progress tbody').append( '<td class="row" colspan="2"> Row #' + results[i].row_number + ' from CSV ' + results[i].status + ' with ' + results[i].error.length + ( ( results[i].error.length == 0 || results[i].error.length > 1 ) ? ' errors' : ' error') + '</td>');
-										$('#import-progress tbody').append( '</tr>' );
-										
+										table_data += '<td class="row">' + results[i].status + '</td>';
+
 										// Display Error
 										var errorString = 'Error Details: ';
 										for( var x = 0; x < results[i].error.length; x++ ){
-											errorString += ' - ' + results[i].error[x] + '';
+											errorString += x+1 + '. ' + results[i].error[x] + ' ';
 										}
-										$('#import-progress tbody').append( '<tr><td colspan="6"><strong>' + errorString + '</strong></td></tr>');
+										table_data += '<td colspan="5"><div class="error">Row #' + results[i].row_number + ' from CSV <strong>failed to import</strong> with ' + results[i].error.length + ( ( results[i].error.length == 0 || results[i].error.length > 1 ) ? ' errors' : ' error') + '<br />' + errorString + '</div></td></tr>';
+										$('#import-progress tbody').append( '<tr>' + table_data + '</tr>' );
 									}
 								}
 								check_completed();
