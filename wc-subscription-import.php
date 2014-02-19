@@ -17,12 +17,6 @@ WC_Subscription_Importer::init();
 
 class WC_Subscription_Importer {
 
-	function __construct() {
-		// Register style sheet.
-		
-	}
-
-
 	public static function init() {
 		global $wcs_importer;
 		$wcs_importer = new WCS_Admin_Importer();
@@ -41,7 +35,7 @@ class WC_Subscription_Importer {
 	}
 
 	function add_import_tool() {
-		register_importer('subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your store via a csv file.', 'subscription_importer' ), 'WC_Subscription_Importer::enqueue_scripts_wcs_import' );
+		register_importer('subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your store via a csv file.', 'subscription_importer' ), 'WC_Subscription_Importer::home' );
 	}
 
 	function enqueue_scripts_wcs_import() {
@@ -66,7 +60,4 @@ class WC_Subscription_Importer {
 		echo '</div>';
 	}
 }
-
-
-
 ?>
