@@ -348,6 +348,9 @@ class WCS_Import_Parser {
 							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : $customer_email;
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
+						case 'billing_first_name':
+							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : $username;
+							update_user_meta( $found_customer, $key, $meta_value );
 						default:
 							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : '';
 							update_user_meta( $found_customer, $key, $meta_value );
