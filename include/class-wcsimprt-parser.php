@@ -295,7 +295,7 @@ class WCS_Import_Parser {
 				$subscription['warning'][] = __( 'Used default subscription status as none was given.', 'wcs_import' );
 			}
 		}
-
+		$subscription['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
 		// Check if the subscription has been successfully added
 		$key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
 		$subscription_check = WC_Subscriptions_Manager::get_subscription( $key );

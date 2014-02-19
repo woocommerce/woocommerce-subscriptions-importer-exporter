@@ -418,9 +418,9 @@ class WCS_Admin_Importer {
 										
 										if( warnings.length > 0 ) {
 											table_data += '<td class="row" rowspan="2"><strong>' + results[i].status + ' ( !! )</strong></td>';
-											table_data += '<td class="row" style="padding-bottom:0px;"><div class="warning">' + ( results[i].order != null  ? results[i].order : '-' ) + '</div></td>';
+											table_data += '<td class="row warning-top"><div class="warning">' + ( results[i].order != null  ? results[i].order : '-' ) + '</div></td>';
 										} else {
-											table_data += '<td class="row updated">' + results[i].status + '</td>';
+											table_data += '<td class="row">' + results[i].status + '</td>';
 											table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
 										}
 										
@@ -429,7 +429,7 @@ class WCS_Admin_Importer {
 										table_data += '<td class="row">' + results[i].subscription_status + '</td>';
 										table_data += '<td class="row">' + warnings.length + '</td>';
 
-										$('#import-progress tbody').append( '<tr>' + table_data + '</tr>' );
+										$('#wcs-import-progress tbody').append( '<tr>' + table_data + '</tr>' );
 
 										// Display Warnings
 										if( warnings.length > 0 ) {
@@ -437,7 +437,7 @@ class WCS_Admin_Importer {
 											for( var x = 0; x < warnings.length; x++ ) {
 												warningString += warnings[x];
 											}
-											$('#import-progress tbody').append( '<tr><td colspan="5" style="padding-top:0px;"><div class="warning">' + warningString + '</div></td></tr>');
+											$('#wcs-import-progress tbody').append( '<tr><td colspan="5" class="warning-bottom"><div class="warning bottom">' + warningString + ' [ Link to edit order: <a href="' + results[i].edit_order + '">#' + results[i].order +'</a> ]</div></td></tr>');
 										}
 									} else {
 										table_data += '<td class="row">' + results[i].status + '</td>';
@@ -448,7 +448,7 @@ class WCS_Admin_Importer {
 											errorString += x+1 + '. ' + results[i].error[x] + ' ';
 										}
 										table_data += '<td colspan="5"><div class="error">Row #' + results[i].row_number + ' from CSV <strong>failed to import</strong> with ' + results[i].error.length + ( ( results[i].error.length == 0 || results[i].error.length > 1 ) ? ' errors' : ' error') + '<br />' + errorString + '</div></td></tr>';
-										$('#import-progress tbody').append( '<tr>' + table_data + '</tr>' );
+										$('#wcs-import-progress tbody').append( '<tr>' + table_data + '</tr>' );
 									}
 								}
 								check_completed();
@@ -499,7 +499,7 @@ class WCS_Admin_Importer {
 		global $file;
 		echo '<h3>' . __( 'Step 3: File Stage', 'wcs_import' ) . '</h3>';
 		?>
-		<table id="import-progress" class="widefat_importer widefat">
+		<table id="wcs-import-progress" class="widefat_importer widefat">
 			<thead>
 				<tr>
 					<th class="row"><?php _e( 'Upload Status', 'wcs_import' ); ?></th>
