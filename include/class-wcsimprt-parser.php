@@ -371,7 +371,8 @@ class WCS_Import_Parser {
 					// check by email
 					$found_customer = email_exists( $customer_email );
 			// if customer still not found, check by username
-			} elseif( ! $found_customer && ! empty( $username ) ) {
+			}
+			if( ! $found_customer && ! empty( $username ) ) {
 				$found_customer = username_exists( $username );
 			}
 
@@ -389,6 +390,7 @@ class WCS_Import_Parser {
 						case 'billing_first_name':
 							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : $username;
 							update_user_meta( $found_customer, $key, $meta_value );
+							break;
 						case 'shipping_addresss_1':
 						case 'shipping_address_2':
 						case 'shipping_city':
