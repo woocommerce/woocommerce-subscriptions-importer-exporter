@@ -1,5 +1,46 @@
-.warning div{
-	border-left: 4px solid #FFD700; 
-	margin-top:0px;
-	background-color:yellow;
+
+#wcs-import-progress {
+	width: 100%;
+}
+
+#wcs-import-progress td, #wcs-import-progress th {
+	padding: .5em 1em;
+}
+#wcs-import-progress td.status, #wcs-import-progress th.status {
+	width: 32px;
+}
+
+#wcs-import-progress .warning-top {
+	padding:1em 1em 0em 1em;
+	padding: .5em 1em;
+
+}
+
+#wcs-import-progress .warning-bottom {
+	padding: 0em 1em 1em 1em;
+}
+
+#wcs-import-progress td.row, #wcs-import-progress th.row {
+	width: 3em;
+	text-align: center;
+}
+
+#wcs-import-progress tr.importer-loading td {
+	background: url('../images/ajax-loader.gif') no-repeat center center;
+	height: 32px;
+}
+
+.widefat_importer td {
+	vertical-align: middle;
+	padding: 5px 0px;
+}
+
+#wcs-import-progress .warning {
+	border-left: 4px solid #FFD700;
+	padding-left: 1em;
+}
+
+#wcs-import-progress .success {
+	border-left: 4px solid #339933;
+	padding-left: 1em;
 }

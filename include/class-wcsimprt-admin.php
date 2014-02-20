@@ -421,7 +421,7 @@ class WCS_Admin_Importer {
 											table_data += '<td class="row warning-top"><div class="warning">' + ( results[i].order != null  ? results[i].order : '-' ) + '</div></td>';
 										} else {
 											table_data += '<td class="row">' + results[i].status + '</td>';
-											table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
+											table_data += '<td class="row"><div class="success">' + ( results[i].order != null  ? results[i].order : '-' ) + '</div></td>';
 										}
 										
 										table_data += '<td class="row">' + results[i].item + ' ( #' + results[i].item_id + ' )</td>';
