@@ -173,6 +173,8 @@ class WCS_Import_Parser {
 		$_product = get_product( $row[$this->mapping['product_id']] );
 		$subscription['item'] = __( $_product->get_title(), 'wcs_import' );
 
+		$missing_ship_addr = $missing_bill_addr = array();
+
 		// populate order meta data
 		foreach( $this->order_meta_fields as $column ) {
 			switch( $column ) {
@@ -211,6 +213,36 @@ class WCS_Import_Parser {
 						$subscription['warning'][] = __( 'No recognisable payment method has been specified therefore default payment method being used.', 'wcs_import' );
 					}
 					break;
+				case 'shipping_addresss_1':
+				case 'shipping_city':
+				case 'shipping_postcode':
+				case 'shipping_state':
+				case 'shipping_country':
+					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					if( empty( $value ) ) {
+						$metadata = get_user_meta( $cust_id, $column );
+						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
+					}
+					if( empty( $value ) ) {
+						$missing_ship_addr[] = $column;
+					}
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
+					break;
+				case 'billing_addresss_1':
+				case 'billing_city':
+				case 'billing_postcode':
+				case 'billing_state':
+				case 'billing_country':
+					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					if( empty( $value ) ) {
+						$metadata = get_user_meta( $cust_id, $column );
+						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
+					}
+					if( empty( $value ) ) {
+						$missing_bill_addr[] = $column;
+					}
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
+					break;
 				case 'customer_user':
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $cust_id);
 					break;
@@ -227,6 +259,12 @@ class WCS_Import_Parser {
 					}
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
 			}
+		}
+		if( ! empty( $missing_ship_addr ) ) {
+			$subscription['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim(implode(', ', $missing_ship_addr), ',') . '. ', 'wcs_import');
+		}
+		if ( ! empty( $missing_bill_addr ) ) {
+			$subscription['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim(implode(', ', $missing_bill_addr), ',') . '. ', 'wcs_import');
 		}
 
 		$order_data = array(
@@ -351,6 +389,20 @@ class WCS_Import_Parser {
 						case 'billing_first_name':
 							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : $username;
 							update_user_meta( $found_customer, $key, $meta_value );
+						case 'shipping_addresss_1':
+						case 'shipping_address_2':
+						case 'shipping_city':
+						case 'shipping_postcode':
+						case 'shipping_state':
+						case 'shipping_country':
+							// Set the shipping address fields to match the billing fields if not specified in CSV
+							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : '';
+							if( empty ( $meta_value ) ) {
+								$n_key = str_replace( "shipping", "billing", $key );
+								$meta_value = ( ! empty( $this->mapping[$n_key] ) ) ? $row[$this->mapping[$n_key]] : '';
+							}
+							update_user_meta( $found_customer, $key, $meta_value );
+							break;
 						default:
 							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : '';
 							update_user_meta( $found_customer, $key, $meta_value );
