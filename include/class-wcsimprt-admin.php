@@ -447,7 +447,7 @@ class WCS_Admin_Importer {
 										for( var x = 0; x < results[i].error.length; x++ ){
 											errorString += x+1 + '. ' + results[i].error[x] + ' ';
 										}
-										table_data += '<td colspan="5"><div class="error">Row #' + results[i].row_number + ' from CSV <strong>failed to import</strong> with ' + results[i].error.length + ( ( results[i].error.length == 0 || results[i].error.length > 1 ) ? ' errors' : ' error') + '<br />' + errorString + '</div></td></tr>';
+										table_data += '<td colspan="5"><div class="error-import">Row #' + results[i].row_number + ' from CSV <strong>failed to import</strong> with ' + results[i].error.length + ( ( results[i].error.length == 0 || results[i].error.length > 1 ) ? ' errors' : ' error') + '<br />' + errorString + '</div></td></tr>';
 										$('#wcs-import-progress tbody').append( '<tr>' + table_data + '</tr>' );
 									}
 								}

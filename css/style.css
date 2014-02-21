@@ -17,12 +17,14 @@
 }
 
 #wcs-import-progress .warning-bottom {
-	padding: 0em 1em 1em 1em;
+	padding: 0em 0.5em .5em 1em;
 }
 
 #wcs-import-progress td.row, #wcs-import-progress th.row {
 	width: 3em;
 	text-align: center;
+	vertical-align: middle;
+	padding:1em 1em 0em 1em;
 }
 
 #wcs-import-progress tr.importer-loading td {
@@ -44,3 +46,9 @@
 	border-left: 4px solid #339933;
 	padding-left: 1em;
 }
+
+#wcs-import-progress .error-import {
+	border-left: 4px solid #CC0000;
+	padding-left: 1em;
+}
+
