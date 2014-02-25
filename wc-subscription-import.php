@@ -17,13 +17,16 @@ WC_Subscription_Importer::init();
 
 class WC_Subscription_Importer {
 
+	static $wcs_importer;
+
 	public static function init() {
-		global $wcs_importer;
-		$wcs_importer = new WCS_Admin_Importer();
+
+		self::$wcs_importer = new WCS_Admin_Importer();
+
 		add_action( 'admin_menu', array( __CLASS__, 'add_sub_menu' ), 10 );
 		add_action( 'admin_init', array( __CLASS__, 'add_import_tool' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts_wcs_import' ) );
-		add_action( 'wp_ajax_wcs_import_request', array( $wcs_importer, 'display_content' ) );
+		add_action( 'wp_ajax_wcs_import_request', array( self::$wcs_importer, 'display_content' ) );
 	}
 
 	/* Add menu item under Woocommerce > Subscription CSV Import Suite */
@@ -43,7 +46,6 @@ class WC_Subscription_Importer {
 
 	/* Main page header */
 	public static function home() {
-		$wcs_importer = new WCS_Admin_Importer();
 		echo '<div class="wrap">';
 		echo '<h2>' . __( 'Subscription CSV Import Suite', 'wcs-importer' ) . '</h2>';
 		?>
@@ -54,7 +56,7 @@ class WC_Subscription_Importer {
 			</div>
 		</div>
 		<?php //WC_Subscription_Importer::display_content();
-		$wcs_importer->display_content();
+		self::$wcs_importer->display_content();
 		echo '</div>';
 	}
 }
