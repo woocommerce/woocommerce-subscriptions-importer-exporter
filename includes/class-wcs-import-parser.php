@@ -83,6 +83,10 @@ class WCS_Import_Parser {
 		);
 	}
 
+	/**
+	 *
+	 * @since 1.0
+	 */
 	function import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num ) {
 		global $woocommerce;
 		$file_path = addslashes( $file );
@@ -100,7 +104,11 @@ class WCS_Import_Parser {
 		return $this->results;
 	}
 
-	/* Loads the csv file contents into the class variable $this->file */
+	/**
+	 * Loads the csv file contents into the class variable $this->file
+	 *
+	 * @since 1.0
+	 */
 	function import_start( $file ) {
 		$enc = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
 		if ( $enc ) setlocale( LC_ALL, 'en_US.' . $enc );
@@ -134,11 +142,19 @@ class WCS_Import_Parser {
 		}
 	}
 
+	/**
+	 *
+	 * @since 1.0
+	 */
 	function format_data_from_csv( $data, $enc ) {
 		return ( $enc == 'UTF-8' ) ? $data : utf8_encode( $data );
 	}
 
-	/* Import Subscription */
+	/**
+	 * Import Subscription
+	 *
+	 * @since 1.0
+	 */
 	function import( $row ) {
 		global $woocommerce;
 
@@ -352,13 +368,21 @@ class WCS_Import_Parser {
 
 	}
 
-	/* Check the product is a woocommerce subscription - an error status will show up on table if this is not the case. */
+	/**
+	 * Check the product is a woocommerce subscription - an error status will show up on table if this is not the case.
+	 *
+	 * @since 1.0
+	 */
 	function check_product( $product_id ) {
 		$is_subscription = WC_Subscriptions_Product::is_subscription( $product_id );
 		return ( empty( $is_subscription) ) ? false : true;
 	}
 
-	/* Checks customer information and creates a new store customer when no customer Id has been given */
+	/**
+	 * Checks customer information and creates a new store customer when no customer Id has been given
+	 *
+	 * @since 1.0
+	 */
 	function check_customer( $row ) {
 		$customer_email = ( ! empty ( $row[$this->mapping['customer_email']] ) ) ? $row[$this->mapping['customer_email']] : '';
 		$username = ( ! empty ( $row[$this->mapping['customer_username']] ) ) ? $row[$this->mapping['customer_username']] : '';

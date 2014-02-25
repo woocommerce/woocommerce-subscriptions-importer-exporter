@@ -8,7 +8,11 @@ class WCS_Admin_Importer {
 	var $mapping;
 	var $file_url;
 
-	/* Displays header followed by the current pages content */
+	/**
+	 * Displays header followed by the current pages content
+	 *
+	 * @since 1.0
+	 */
 	public function display_content() {
 		global $file;
 	
@@ -33,7 +37,12 @@ class WCS_Admin_Importer {
 			break;
 		}
 	}
-	/* Initial plugin page. Prompts the admin to upload the CSV file containing subscription details. */
+
+	/**
+	 * Initial plugin page. Prompts the admin to upload the CSV file containing subscription details.
+	 *
+	 * @since 1.0
+	 */
 	static function upload_page() { 
 		echo '<h3>' . __( 'Step 1: Upload CSV File', 'wcs_import' ) . '</h3>';
 		$action = 'admin.php?page=import_subscription&amp;step=2&amp;';
@@ -83,6 +92,10 @@ class WCS_Admin_Importer {
 		endif;
 	}
 
+	/**
+	 *
+	 * @since 1.0
+	 */
 	function handle_file() {
 		global $file;
 		if ( empty( $_POST['file_url'] ) ) {
@@ -127,11 +140,19 @@ class WCS_Admin_Importer {
 		}
 	}
 
+	/**
+	 *
+	 * @since 1.0
+	 */
 	function format_data_from_csv( $data, $enc ) {
 		return ( $enc == 'UTF-8' ) ? $data : utf8_encode( $data );
 	}
 
-	/* Step 2: Once uploaded file is recognised, the admin will be required to map CSV columns to the required fields. */
+	/**
+	 * Step 2: Once uploaded file is recognised, the admin will be required to map CSV columns to the required fields.
+	 *
+	 * @since 1.0
+	 */
 	function map_fields( $row ) {
 		$action = 'admin.php?page=import_subscription&amp;step=3&amp;';
 		?>
@@ -217,7 +238,11 @@ class WCS_Admin_Importer {
 		<?php
 	}
 
-	/* Checks the mapping provides enough information to continue importing subscriptions */
+	/**
+	 * Checks the mapping provides enough information to continue importing subscriptions
+	 *
+	 * @since 1.0
+	 */
 	function check_mapping() {
 		// Possible mapping options
 		$this->mapping = array(
@@ -285,7 +310,11 @@ class WCS_Admin_Importer {
 		$this->AJAX_setup();
 	}
 
-	/* Sets up the AJAX requests and calls import_AJAX_start( .. ) */
+	/**
+	 * Sets up the AJAX requests and calls import_AJAX_start( .. )
+	 *
+	 * @since 1.0
+	 */
 	function AJAX_setup() {
 		$request_limit = 15; // May change
 		$file_positions = $row_start = array();
@@ -371,7 +400,11 @@ class WCS_Admin_Importer {
 <?php
 	}
 
-	/* Sends the AJAX call and waits for the repsonse data to fill in the confirmation table. */
+	/**
+	 * Sends the AJAX call and waits for the repsonse data to fill in the confirmation table.
+	 *
+	 * @since 1.0
+	 */
 	function import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ) {
 		$array = json_encode($file_positions);
 		$starting_row_number = json_encode( $row_start );
@@ -473,7 +506,11 @@ class WCS_Admin_Importer {
 
 	}
 
-	/* AJAX request holding the file, delimiter and mapping information is sent to this function. */
+	/**
+	 * AJAX request holding the file, delimiter and mapping information is sent to this function.
+	 *
+	 * @since 1.0
+	 */
 	function AJAX_request_handler() {
 		if ( ! current_user_can( 'manage_woocommerce' ) ){
 			error_log('invalid user');
@@ -497,7 +534,11 @@ class WCS_Admin_Importer {
 		exit; // End
 	}
 
-	/* Step 3: Displays the information about to be uploaded and waits for confirmation by the admin. */
+	/**
+	 * Step 3: Displays the information about to be uploaded and waits for confirmation by the admin.
+	 *
+	 * @since 1.0
+	 */
 	function confirmation_table() { 
 		global $file;
 		echo '<h3>' . __( 'Step 3: File Stage', 'wcs_import' ) . '</h3>';
@@ -522,7 +563,11 @@ class WCS_Admin_Importer {
 		</table><?php
 	}
 
-	/* Handles displaying an error message throughout the process of importing subscriptions. */
+	/**
+	 * Handles displaying an error message throughout the process of importing subscriptions.
+	 *
+	 * @since 1.0
+	 */
 	function importer_error() {
 		global $file;
 		?>

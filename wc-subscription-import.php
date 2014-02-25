@@ -29,22 +29,38 @@ class WC_Subscription_Importer {
 		add_action( 'wp_ajax_wcs_import_request', array( self::$wcs_importer, 'display_content' ) );
 	}
 
-	/* Add menu item under Woocommerce > Subscription CSV Import Suite */
+	/**
+	 * Add menu item under Woocommerce > Subscription CSV Import Suite
+	 *
+	 * @since 1.0
+	 */
 	public static function add_sub_menu() {
 		$menu = add_submenu_page('woocommerce', __( 'Subscription CSV Import Suite', 'wcs-importer' ),  __( 'Subscription CSV Import Suite', 'wcs-importer' ), 'manage_options', 'import_subscription', array( __CLASS__, 'home' ) );
 
 	}
 
+	/**
+	 *
+	 * @since 1.0
+	 */
 	public static function add_import_tool() {
 		register_importer('subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your store via a csv file.', 'subscription_importer' ), array( __CLASS__, 'home' ) );
 	}
 
+	/**
+	 *
+	 * @since 1.0
+	 */
 	public static function enqueue_scripts_wcs_import() {
 		wp_register_style( 'wcs-import_admin_css', plugin_dir_url(__FILE__) . '/css/style.css' );
 		wp_enqueue_style( 'wcs-import_admin_css' );
 	}
 
-	/* Main page header */
+	/**
+	 * Main page header
+	 *
+	 * @since 1.0
+	 */
 	public static function home() {
 		echo '<div class="wrap">';
 		echo '<h2>' . __( 'Subscription CSV Import Suite', 'wcs-importer' ) . '</h2>';
