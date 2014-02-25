@@ -76,4 +76,3 @@ class WC_Subscription_Importer {
 		echo '</div>';
 	}
 }
-?>

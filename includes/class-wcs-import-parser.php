@@ -446,4 +446,3 @@ class WCS_Import_Parser {
 		}
 	}
 }
-?>

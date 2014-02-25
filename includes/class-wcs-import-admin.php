@@ -577,4 +577,3 @@ class WCS_Admin_Importer {
 		<?php
 	}
 }
-?>
