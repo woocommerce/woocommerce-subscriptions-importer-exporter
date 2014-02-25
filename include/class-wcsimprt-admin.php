@@ -287,7 +287,7 @@ class WCS_Admin_Importer {
 
 	/* Sets up the AJAX requests and calls import_AJAX_start( .. ) */
 	function AJAX_setup() {
-		$request_limit = 3; // May change
+		$request_limit = 15; // May change
 		$file_positions = $row_start = array();
 		$payment_method_error = $payment_meta_error = array();
 		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
@@ -355,10 +355,13 @@ class WCS_Admin_Importer {
 		<script>
 				jQuery(document).ready(function($) {
 					if ( <?php echo count( $payment_method_error ); ?> > 0 ) {
-						if (confirm("You're importing subscriptions for [" + <?php echo json_encode( $payment_method_error ); ?> + "] without specifying [ " + <?php echo json_encode( $payment_meta_error ); ?> + " ]. This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?")){
+					<?php $method_error = json_encode( $payment_method_error ); ?>
+					<?php $method_meta = json_encode( $payment_meta_error ); ?>
+					<?php $errorString = "Youre importing subscriptions for " . $method_error . " without specifying " . $method_meta . " . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?"; ?>
+						if (confirm('<?php _e( $errorString, "wcs_import"); ?>')){
 							<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
 						} else {
-							console.log("Exit before importing subscriptions");
+							window.location.href = "<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>";
 						}
 					} else {
 						<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
@@ -523,8 +526,8 @@ class WCS_Admin_Importer {
 	function importer_error() {
 		global $file;
 		?>
-		<h3>Error while uploading File</h3>
-		<p>Error message: <?php _e($file['error']); ?></p>
+		<h3><?php _e('Error while uploading File', 'wcs_import'); ?></h3>
+		<p>Error message: <?php _e($file['error'], 'wcs_import'); ?></p>
 		<p><a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Import another file', 'wcs_import' ); ?></a></p>
 		<?php
 	}
