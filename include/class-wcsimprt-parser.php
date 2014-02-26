@@ -310,15 +310,14 @@ class WCS_Import_Parser {
 					'expiry_date'	=> ( ! empty( $row[$this->mapping['subscription_expiry_date']] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '',
 					'end_date'		=> ( ! empty( $row[$this->mapping['subscription_end_date']] ) ) ? $row[$this->mapping['subscription_end_date']] : '',
 			);
+
 			// Create pening Subscription
 			WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
 			// Add additional subscription meta data
 			$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
-			WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
 
 			$_POST['order_id'] = $order_id;
 			WC_Subscriptions_Order::prefill_order_item_meta( Array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
-
 			// Update the status of the subscription order
 			if( ! empty( $this->mapping['subscription_status'] ) && $row[$this->mapping['subscription_status']] ) {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['subscription_status']] ) );
@@ -326,6 +325,8 @@ class WCS_Import_Parser {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
 				$subscription['warning'][] = __( 'Used default subscription status as none was given. ', 'wcs_import' );
 			}
+			
+			WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
 		}
 
 		$subscription['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
