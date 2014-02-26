@@ -155,8 +155,8 @@ class WCS_Admin_Importer {
 							<select name="mapto[<?php echo $header; ?>]">
 								<optgroup label="<?php _e( 'Subsciption Information', 'wcs_import'); ?>">
 									<option value="0"><?php _e( 'Do not import', 'wcs_import'); ?></option>
-									<option value="product_id" <?php selected( $header, 'product_id' ); ?>>product_id</option>
-									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>>customer_id</option>
+									<option value="product_id" <?php selected( $header, 'product_id' ); ?>><?php _e( 'product_id', 'wcs_import' ); ?></option>
+									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>><?php _e( 'customer_id', 'wcs_import' ); ?></option>
 									<optgroup label="<?php _e( 'Other Customer Data', 'wcs_import' ); ?>">
 										<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
 										<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
