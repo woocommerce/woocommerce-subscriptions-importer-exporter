@@ -30,13 +30,12 @@ class WC_Subscription_Importer {
 	}
 
 	/**
-	 * Add menu item under Woocommerce > Subscription CSV Import Suite
+	 * Add menu item under Woocommerce > Subscription CSV Importer
 	 *
 	 * @since 1.0
 	 */
 	public static function add_sub_menu() {
-		$menu = add_submenu_page('woocommerce', __( 'Subscription CSV Import Suite', 'wcs-importer' ),  __( 'Subscription CSV Import Suite', 'wcs-importer' ), 'manage_options', 'import_subscription', array( __CLASS__, 'home' ) );
-
+		$menu = add_submenu_page('woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( __CLASS__, 'home' ) );
 	}
 
 	/**
@@ -44,7 +43,7 @@ class WC_Subscription_Importer {
 	 * @since 1.0
 	 */
 	public static function add_import_tool() {
-		register_importer('subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your store via a csv file.', 'subscription_importer' ), array( __CLASS__, 'home' ) );
+		register_importer( 'subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-importer' ), array( __CLASS__, 'home' ) );
 	}
 
 	/**
@@ -63,11 +62,11 @@ class WC_Subscription_Importer {
 	 */
 	public static function home() {
 		echo '<div class="wrap">';
-		echo '<h2>' . __( 'Subscription CSV Import Suite', 'wcs-importer' ) . '</h2>';
+		echo '<h2>' . __( 'Subscription CSV Importer', 'wcs-importer' ) . '</h2>';
 		?>
 		<div id="message" class="updated woocommerce-message wc-connect">
 			<div class="squeezer">
-				<h4><?php _e( '<strong>Subscription CSV Import Suite</strong> &#8211; Before gettign started prepare your CSV files', 'wcs-importer' ); ?></h4>
+				<h4><?php _e( '<strong>Subscription CSV Importer</strong> &#8211; Before gettign started prepare your CSV files', 'wcs-importer' ); ?></h4>
 				<p class="submit"><a href="" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a></p>
 			</div>
 		</div>
