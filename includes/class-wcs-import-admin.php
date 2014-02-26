@@ -30,7 +30,7 @@ class WCS_Admin_Importer {
 		case 3 :
 			$this->check_mapping();
 		case 4 :
-			$this->AJAX_request_handler();
+			$this->ajax_request_handler();
 			break;
 		default : //default to home page
 			$this->upload_page();
@@ -307,15 +307,15 @@ class WCS_Admin_Importer {
 		}
 		// Need to check for errors
 		$this->confirmation_table();
-		$this->AJAX_setup();
+		$this->ajax_setup();
 	}
 
 	/**
-	 * Sets up the AJAX requests and calls import_AJAX_start( .. )
+	 * Sets up the AJAX requests and calls import_ajax_start( .. )
 	 *
 	 * @since 1.0
 	 */
-	function AJAX_setup() {
+	function ajax_setup() {
 		$request_limit = 15; // May change
 		$file_positions = $row_start = array();
 		$payment_method_error = $payment_meta_error = array();
@@ -366,7 +366,7 @@ class WCS_Admin_Importer {
 					// Import rows between $previous_position $position
 					$file_positions[] = $previous_pos;
 					$file_positions[] = $position;
-					//$this->import_AJAX_start( $file, $delimiter, $previous_pos, $position );
+					//$this->import_ajax_start( $file, $delimiter, $previous_pos, $position );
 				}
 			}
 
@@ -374,7 +374,7 @@ class WCS_Admin_Importer {
 			if ( $count > 0 ) {
 				//rows.push( [ <?php echo $position; , '' ] );
 				$total++;
-				//$this->import_AJAX_start( $file, $delimiter, $position, ftell( $handle ) );
+				//$this->import_ajax_start( $file, $delimiter, $position, ftell( $handle ) );
 				$file_positions[] = $position;
 				$file_positions[] = ftell( $handle );
 			}
@@ -388,12 +388,12 @@ class WCS_Admin_Importer {
 					<?php $method_meta = json_encode( $payment_meta_error ); ?>
 					<?php $errorString = "Youre importing subscriptions for " . $method_error . " without specifying " . $method_meta . " . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?"; ?>
 						if (confirm('<?php _e( $errorString, "wcs_import"); ?>')){
-							<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
+							<?php $this->import_ajax_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
 						} else {
 							window.location.href = "<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>";
 						}
 					} else {
-						<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
+						<?php $this->import_ajax_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
 					}
 				});
 		</script>
@@ -405,7 +405,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	function import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ) {
+	function import_ajax_start( $file, $delimiter, $file_positions, $total, $row_start ) {
 		$array = json_encode($file_positions);
 		$starting_row_number = json_encode( $row_start );
 		?>
@@ -416,10 +416,10 @@ class WCS_Admin_Importer {
 					var starting_row_number = <?php echo $starting_row_number; ?>;
 					var count = 0;
 					for( var i = 0; i < positions.length; i+=2 ) {
-						AJAX_import( positions[i], positions[i+1], starting_row_number[i/2] );
+						ajax_import( positions[i], positions[i+1], starting_row_number[i/2] );
 					}
 
-					function AJAX_import( start_pos, end_pos, row_start ) {
+					function ajax_import( start_pos, end_pos, row_start ) {
 						var data = {
 							action:		'wcs_import_request',
 							mapping:	'<?php echo json_encode( $this->mapping ); ?>',
@@ -511,7 +511,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	function AJAX_request_handler() {
+	function ajax_request_handler() {
 		if ( ! current_user_can( 'manage_woocommerce' ) ){
 			error_log('invalid user');
 			die();
