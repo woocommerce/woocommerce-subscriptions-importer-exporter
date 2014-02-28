@@ -23,14 +23,14 @@ class WC_Subscription_Importer {
 		add_action( 'admin_menu', 'WC_Subscription_Importer::add_sub_menu', 10 );
 		add_action( 'admin_init', 'WC_Subscription_Importer::add_import_tool' );
 		add_action( 'admin_enqueue_scripts', 'WC_Subscription_Importer::enqueue_scripts_wcs_import' );
-		add_action( 'wp_ajax_wcs_import_request', array($wcs_importer, 'display_content'));
+		add_action( 'wp_ajax_wcs_import_request', array( $wcs_importer, 'display_content' ) );
 
 		define( 'WCS_DEBUG', true );
 	}
 
 	/* Add menu item under Woocommerce > Subscription CSV Import Suite */
 	function add_sub_menu() {
-		$menu = add_submenu_page('woocommerce', __( 'Subscription CSV Import Suite', 'wcs-importer' ),  __( 'Subscription CSV Import Suite', 'wcs-importer' ), 'manage_options', 'import_subscription', 'WC_Subscription_Importer::home');
+		$menu = add_submenu_page( 'woocommerce', __( 'Subscription CSV Import Suite', 'wcs-importer' ),  __( 'Subscription CSV Import Suite', 'wcs-importer' ), 'manage_options', 'import_subscription', 'WC_Subscription_Importer::home' );
 
 	}
 

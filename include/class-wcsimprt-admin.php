@@ -153,7 +153,7 @@ class WCS_Admin_Importer {
 					<tr>
 						<td> <!-- Available mapping options -->
 							<select name="mapto[<?php echo $header; ?>]">
-								<option value="0"><?php _e( 'Do not import', 'wcs_import'); ?></option>
+								<option value="0"><?php _e( 'Do not import', 'wcs_import' ); ?></option>
 								<optgroup label="<?php _e( 'Customer Fields', 'wcs_import'); ?>">
 									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>>customer_id</option>
 									<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
@@ -207,7 +207,7 @@ class WCS_Admin_Importer {
 							</select>
 						</td>
 						<td width="25%"><?php echo $header; ?></td> <!-- Column deader from csv file -->
-						<td><code><?php if ( $example != '' ) echo esc_html( $example ); else echo '-'; ?></code></td>
+						<td><code><?php echo ( ! empty( $empty ) ) ? esc_html( $example ) : '-'; ?></code></td>
 					</tr>
 					<?php endforeach; ?>
 				</tbody>
@@ -339,15 +339,12 @@ class WCS_Admin_Importer {
 					// Import rows between $previous_position $position
 					$file_positions[] = $previous_pos;
 					$file_positions[] = $position;
-					//$this->import_AJAX_start( $file, $delimiter, $previous_pos, $position );
 				}
 			}
 
 			// Account for the remainder
 			if ( $count > 0 ) {
-				//rows.push( [ <?php echo $position; , '' ] );
 				$total++;
-				//$this->import_AJAX_start( $file, $delimiter, $position, ftell( $handle ) );
 				$file_positions[] = $position;
 				$file_positions[] = ftell( $handle );
 			}
@@ -357,10 +354,11 @@ class WCS_Admin_Importer {
 		<script>
 				jQuery(document).ready(function($) {
 					if ( <?php echo count( $payment_method_error ); ?> > 0 ) {
-					<?php $method_error = json_encode( $payment_method_error ); ?>
-					<?php $method_meta = json_encode( $payment_meta_error ); ?>
-					<?php $errorString = "Youre importing subscriptions for " . $method_error . " without specifying " . $method_meta . " . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?"; ?>
-						if (confirm('<?php _e( $errorString, "wcs_import"); ?>')){
+						<?php 
+						$method_error = json_encode( $payment_method_error );
+						$method_meta = json_encode( $payment_meta_error );
+						$errorString = "Youre importing subscriptions for " . $method_error . " without specifying " . $method_meta . " . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?"; ?>
+						if (confirm( '<?php _e( $errorString, "wcs_import" ); ?>' )){
 							<?php $this->import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
 						} else {
 							window.location.href = "<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>";
@@ -375,7 +373,7 @@ class WCS_Admin_Importer {
 
 	/* Sends the AJAX call and waits for the repsonse data to fill in the confirmation table. */
 	function import_AJAX_start( $file, $delimiter, $file_positions, $total, $row_start ) {
-		$array = json_encode($file_positions);
+		$array = json_encode( $file_positions );
 		$starting_row_number = json_encode( $row_start );
 		?>
 			jQuery(document).ready(function($) {
@@ -400,7 +398,7 @@ class WCS_Admin_Importer {
 						}
 
 						$.ajax({
-							url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4'), admin_url( 'admin-ajax.php' ) ) ; ?>',
+							url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4' ), admin_url( 'admin-ajax.php' ) ) ; ?>',
 							type:	'POST',
 							data:	data,
 							success: function( response ) {
@@ -478,7 +476,7 @@ class WCS_Admin_Importer {
 	/* AJAX request holding the file, delimiter and mapping information is sent to this function. */
 	function AJAX_request_handler() {
 		if ( ! current_user_can( 'manage_woocommerce' ) ){
-			error_log('invalid user');
+			error_log( 'invalid user' );
 			die();
 		}
 		@set_time_limit(0);
@@ -528,8 +526,8 @@ class WCS_Admin_Importer {
 	function importer_error() {
 		global $file;
 		?>
-		<h3><?php _e('Error while uploading File', 'wcs_import'); ?></h3>
-		<p>Error message: <?php _e($file['error'], 'wcs_import'); ?></p>
+		<h3><?php _e( 'Error while uploading File', 'wcs_import' ); ?></h3>
+		<p>Error message: <?php _e( $file['error'], 'wcs_import' ); ?></p>
 		<p><a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Import another file', 'wcs_import' ); ?></a></p>
 		<?php
 	}
