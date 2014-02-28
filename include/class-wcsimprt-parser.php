@@ -159,7 +159,7 @@ class WCS_Import_Parser {
 		if( ! empty( $subscription['error'] ) ) {
 			$subscription['status'] = __( 'failed', 'wcs_import' );
 			$subscription['row_number'] = $this->starting_row_number;
-			array_push($this->results, $subscription);
+			array_push( $this->results, $subscription );
 			return;
 		}
 
@@ -220,7 +220,7 @@ class WCS_Import_Parser {
 					if( empty( $value ) ) {
 						$missing_ship_addr[] = $column;
 					}
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				case 'billing_addresss_1':
 				case 'billing_city':
@@ -235,10 +235,10 @@ class WCS_Import_Parser {
 					if( empty( $value ) ) {
 						$missing_bill_addr[] = $column;
 					}
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				case 'customer_user':
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $cust_id);
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $cust_id );
 					break;
 				case 'order_total':
 				case 'order_recurring_total':
@@ -251,14 +251,14 @@ class WCS_Import_Parser {
 						$metadata = get_user_meta( $cust_id, $column );
 						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
 					}
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 			}
 		}
 		if( ! empty( $missing_ship_addr ) ) {
-			$subscription['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim(implode(', ', $missing_ship_addr), ',') . '. ', 'wcs_import');
+			$subscription['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim( implode(', ', $missing_ship_addr ), ',' ) . '. ', 'wcs_import' );
 		}
 		if ( ! empty( $missing_bill_addr ) ) {
-			$subscription['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim(implode(', ', $missing_bill_addr), ',') . '. ', 'wcs_import');
+			$subscription['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_bill_addr ), ',' ) . '. ', 'wcs_import' );
 		}
 
 		$order_data = array(
@@ -277,7 +277,7 @@ class WCS_Import_Parser {
 			update_post_meta( $order_id, $meta['key'], $meta['value'] );
 
 			if ( '_customer_user' == $meta['key'] && $meta['value'] ) {
-				update_user_meta( $meta['value'], "paying_customer", 1 );
+				update_user_meta( $meta['value'], 'paying_customer', 1 );
 			}
 		}
 
@@ -301,8 +301,9 @@ class WCS_Import_Parser {
 			}
 
 			// Add line item meta for backorder status
-			if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) )
+			if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) ) {
 				wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
+			}
 
 			// Update the subscription meta data with values in $subscription_meta
 			$subscription_meta = array (
@@ -397,7 +398,7 @@ class WCS_Import_Parser {
 							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : '';
 							if( empty ( $meta_value ) ) {
 								$n_key = str_replace( "shipping", "billing", $key );
-								$meta_value = ( ! empty($row[ $this->mapping[$n_key]] ) ) ? $row[$this->mapping[$n_key]] : '';
+								$meta_value = ( ! empty( $row[ $this->mapping[$n_key]] ) ) ? $row[$this->mapping[$n_key]] : '';
 							}
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
