@@ -66,7 +66,7 @@ class WC_Subscription_Importer {
 		?>
 		<div id="message" class="updated woocommerce-message wc-connect">
 			<div class="squeezer">
-				<h4><?php _e( '<strong>Subscription CSV Importer</strong> &#8211; Before gettign started prepare your CSV files', 'wcs-importer' ); ?></h4>
+				<h4><?php _e( '<strong>Subscription CSV Importer</strong> &#8211; before you begin, please prepare your CSV file.', 'wcs-importer' ); ?></h4>
 				<p class="submit"><a href="" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a></p>
 			</div>
 		</div>

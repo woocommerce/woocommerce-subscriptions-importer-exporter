@@ -171,7 +171,7 @@ class WCS_Admin_Importer {
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach( $row as $header => $example ) : ?>
+					<?php foreach( $row as $header => $sample ) : ?>
 					<tr <?php echo ( ++$row_number % 2 ) ? '' : 'class="alternate"'; ?>>
 						<td> <!-- Available mapping options -->
 							<select name="mapto[<?php echo $header; ?>]">
@@ -229,7 +229,7 @@ class WCS_Admin_Importer {
 							</select>
 						</td>
 						<td width="25%"><?php echo $header; ?></td> <!-- Column deader from csv file -->
-						<td><code><?php echo ( ! empty( $example ) ) ? esc_html( $example ) : '-'; ?></code></td>
+						<td><code><?php echo ( ! empty( $sample ) ) ? esc_html( $sample ) : '-'; ?></code></td>
 					</tr>
 					<?php endforeach; ?>
 				</tbody>
