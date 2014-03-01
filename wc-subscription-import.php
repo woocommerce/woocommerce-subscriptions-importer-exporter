@@ -70,7 +70,10 @@ class WC_Subscription_Importer {
 		<div id="message" class="updated woocommerce-message wc-connect">
 			<div class="squeezer">
 				<h4><?php _e( '<strong>Subscription CSV Importer</strong> &#8211; before you begin, please prepare your CSV file.', 'wcs-importer' ); ?></h4>
-				<p class="submit"><a href="" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a></p>
+				<p class="submit">
+					<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a>
+					<a href="<?php echo plugins_url( 'wcs-import-sample.csv', __FILE__ ); ?>" class="button wcs-importer-download"><?php _e( 'Download Example CSV', 'wcs-importer' ); ?></a>
+				</p>
 			</div>
 		</div>
 		<?php //WC_Subscription_Importer::display_content();
