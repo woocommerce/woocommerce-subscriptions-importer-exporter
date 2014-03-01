@@ -44,7 +44,7 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	static function upload_page() { 
-		echo '<h3>' . __( 'Step 1: Upload CSV File', 'wcs_import' ) . '</h3>';
+		echo '<h3>' . __( 'Step 1: Upload CSV File', 'wcs-importer' ) . '</h3>';
 		$action = 'admin.php?page=import_subscription&amp;step=2&amp;';
 		$bytes = apply_filters( 'import_upload_size_limit', wp_max_upload_size() );
 		$size = size_format( $bytes );
@@ -72,14 +72,14 @@ class WCS_Admin_Importer {
 						</tr>
 						<tr>
 							<th>
-								<label for="file_url"><?php _e( 'OR enter path to file:', 'wcs_import' ); ?></label>
+								<label for="file_url"><?php _e( 'OR enter path to file:', 'wcs-importer' ); ?></label>
 							</th>
 							<td>
 								<?php echo ' ' . ABSPATH . ' '; ?><input type="text" id="file_url" name="file_url" size="50" />
 							</td>
 						</tr>
 						<tr>
-							<th><label><?php _e( 'Delimiter', 'wcs_import' ); ?></label><br/></th>
+							<th><label><?php _e( 'Delimiter', 'wcs-importer' ); ?></label><br/></th>
 							<td><input type="text" name="delimiter" placeholder="," size="2" /></td>
 						</tr>
 					</tbody>
@@ -157,7 +157,7 @@ class WCS_Admin_Importer {
 		$action = 'admin.php?page=import_subscription&amp;step=3&amp;';
 		$row_number = 1;
 		?>
-		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs_import' ); ?></h3>
+		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs-importer' ); ?></h3>
 		<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
 			<input type="hidden" name="file_id" value="<?php echo $this->id; ?>">
 			<input type="hidden" name="file_url" value="<?php echo $this->file_url; ?>">
@@ -165,9 +165,9 @@ class WCS_Admin_Importer {
 			<table class="widefat widefat_importer">
 				<thead>
 					<tr>
-						<th><?php _e( 'Map to', 'wcs_import' ); ?></th>
-						<th><?php _e( 'Column Header', 'wcs_import' ); ?></th>
-						<th><?php _e( 'Example Column Value', 'wcs_import' ); ?></th>
+						<th><?php _e( 'Map to', 'wcs-importer' ); ?></th>
+						<th><?php _e( 'Column Header', 'wcs-importer' ); ?></th>
+						<th><?php _e( 'Example Column Value', 'wcs-importer' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -175,8 +175,8 @@ class WCS_Admin_Importer {
 					<tr <?php echo ( ++$row_number % 2 ) ? '' : 'class="alternate"'; ?>>
 						<td> <!-- Available mapping options -->
 							<select name="mapto[<?php echo $header; ?>]">
-								<option value="0"><?php _e( 'Do not import', 'wcs_import' ); ?></option>
-								<optgroup label="<?php _e( 'Customer Fields', 'wcs_import'); ?>">
+								<option value="0"><?php _e( 'Do not import', 'wcs-importer' ); ?></option>
+								<optgroup label="<?php _e( 'Customer Fields', 'wcs-importer'); ?>">
 									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>>customer_id</option>
 									<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
 									<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
@@ -197,7 +197,7 @@ class WCS_Admin_Importer {
 									<option value="shipping_postcode" <?php selected( $header, 'shipping_postcode' ); ?>>shipping_postcode</option>
 									<option value="shipping_country" <?php selected( $header, 'shipping_country' ); ?>>shipping_country</option>
 								</optgroup>
-								<optgroup label="<?php _e( 'Order Fields', 'wcs_import' ); ?>">
+								<optgroup label="<?php _e( 'Order Fields', 'wcs-importer' ); ?>">
 									<option value="recurring_line_total" <?php selected( $header, 'recurring_line_total' ); ?>>recurring_line_total</option>
 									<option value="recurring_line_tax" <?php selected( $header, 'recurring_line_tax' ); ?>>recurring_line_tax</option>
 									<option value="recurring_line_subtotal" <?php selected( $header, 'recurring_line_subtotal' ); ?>>recurring_line_subtotal</option>
@@ -219,7 +219,7 @@ class WCS_Admin_Importer {
 									<option value="stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
 									<option value="paypal_subscriber_id" <?php selected( $header, 'paypal_subscriber_id' ); ?>>paypal_subscriber_id</option>
 								</optgroup>
-								<optgroup label="<?php _e( 'Subscription Status', 'wcs_import' ); ?>">
+								<optgroup label="<?php _e( 'Subscription Status', 'wcs-importer' ); ?>">
 									<option value="subscription_status" <?php selected( $header, 'subscription_status' ); ?>>subscription_status</option>
 									<option value="subscription_start_date" <?php selected( $header, 'subscription_start_date' ); ?>>subscription_start_date</option>
 									<option value="subscription_expiry_date" <?php selected( $header, 'subscription_expiry_date' ); ?>>subscription_expiry_date</option>
@@ -500,7 +500,7 @@ class WCS_Admin_Importer {
 							$('.importer-loading').addClass('finished').removeClass('importer-loading');
 							$('.finished').html('<td colspan="6" class="row">Finished Importing</td>');
 
-							$('.wrap').append('<p><?php _e( 'All done!', 'wcs_import' );?> <a href="<?php echo admin_url( 'admin.php?page=subscriptions' ); ?>"><?php _e( 'View Subscriptions', 'wcs_import' ); ?></a>, <a href="<?php echo admin_url( 'edit.php?post_type=shop_order' ); ?>"><?php _e( 'View Orders', 'wcs_import' ); ?></a> or <a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>">Import another file</a> </p>');
+							$('.wrap').append('<p><?php _e( 'All done!', 'wcs-importer' );?> <a href="<?php echo admin_url( 'admin.php?page=subscriptions' ); ?>"><?php _e( 'View Subscriptions', 'wcs-importer' ); ?></a>, <a href="<?php echo admin_url( 'edit.php?post_type=shop_order' ); ?>"><?php _e( 'View Orders', 'wcs-importer' ); ?></a> or <a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>">Import another file</a> </p>');
 						}
 					}
 			});
@@ -545,17 +545,17 @@ class WCS_Admin_Importer {
 	 */
 	function confirmation_table() { 
 		global $file;
-		echo '<h3>' . __( 'Step 3: File Stage', 'wcs_import' ) . '</h3>';
+		echo '<h3>' . __( 'Step 3: File Stage', 'wcs-importer' ) . '</h3>';
 		?>
 		<table id="wcs-import-progress" class="widefat_importer widefat">
 			<thead>
 				<tr>
-					<th class="row"><?php _e( 'Upload Status', 'wcs_import' ); ?></th>
-					<th class="row"><?php _e( 'Order #', 'wcs_import' ); ?></th>
-					<th class="row"><?php _e( 'Subscription', 'wcs_import' ); ?></th>
-					<th class="row"><?php _e( 'User Name', 'wcs_import' ); ?></th>
-					<th class="row"><?php _e( 'Subscription Status', 'wcs_import' ); ?></th>
-					<th class="row"><?php _e( 'Number of Warnings', 'wcs_import' ); ?></th>
+					<th class="row"><?php _e( 'Upload Status', 'wcs-importer' ); ?></th>
+					<th class="row"><?php _e( 'Order #', 'wcs-importer' ); ?></th>
+					<th class="row"><?php _e( 'Subscription', 'wcs-importer' ); ?></th>
+					<th class="row"><?php _e( 'User Name', 'wcs-importer' ); ?></th>
+					<th class="row"><?php _e( 'Subscription Status', 'wcs-importer' ); ?></th>
+					<th class="row"><?php _e( 'Number of Warnings', 'wcs-importer' ); ?></th>
 				</tr>
 			</thead>
 			<tfoot>
@@ -575,9 +575,9 @@ class WCS_Admin_Importer {
 	function importer_error() {
 		global $file;
 		?>
-		<h3><?php _e( 'Error while uploading File', 'wcs_import' ); ?></h3>
-		<p>Error message: <?php _e( $file['error'], 'wcs_import' ); ?></p>
-		<p><a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Import another file', 'wcs_import' ); ?></a></p>
+		<h3><?php _e( 'Error while uploading File', 'wcs-importer' ); ?></h3>
+		<p>Error message: <?php _e( $file['error'], 'wcs-importer' ); ?></p>
+		<p><a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Import another file', 'wcs-importer' ); ?></a></p>
 		<?php
 	}
 }
