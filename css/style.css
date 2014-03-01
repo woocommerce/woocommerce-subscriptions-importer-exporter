@@ -10,21 +10,16 @@
 	width: 32px;
 }
 
-#wcs-import-progress .warning-top {
-	padding:1em 1em 0em 1em;
-	padding: .5em 1em;
-
-}
-
-#wcs-import-progress .warning-bottom {
-	padding: 0em 0.5em .5em 1em;
-}
-
-#wcs-import-progress td.row, #wcs-import-progress th.row {
+#wcs-import-progress td.row,
+#wcs-import-progress th.row {
 	width: 3em;
 	text-align: center;
 	vertical-align: middle;
-	padding:1em 1em 0em 1em;
+	padding: 1em;
+}
+
+#wcs-import-progress tr.warning-top td.row {
+	padding-bottom: 0;
 }
 
 #wcs-import-progress tr.importer-loading td {
@@ -34,7 +29,7 @@
 
 .widefat_importer td {
 	vertical-align: middle;
-	padding: 5px 0px;
+	padding: 6px 0px 4px 10px;
 }
 
 #wcs-import-progress .warning {
@@ -52,3 +47,51 @@
 	padding-left: 1em;
 }
 
+.wcs-importer-download {
+	display: inline-block;
+	margin-right: 16px;
+}
+
+/* Imported Status Styles */
+#wcs-import-progress td.column-status {
+	padding: 6px 7px;
+}
+#wcs-import-progress .column-status mark {
+	display: inline-block;
+	text-align: center;
+	white-space: nowrap;
+	padding: 4px 12px;
+	background: #999;
+	border: 1px solid #999;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	-o-border-radius: 4px;
+	border-radius: 4px;
+	margin: 0;
+	font-size: 9px;
+	text-transform: uppercase;
+	color: #fff;
+	font-weight: bold;
+	text-shadow:0 1px 0 rgba(0,0,0,0.3);
+	width: 66px;
+}
+#wcs-import-progress .column-status mark.active {
+	background-color: #339933;
+	border-color: #339933;
+}
+#wcs-import-progress .column-status mark.expired {
+	background-color: #A0658B;
+	border-color: #A0658B;
+}
+#wcs-import-progress .column-status mark.pending {
+	background-color: #999;
+	border-color: #999;
+}
+#wcs-import-progress .column-status mark.on-hold {
+	background-color: #E66F00;
+	border-color: #E66F00;
+}
+#wcs-import-progress .column-status mark.cancelled {
+	background-color: #ccc;
+	border-color: #ccc;
+}
