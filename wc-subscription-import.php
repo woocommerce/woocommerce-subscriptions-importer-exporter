@@ -10,8 +10,8 @@ License: -
 */
 if ( !defined( 'ABSPATH') ) exit; // Exit if accessed directly
 // Plugin Classes
-include dirname( __FILE__ ) . '/includes/class-wcs-import-admin.php';
-include dirname( __FILE__ ) . '/includes/class-wcs-import-parser.php';
+require_once( dirname( __FILE__ ) . '/includes/class-wcs-import-admin.php' );
+require_once( dirname( __FILE__ ) . '/includes/class-wcs-import-parser.php' );
 
 WC_Subscription_Importer::init();
 
