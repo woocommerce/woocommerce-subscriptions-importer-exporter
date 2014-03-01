@@ -229,7 +229,7 @@ class WCS_Admin_Importer {
 							</select>
 						</td>
 						<td width="25%"><?php echo $header; ?></td> <!-- Column deader from csv file -->
-						<td><code><?php echo ( ! empty( $empty ) ) ? esc_html( $example ) : '-'; ?></code></td>
+						<td><code><?php echo ( ! empty( $example ) ) ? esc_html( $example ) : '-'; ?></code></td>
 					</tr>
 					<?php endforeach; ?>
 				</tbody>
