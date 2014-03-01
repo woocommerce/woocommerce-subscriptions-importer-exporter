@@ -43,7 +43,7 @@ class WC_Subscription_Importer {
 	 * @since 1.0
 	 */
 	public static function add_import_tool() {
-		register_importer( 'subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-importer' ), array( __CLASS__, 'home' ) );
+		register_importer( 'woocommerce_subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-importer' ), array( __CLASS__, 'home' ) );
 	}
 
 	/**
