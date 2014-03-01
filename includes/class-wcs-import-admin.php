@@ -522,17 +522,19 @@ class WCS_Admin_Importer {
 		@ob_flush();
 		@flush();
 
-		$file = stripslashes($_POST['file']);
-		$mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
-		$delimiter = $_POST['delimiter'];
-		$start = ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0;
-		$end = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
-		$starting_row_num = absint( $_POST['row_num'] );
-		$this->parser = new WCS_Import_Parser();
-		$this->results = $this->parser->import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num );
-		echo '<div style="display:none;">';
-		echo "<!--WC_START-->" . json_encode( $this->results ) . "<!--WC_END-->";
-		echo '</div>';
+		if( isset( $_POST['file'] ) && isset( $_POST['row_num'] ) && isset( $_POST['mapping'] ) ) {
+			$file = stripslashes($_POST['file']);
+			$mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
+			$delimiter = $_POST['delimiter'];
+			$start = ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0;
+			$end = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
+			$starting_row_num = absint( $_POST['row_num'] );
+			$this->parser = new WCS_Import_Parser();
+			$this->results = $this->parser->import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num );
+			echo '<div style="display:none;">';
+			echo "<!--WC_START-->" . json_encode( $this->results ) . "<!--WC_END-->";
+			echo '</div>';
+		}
 		exit; // End
 	}
 
