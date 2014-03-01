@@ -514,9 +514,9 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	function ajax_request_handler() {
+
 		if ( ! current_user_can( 'manage_woocommerce' ) ){
-			error_log( 'invalid user' );
-			die();
+			wp_die( "Cheatin' huh?");
 		}
 		@set_time_limit(0);
 		@ob_flush();
