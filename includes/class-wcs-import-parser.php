@@ -7,8 +7,6 @@ class WCS_Import_Parser {
 	var $results = array();
 	var $start_pos;
 	var $end_pos;
-	var $available_gateways;
-	var $available_shipping_methods;
 	var $starting_row_number;
 
 	function __construct() {
@@ -96,10 +94,6 @@ class WCS_Import_Parser {
 		$this->end_pos = $end;
 		$this->starting_row_number = $starting_row_num;
 
-		// Get the stores available payment gateways
-		$this->available_gateways = $woocommerce->payment_gateways->get_available_payment_gateways();
-		$this->available_shipping_methods  = $woocommerce->shipping->load_shipping_methods();
-
 		$this->import_start( $file_path );
 		return $this->results;
 	}
@@ -181,7 +175,7 @@ class WCS_Import_Parser {
 		if( ! empty( $subscription['error'] ) ) {
 			$subscription['status'] = __( 'failed', 'wcs_import' );
 			$subscription['row_number'] = $this->starting_row_number;
-			array_push($this->results, $subscription);
+			array_push( $this->results, $subscription );
 			return;
 		}
 
@@ -201,7 +195,7 @@ class WCS_Import_Parser {
 					$postmeta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
 					if( empty( $method ) || empty( $title ) ) {
 						// set up warning message to show admin -  Do i need be more specific??
-						$subscription['warning'][] = __( 'Shipping method and/or title for the order has been set to empty', 'wcs_import' );
+						$subscription['warning'][] = __( 'Shipping method and/or title for the order has been set to empty. ', 'wcs_import' );
 					}
 					break;
 				case 'payment_method':
@@ -226,7 +220,7 @@ class WCS_Import_Parser {
 						$postmeta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
 					} else { // default to manual payment regardless
 						$postmeta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
-						$subscription['warning'][] = __( 'No recognisable payment method has been specified therefore default payment method being used.', 'wcs_import' );
+						$subscription['warning'][] = __( 'No recognisable payment method has been specified therefore default payment method being used. ', 'wcs_import' );
 					}
 					break;
 				case 'shipping_addresss_1':
@@ -242,7 +236,7 @@ class WCS_Import_Parser {
 					if( empty( $value ) ) {
 						$missing_ship_addr[] = $column;
 					}
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				case 'billing_addresss_1':
 				case 'billing_city':
@@ -257,10 +251,10 @@ class WCS_Import_Parser {
 					if( empty( $value ) ) {
 						$missing_bill_addr[] = $column;
 					}
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				case 'customer_user':
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $cust_id);
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $cust_id );
 					break;
 				case 'order_total':
 				case 'order_recurring_total':
@@ -273,14 +267,14 @@ class WCS_Import_Parser {
 						$metadata = get_user_meta( $cust_id, $column );
 						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
 					}
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value);
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 			}
 		}
 		if( ! empty( $missing_ship_addr ) ) {
-			$subscription['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim(implode(', ', $missing_ship_addr), ',') . '. ', 'wcs_import');
+			$subscription['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim( implode(', ', $missing_ship_addr ), ',' ) . '. ', 'wcs_import' );
 		}
 		if ( ! empty( $missing_bill_addr ) ) {
-			$subscription['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim(implode(', ', $missing_bill_addr), ',') . '. ', 'wcs_import');
+			$subscription['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_bill_addr ), ',' ) . '. ', 'wcs_import' );
 		}
 
 		$order_data = array(
@@ -299,7 +293,7 @@ class WCS_Import_Parser {
 			update_post_meta( $order_id, $meta['key'], $meta['value'] );
 
 			if ( '_customer_user' == $meta['key'] && $meta['value'] ) {
-				update_user_meta( $meta['value'], "paying_customer", 1 );
+				update_user_meta( $meta['value'], 'paying_customer', 1 );
 			}
 		}
 
@@ -323,8 +317,9 @@ class WCS_Import_Parser {
 			}
 
 			// Add line item meta for backorder status
-			if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) )
+			if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) ) {
 				wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
+			}
 
 			// Update the subscription meta data with values in $subscription_meta
 			$subscription_meta = array (
@@ -332,23 +327,25 @@ class WCS_Import_Parser {
 					'expiry_date'	=> ( ! empty( $row[$this->mapping['subscription_expiry_date']] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '',
 					'end_date'		=> ( ! empty( $row[$this->mapping['subscription_end_date']] ) ) ? $row[$this->mapping['subscription_end_date']] : '',
 			);
+
 			// Create pening Subscription
 			WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
 			// Add additional subscription meta data
 			$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
-			WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
 
 			$_POST['order_id'] = $order_id;
 			WC_Subscriptions_Order::prefill_order_item_meta( Array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
-
 			// Update the status of the subscription order
 			if( ! empty( $this->mapping['subscription_status'] ) && $row[$this->mapping['subscription_status']] ) {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['subscription_status']] ) );
 			} else {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
-				$subscription['warning'][] = __( 'Used default subscription status as none was given.', 'wcs_import' );
+				$subscription['warning'][] = __( 'Used default subscription status as none was given. ', 'wcs_import' );
 			}
+			
+			WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
 		}
+
 		$subscription['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
 		// Check if the subscription has been successfully added
 		$key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
@@ -408,7 +405,7 @@ class WCS_Import_Parser {
 					switch( $key ) {
 						case 'billing_email':
 							// user billing email if set in csv otherwise use the user's account email
-							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : $customer_email;
+							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : $customer_email;
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
 						case 'billing_first_name':
@@ -422,15 +419,15 @@ class WCS_Import_Parser {
 						case 'shipping_state':
 						case 'shipping_country':
 							// Set the shipping address fields to match the billing fields if not specified in CSV
-							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : '';
+							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : '';
 							if( empty ( $meta_value ) ) {
 								$n_key = str_replace( "shipping", "billing", $key );
-								$meta_value = ( ! empty( $this->mapping[$n_key] ) ) ? $row[$this->mapping[$n_key]] : '';
+								$meta_value = ( ! empty( $row[ $this->mapping[$n_key]] ) ) ? $row[$this->mapping[$n_key]] : '';
 							}
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
 						default:
-							$meta_value = ( ! empty( $this->mapping[$key] ) ) ? $row[$this->mapping[$key]] : '';
+							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : '';
 							update_user_meta( $found_customer, $key, $meta_value );
 					}
 				}

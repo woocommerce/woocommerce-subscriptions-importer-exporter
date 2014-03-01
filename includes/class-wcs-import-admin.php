@@ -174,59 +174,61 @@ class WCS_Admin_Importer {
 					<tr>
 						<td> <!-- Available mapping options -->
 							<select name="mapto[<?php echo $header; ?>]">
-								<optgroup label="<?php _e( 'Subsciption Information', 'wcs_import'); ?>">
-									<option value="0"><?php _e( 'Do not import', 'wcs_import'); ?></option>
-									<option value="product_id" <?php selected( $header, 'product_id' ); ?>>product_id</option>
+								<option value="0"><?php _e( 'Do not import', 'wcs_import' ); ?></option>
+								<optgroup label="<?php _e( 'Customer Fields', 'wcs_import'); ?>">
 									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>>customer_id</option>
-									<optgroup label="<?php _e( 'Other Customer Data', 'wcs_import' ); ?>">
-										<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
-										<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
-										<option value="billing_first_name" <?php selected( $header, 'billing_first_name' ); ?>>billing_first_name</option>
-										<option value="billing_last_name" <?php selected( $header, 'billing_last_name' ); ?>>billing_last_name</option>
-										<option value="billing_address_1" <?php selected( $header, 'billing_address_1' ); ?>>billing_address_1</option>
-										<option value="billing_address_2" <?php selected( $header, 'billing_address_2' ); ?>>billing_address_2</option>
-										<option value="billing_city" <?php selected( $header, 'billing_city' ); ?>>billing_city</option>
-										<option value="billing_state" <?php selected( $header, 'billing_state' ); ?>>billing_state</option>
-										<option value="billing_postcode" <?php selected( $header, 'billing_postcode' ); ?>>billing_postcode</option>
-										<option value="billing_country" <?php selected( $header, 'billing_country' ); ?>>billing_country</option>
-										<option value="billing_email" <?php selected( $header, 'billing_email' ); ?>>billing_email</option>
-										<option value="billing_phone" <?php selected( $header, 'billing_phone' ); ?>>billing_phone</option>
-										<option value="shipping_address_1" <?php selected( $header, 'shipping_address_1' ); ?>>shipping_address_1</option>
-										<option value="shipping_address_2" <?php selected( $header, 'shipping_address_2' ); ?>>shipping_address_2</option>
-										<option value="shipping_city" <?php selected( $header, 'shipping_city' ); ?>>shipping_city</option>
-										<option value="shipping_state" <?php selected( $header, 'shipping_state' ); ?>>shipping_state</option>
-										<option value="shipping_postcode" <?php selected( $header, 'shipping_postcode' ); ?>>shipping_postcode</option>
-										<option value="shipping_country" <?php selected( $header, 'shipping_country' ); ?>>shipping_country</option>
-									</optgroup>
+									<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
+									<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
+									<option value="billing_first_name" <?php selected( $header, 'billing_first_name' ); ?>>billing_first_name</option>
+									<option value="billing_last_name" <?php selected( $header, 'billing_last_name' ); ?>>billing_last_name</option>
+									<option value="billing_address_1" <?php selected( $header, 'billing_address_1' ); ?>>billing_address_1</option>
+									<option value="billing_address_2" <?php selected( $header, 'billing_address_2' ); ?>>billing_address_2</option>
+									<option value="billing_city" <?php selected( $header, 'billing_city' ); ?>>billing_city</option>
+									<option value="billing_state" <?php selected( $header, 'billing_state' ); ?>>billing_state</option>
+									<option value="billing_postcode" <?php selected( $header, 'billing_postcode' ); ?>>billing_postcode</option>
+									<option value="billing_country" <?php selected( $header, 'billing_country' ); ?>>billing_country</option>
+									<option value="billing_email" <?php selected( $header, 'billing_email' ); ?>>billing_email</option>
+									<option value="billing_phone" <?php selected( $header, 'billing_phone' ); ?>>billing_phone</option>
+									<option value="shipping_address_1" <?php selected( $header, 'shipping_address_1' ); ?>>shipping_address_1</option>
+									<option value="shipping_address_2" <?php selected( $header, 'shipping_address_2' ); ?>>shipping_address_2</option>
+									<option value="shipping_city" <?php selected( $header, 'shipping_city' ); ?>>shipping_city</option>
+									<option value="shipping_state" <?php selected( $header, 'shipping_state' ); ?>>shipping_state</option>
+									<option value="shipping_postcode" <?php selected( $header, 'shipping_postcode' ); ?>>shipping_postcode</option>
+									<option value="shipping_country" <?php selected( $header, 'shipping_country' ); ?>>shipping_country</option>
+								</optgroup>
+								<optgroup label="<?php _e( 'Order Fields', 'wcs_import' ); ?>">
+									<option value="recurring_line_total" <?php selected( $header, 'recurring_line_total' ); ?>>recurring_line_total</option>
+									<option value="recurring_line_tax" <?php selected( $header, 'recurring_line_tax' ); ?>>recurring_line_tax</option>
+									<option value="recurring_line_subtotal" <?php selected( $header, 'recurring_line_subtotal' ); ?>>recurring_line_subtotal</option>
+									<option value="recurring_line_subtotal_tax" <?php selected( $header, 'recurring_line_subtotal_tax' ); ?>>recurring_line_subtotal_tax</option>
+									<option value="line_total" <?php selected( $header, 'line_total' ); ?>>line_total</option>
+									<option value="line_tax" <?php selected( $header, 'line_tax' ); ?>>line_tax</option>
+									<option value="line_subtotal" <?php selected( $header, 'line_subtotal' ); ?>>line_subtotal</option>
+									<option value="line_subtotal_tax" <?php selected( $header, 'line_subtotal_tax' ); ?>>line_subtotal_tax</option>
+									<option value="order_discount" <?php selected( $header, 'order_discount' ); ?>>order_discount</option>
+									<option value="cart_discount" <?php selected( $header, 'cart_discount' ); ?>>cart_discount</option>
+									<option value="order_shipping_tax" <?php selected( $header, 'order_shipping_tax' ); ?>>order_shipping_tax</option>
+									<option value="order_shipping" <?php selected( $header, 'order_shipping' ); ?>>order_shipping</option>
+									<option value="order_tax" <?php selected( $header, 'order_tax' ); ?>>order_tax</option>
+									<option value="order_total" <?php selected( $header, 'order_total' ); ?>>order_total</option>
+									<option value="payment_method" <?php selected( $header, 'payment_method' ); ?>>payment_method</option>
+									<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
+									<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
+									<option value="shipping_method_title" <?php selected( $header, 'shipping_method_title' ); ?>>shipping_method_title</option>
+									<option value="stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
+									<option value="paypal_subscriber_id" <?php selected( $header, 'paypal_subscriber_id' ); ?>>paypal_subscriber_id</option>
+								</optgroup>
+								<optgroup label="<?php _e( 'Subscription Status', 'wcs_import' ); ?>">
 									<option value="subscription_status" <?php selected( $header, 'subscription_status' ); ?>>subscription_status</option>
 									<option value="subscription_start_date" <?php selected( $header, 'subscription_start_date' ); ?>>subscription_start_date</option>
 									<option value="subscription_expiry_date" <?php selected( $header, 'subscription_expiry_date' ); ?>>subscription_expiry_date</option>
 									<option value="subscription_end_date" <?php selected( $header, 'subscription_end_date' ); ?>>subscription_end_date</option>
+									<option value="product_id" <?php selected( $header, 'product_id' ); ?>>product_id</option>
 								</optgroup>
-								<option value="recurring_line_total" <?php selected( $header, 'recurring_line_total' ); ?>>recurring_line_total</option>
-								<option value="recurring_line_tax" <?php selected( $header, 'recurring_line_tax' ); ?>>recurring_line_tax</option>
-								<option value="recurring_line_subtotal" <?php selected( $header, 'recurring_line_subtotal' ); ?>>recurring_line_subtotal</option>
-								<option value="recurring_line_subtotal_tax" <?php selected( $header, 'recurring_line_subtotal_tax' ); ?>>recurring_line_subtotal_tax</option>
-								<option value="line_total" <?php selected( $header, 'line_total' ); ?>>line_total</option>
-								<option value="line_tax" <?php selected( $header, 'line_tax' ); ?>>line_tax</option>
-								<option value="line_subtotal" <?php selected( $header, 'line_subtotal' ); ?>>line_subtotal</option>
-								<option value="line_subtotal_tax" <?php selected( $header, 'line_subtotal_tax' ); ?>>line_subtotal_tax</option>
-								<option value="order_discount" <?php selected( $header, 'order_discount' ); ?>>order_discount</option>
-								<option value="cart_discount" <?php selected( $header, 'cart_discount' ); ?>>cart_discount</option>
-								<option value="order_shipping_tax" <?php selected( $header, 'order_shipping_tax' ); ?>>order_shipping_tax</option>
-								<option value="order_shipping" <?php selected( $header, 'order_shipping' ); ?>>order_shipping</option>
-								<option value="order_tax" <?php selected( $header, 'order_tax' ); ?>>order_tax</option>
-								<option value="order_total" <?php selected( $header, 'order_total' ); ?>>order_total</option>
-								<option value="payment_method" <?php selected( $header, 'payment_method' ); ?>>payment_method</option>
-								<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
-								<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
-								<option value="shipping_method_title" <?php selected( $header, 'shipping_method_title' ); ?>>shipping_method_title</option>
-								<option value="stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
-								<option value="paypal_subscriber_id" <?php selected( $header, 'paypal_subscriber_id' ); ?>>paypal_subscriber_id</option>
 							</select>
 						</td>
 						<td width="25%"><?php echo $header; ?></td> <!-- Column deader from csv file -->
-						<td><code><?php if ( $example != '' ) echo esc_html( $example ); else echo '-'; ?></code></td>
+						<td><code><?php echo ( ! empty( $empty ) ) ? esc_html( $example ) : '-'; ?></code></td>
 					</tr>
 					<?php endforeach; ?>
 				</tbody>
@@ -366,15 +368,12 @@ class WCS_Admin_Importer {
 					// Import rows between $previous_position $position
 					$file_positions[] = $previous_pos;
 					$file_positions[] = $position;
-					//$this->import_ajax_start( $file, $delimiter, $previous_pos, $position );
 				}
 			}
 
 			// Account for the remainder
 			if ( $count > 0 ) {
-				//rows.push( [ <?php echo $position; , '' ] );
 				$total++;
-				//$this->import_ajax_start( $file, $delimiter, $position, ftell( $handle ) );
 				$file_positions[] = $position;
 				$file_positions[] = ftell( $handle );
 			}
@@ -383,11 +382,11 @@ class WCS_Admin_Importer {
 		?>
 		<script>
 				jQuery(document).ready(function($) {
-					if ( <?php echo count( $payment_method_error ); ?> > 0 ) {
-					<?php $method_error = json_encode( $payment_method_error ); ?>
-					<?php $method_meta = json_encode( $payment_meta_error ); ?>
-					<?php $errorString = "Youre importing subscriptions for " . $method_error . " without specifying " . $method_meta . " . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?"; ?>
-						if (confirm('<?php _e( $errorString, "wcs_import"); ?>')){
+					if ( <?php echo count( $payment_method_error ); ?> > 0 ) { <?php 
+						$method_error = json_encode( $payment_method_error );
+						$method_meta = json_encode( $payment_meta_error );
+						$errorString = "Youre importing subscriptions for " . $method_error . " without specifying " . $method_meta . " . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?"; ?>
+						if (confirm( '<?php _e( $errorString, "wcs_import" ); ?>' )){
 							<?php $this->import_ajax_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
 						} else {
 							window.location.href = "<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>";
@@ -431,7 +430,7 @@ class WCS_Admin_Importer {
 						}
 
 						$.ajax({
-							url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4'), admin_url( 'admin-ajax.php' ) ) ; ?>',
+							url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4' ), admin_url( 'admin-ajax.php' ) ) ; ?>',
 							type:	'POST',
 							data:	data,
 							success: function( response ) {
@@ -513,7 +512,7 @@ class WCS_Admin_Importer {
 	 */
 	function ajax_request_handler() {
 		if ( ! current_user_can( 'manage_woocommerce' ) ){
-			error_log('invalid user');
+			error_log( 'invalid user' );
 			die();
 		}
 		@set_time_limit(0);
@@ -571,8 +570,8 @@ class WCS_Admin_Importer {
 	function importer_error() {
 		global $file;
 		?>
-		<h3><?php _e('Error while uploading File', 'wcs_import'); ?></h3>
-		<p>Error message: <?php _e($file['error'], 'wcs_import'); ?></p>
+		<h3><?php _e( 'Error while uploading File', 'wcs_import' ); ?></h3>
+		<p>Error message: <?php _e( $file['error'], 'wcs_import' ); ?></p>
 		<p><a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Import another file', 'wcs_import' ); ?></a></p>
 		<?php
 	}
