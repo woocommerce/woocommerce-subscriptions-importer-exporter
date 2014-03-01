@@ -27,6 +27,9 @@ class WC_Subscription_Importer {
 		add_action( 'admin_init', array( __CLASS__, 'add_import_tool' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts_wcs_import' ) );
 		add_action( 'wp_ajax_wcs_import_request', array( self::$wcs_importer, 'display_content' ) );
+
+		// Add the "Settings | Documentation" links on the Plugins administration screen
+		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), __CLASS__ . '::action_links' );
 	}
 
 	/**
@@ -73,5 +76,22 @@ class WC_Subscription_Importer {
 		<?php //WC_Subscription_Importer::display_content();
 		self::$wcs_importer->display_content();
 		echo '</div>';
+	}
+
+	/**
+	 * Include Docs & Settings links on the Plugins administration screen
+	 *
+	 * @param mixed $links
+	 * @since 1.0
+	 */
+	public static function action_links( $links ) {
+
+		$plugin_links = array(
+			'<a href="' . admin_url( 'admin.php?page=import_subscription' ) . '">' . __( 'Import', 'wcs-importer' ) . '</a>',
+			'<a href="http://docs.woothemes.com/document/subscriptions-importer/">' . __( 'Docs', 'wcs-importer' ) . '</a>',
+			'<a href="http://support.woothemes.com">' . __( 'Support', 'wcs-importer' ) . '</a>',
+		);
+
+		return array_merge( $plugin_links, $links );
 	}
 }
