@@ -157,7 +157,7 @@ class WCS_Import_Parser {
 		$subscription['warning'] = $subscription['error'] = array();
 		// Check Product id a woocommerce product
 		if( ! ( $this->check_product( $row[$this->mapping['product_id']] ) ) ) {
-			$subscription['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs_import' );
+			$subscription['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
 		}
 
 		// Check customer id is valid or create one
@@ -173,7 +173,7 @@ class WCS_Import_Parser {
 
 		// skip importing rows without the required information
 		if( ! empty( $subscription['error'] ) ) {
-			$subscription['status'] = __( 'failed', 'wcs_import' );
+			$subscription['status'] = __( 'failed', 'wcs-importer' );
 			$subscription['row_number'] = $this->starting_row_number;
 			array_push( $this->results, $subscription );
 			return;
@@ -181,7 +181,7 @@ class WCS_Import_Parser {
 
 		// Get product object - checked validity @ L141
 		$_product = get_product( $row[$this->mapping['product_id']] );
-		$subscription['item'] = __( $_product->get_title(), 'wcs_import' );
+		$subscription['item'] = __( $_product->get_title(), 'wcs-importer' );
 
 		$missing_ship_addr = $missing_bill_addr = array();
 
@@ -195,7 +195,7 @@ class WCS_Import_Parser {
 					$postmeta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
 					if( empty( $method ) || empty( $title ) ) {
 						// set up warning message to show admin -  Do i need be more specific??
-						$subscription['warning'][] = __( 'Shipping method and/or title for the order has been set to empty. ', 'wcs_import' );
+						$subscription['warning'][] = __( 'Shipping method and/or title for the order has been set to empty. ', 'wcs-importer' );
 					}
 					break;
 				case 'payment_method':
@@ -220,7 +220,7 @@ class WCS_Import_Parser {
 						$postmeta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
 					} else { // default to manual payment regardless
 						$postmeta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
-						$subscription['warning'][] = __( 'No recognisable payment method has been specified therefore default payment method being used. ', 'wcs_import' );
+						$subscription['warning'][] = __( 'No recognisable payment method has been specified therefore default payment method being used. ', 'wcs-importer' );
 					}
 					break;
 				case 'shipping_addresss_1':
@@ -271,10 +271,10 @@ class WCS_Import_Parser {
 			}
 		}
 		if( ! empty( $missing_ship_addr ) ) {
-			$subscription['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim( implode(', ', $missing_ship_addr ), ',' ) . '. ', 'wcs_import' );
+			$subscription['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim( implode(', ', $missing_ship_addr ), ',' ) . '. ', 'wcs-importer' );
 		}
 		if ( ! empty( $missing_bill_addr ) ) {
-			$subscription['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_bill_addr ), ',' ) . '. ', 'wcs_import' );
+			$subscription['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_bill_addr ), ',' ) . '. ', 'wcs-importer' );
 		}
 
 		$order_data = array(
@@ -340,7 +340,7 @@ class WCS_Import_Parser {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['subscription_status']] ) );
 			} else {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
-				$subscription['warning'][] = __( 'Used default subscription status as none was given. ', 'wcs_import' );
+				$subscription['warning'][] = __( 'Used default subscription status as none was given. ', 'wcs-importer' );
 			}
 			
 			WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
@@ -353,13 +353,13 @@ class WCS_Import_Parser {
 		if( ! empty ( $subscription_check['order_id'] ) && ! empty ( $subscription_check['product_id'] ) ) {
 			// successfully added subscription
 			// Attach information on each order to the results array
-			$subscription['status'] = __( 'success', 'wcs_import' );
+			$subscription['status'] = __( 'success', 'wcs-importer' );
 			$subscription['order'] = $subscription_check['order_id'];
 			$subscription['subscription_status'] = $subscription_check['status'];
 			$subscription['item_id'] = ( ! empty ( $subscription_check['variation_id'] ) ) ? $subcription_check['variation_id'] : $subscription_check['product_id'];
 			array_push( $this->results, $subscription );
 		} else {
-			$subscription['status'] = __( 'failed', 'wcs_import' );
+			$subscription['status'] = __( 'failed', 'wcs-importer' );
 			array_push( $this->results, $subscription );
 		}
 
