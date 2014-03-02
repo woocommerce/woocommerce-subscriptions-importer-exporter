@@ -328,13 +328,10 @@ class WCS_Import_Parser {
 					'end_date'		=> ( ! empty( $row[$this->mapping['subscription_end_date']] ) ) ? $row[$this->mapping['subscription_end_date']] : '',
 			);
 
-			// Create pening Subscription
-			WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
-			// Add additional subscription meta data
-			$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
-
 			$_POST['order_id'] = $order_id;
 			WC_Subscriptions_Order::prefill_order_item_meta( Array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
+			// Create pening Subscription
+			WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
 			// Update the status of the subscription order
 			if( ! empty( $this->mapping['subscription_status'] ) && $row[$this->mapping['subscription_status']] ) {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['subscription_status']] ) );
@@ -342,7 +339,8 @@ class WCS_Import_Parser {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
 				$subscription['warning'][] = __( 'Used default subscription status as none was given. ', 'wcs-importer' );
 			}
-			
+			// Add additional subscription meta data
+			$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
 			WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
 		}
 
@@ -350,6 +348,7 @@ class WCS_Import_Parser {
 		// Check if the subscription has been successfully added
 		$key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
 		$subscription_check = WC_Subscriptions_Manager::get_subscription( $key );
+
 		if( ! empty ( $subscription_check['order_id'] ) && ! empty ( $subscription_check['product_id'] ) ) {
 			// successfully added subscription
 			// Attach information on each order to the results array
@@ -362,7 +361,6 @@ class WCS_Import_Parser {
 			$subscription['status'] = __( 'failed', 'wcs-importer' );
 			array_push( $this->results, $subscription );
 		}
-
 	}
 
 	/**
