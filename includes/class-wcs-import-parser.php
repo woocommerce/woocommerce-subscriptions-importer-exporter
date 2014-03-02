@@ -323,7 +323,7 @@ class WCS_Import_Parser {
 
 			// Update the subscription meta data with values in $subscription_meta
 			$subscription_meta = array (
-					'start_date' 	=> ( ! empty( $row[$this->mapping['subscription_start_date']] ) ) ? $row[$this->mapping['subscription_start_date']] : '',
+					'start_date' 	=> ( ! empty( $row[$this->mapping['subscription_start_date']] ) ) ? $row[$this->mapping['subscription_start_date']] : date( 'm/d/y' ),
 					'expiry_date'	=> ( ! empty( $row[$this->mapping['subscription_expiry_date']] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '',
 					'end_date'		=> ( ! empty( $row[$this->mapping['subscription_end_date']] ) ) ? $row[$this->mapping['subscription_end_date']] : '',
 			);
