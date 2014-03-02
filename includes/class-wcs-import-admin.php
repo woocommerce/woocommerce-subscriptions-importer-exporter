@@ -190,6 +190,7 @@ class WCS_Admin_Importer {
 									<option value="billing_country" <?php selected( $header, 'billing_country' ); ?>>billing_country</option>
 									<option value="billing_email" <?php selected( $header, 'billing_email' ); ?>>billing_email</option>
 									<option value="billing_phone" <?php selected( $header, 'billing_phone' ); ?>>billing_phone</option>
+									<option value="billing_company" <?php selected( $header, 'billing_company' ); ?>>billing_company</option>
 									<option value="shipping_address_1" <?php selected( $header, 'shipping_address_1' ); ?>>shipping_address_1</option>
 									<option value="shipping_address_2" <?php selected( $header, 'shipping_address_2' ); ?>>shipping_address_2</option>
 									<option value="shipping_city" <?php selected( $header, 'shipping_city' ); ?>>shipping_city</option>
@@ -218,6 +219,7 @@ class WCS_Admin_Importer {
 									<option value="shipping_method_title" <?php selected( $header, 'shipping_method_title' ); ?>>shipping_method_title</option>
 									<option value="stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
 									<option value="paypal_subscriber_id" <?php selected( $header, 'paypal_subscriber_id' ); ?>>paypal_subscriber_id</option>
+									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
 								</optgroup>
 								<optgroup label="<?php _e( 'Subscription Status', 'wcs-importer' ); ?>">
 									<option value="subscription_status" <?php selected( $header, 'subscription_status' ); ?>>subscription_status</option>
@@ -263,6 +265,7 @@ class WCS_Admin_Importer {
 			'billing_country' 			  => '',
 			'billing_email' 			  => '',
 			'billing_phone' 			  => '',
+			'billing_company'			  => '',
 			'shipping_first_name' 		  => '',
 			'shipping_last_name' 		  => '',
 			'shipping_company' 			  => '',
@@ -297,7 +300,7 @@ class WCS_Admin_Importer {
 			'stripe_customer_id'		  => '',
 			'paypal_subscriber_id'		  => '',
 			'payment_method_title'		  => '',
-		
+			'download_permission_granted' => '',
 		);
 
 		$mapping = $_POST['mapto'];
