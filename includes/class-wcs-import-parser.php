@@ -42,7 +42,6 @@ class WCS_Import_Parser {
 			"shipping_state",
 			"shipping_postcode",
 			"shipping_country",
-			"Download Permissions Granted",
 		);
 
 		// User meta data
@@ -173,7 +172,7 @@ class WCS_Import_Parser {
 
 		// skip importing rows without the required information
 		if( ! empty( $subscription['error'] ) ) {
-			$subscription['status'] = __( 'failed', 'wcs-importer' );
+			$subscription['status'] = 'failed';
 			$subscription['row_number'] = $this->starting_row_number;
 			array_push( $this->results, $subscription );
 			return;
@@ -323,7 +322,7 @@ class WCS_Import_Parser {
 
 			// Update the subscription meta data with values in $subscription_meta
 			$subscription_meta = array (
-					'start_date' 	=> ( ! empty( $row[$this->mapping['subscription_start_date']] ) ) ? $row[$this->mapping['subscription_start_date']] : date( 'm/d/y' ),
+					'start_date' 	=> ( ! empty( $row[$this->mapping['subscription_start_date']] ) ) ? $row[$this->mapping['subscription_start_date']] : date('m/d/y'),
 					'expiry_date'	=> ( ! empty( $row[$this->mapping['subscription_expiry_date']] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '',
 					'end_date'		=> ( ! empty( $row[$this->mapping['subscription_end_date']] ) ) ? $row[$this->mapping['subscription_end_date']] : '',
 			);
@@ -352,15 +351,16 @@ class WCS_Import_Parser {
 		if( ! empty ( $subscription_check['order_id'] ) && ! empty ( $subscription_check['product_id'] ) ) {
 			// successfully added subscription
 			// Attach information on each order to the results array
-			$subscription['status'] = __( 'success', 'wcs-importer' );
+			$subscription['status'] = 'success';
 			$subscription['order'] = $subscription_check['order_id'];
 			$subscription['subscription_status'] = $subscription_check['status'];
 			$subscription['item_id'] = ( ! empty ( $subscription_check['variation_id'] ) ) ? $subcription_check['variation_id'] : $subscription_check['product_id'];
 			array_push( $this->results, $subscription );
 		} else {
-			$subscription['status'] = __( 'failed', 'wcs-importer' );
+			$subscription['status'] = 'failed';
 			array_push( $this->results, $subscription );
 		}
+
 	}
 
 	/**

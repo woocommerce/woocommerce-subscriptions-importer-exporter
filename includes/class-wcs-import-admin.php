@@ -452,15 +452,13 @@ class WCS_Admin_Importer {
 								for( var i = 0; i < results.length; i++ ){
 									var table_data = '',
 										row_classes = ( i % 2 ) ? '' : 'alternate';
-
-									if( results[i].status == "<?php _e( 'success', 'wcs-importer' ); ?>" ) {
+									if( results[i].status == "success" ) {
 										var warnings = results[i].warning;
-										
 										if( warnings.length > 0 ) {
-											table_data += '<td class="row warning" rowspan="2"><strong>' + results[i].status + ' ( !! )</strong></td>';
+											table_data += '<td class="row warning" rowspan="2"><strong><?php _e( 'success', 'wcs-importer' ); ?> ( !! )</strong></td>';
 											table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
 										} else {
-											table_data += '<td class="row success">' + results[i].status + '</td>';
+											table_data += '<td class="row success"><?php _e( 'success', 'wcs-importer' ); ?></td>';
 											table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
 										}
 										
@@ -481,7 +479,7 @@ class WCS_Admin_Importer {
 											$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '"><td colspan="5">' + warningString + ' [ <a href="' + results[i].edit_order + '"><?php _e( 'Edit Order', 'wcs-importer' ); ?> #' + results[i].order +'</a> ]</td></tr>');
 										}
 									} else {
-										table_data += '<td class="row error-import">' + results[i].status + '</td>';
+										table_data += '<td class="row error-import"><?php _e( 'failed', 'wcs-importer' ); ?></td>';
 
 										// Display Error
 										var errorString = '<?php _e( 'Error Details', 'wcs-importer' ); ?>: ';
