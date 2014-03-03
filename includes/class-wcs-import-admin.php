@@ -438,7 +438,6 @@ class WCS_Admin_Importer {
 							type:	'POST',
 							data:	data,
 							success: function( response ) {
-								console.log(response);
 								count++;
 								// Update confirmation table
 								// Get the valid JSON only from the returned string
@@ -454,7 +453,7 @@ class WCS_Admin_Importer {
 									var table_data = '',
 										row_classes = ( i % 2 ) ? '' : 'alternate';
 
-									if( results[i].status == 'success' ) {
+									if( results[i].status == "<?php _e( 'success', 'wcs-importer' ); ?>" ) {
 										var warnings = results[i].warning;
 										
 										if( warnings.length > 0 ) {
@@ -474,17 +473,18 @@ class WCS_Admin_Importer {
 
 										// Display Warnings
 										if( warnings.length > 0 ) {
-											var warningString = ( ( warnings.length > 1 ) ? 'Warnings: ' : 'Warning: ' );
+											var warningString = ( ( warnings.length > 1 ) ? '<?php _e( 'Warnings', 'wcs-importer' ); ?>' : '<?php _e( 'Warning', 'wcs-importer' ); ?>');
+											warningString += ': ';
 											for( var x = 0; x < warnings.length; x++ ) {
 												warningString += warnings[x];
 											}
-											$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '"><td colspan="5">' + warningString + ' [ <a href="' + results[i].edit_order + '">Edit Order #' + results[i].order +'</a> ]</td></tr>');
+											$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '"><td colspan="5">' + warningString + ' [ <a href="' + results[i].edit_order + '"><?php _e( 'Edit Order', 'wcs-importer' ); ?> #' + results[i].order +'</a> ]</td></tr>');
 										}
 									} else {
 										table_data += '<td class="row error-import">' + results[i].status + '</td>';
 
 										// Display Error
-										var errorString = 'Error Details: ';
+										var errorString = '<?php _e( 'Error Details', 'wcs-importer' ); ?>: ';
 										for( var x = 0; x < results[i].error.length; x++ ){
 											errorString += x+1 + '. ' + results[i].error[x] + ' ';
 										}
@@ -501,9 +501,9 @@ class WCS_Admin_Importer {
 					function check_completed() {
 						if( count >= total ) {
 							$('.importer-loading').addClass('finished').removeClass('importer-loading');
-							$('.finished').html('<td colspan="6" class="row">Finished Importing</td>');
+							$('.finished').html('<td colspan="6" class="row"><?php _e( 'Finished Importing', 'wcs-importer' ); ?></td>');
 
-							$('.wrap').append('<p><?php _e( 'All done!', 'wcs-importer' );?> <a href="<?php echo admin_url( 'admin.php?page=subscriptions' ); ?>"><?php _e( 'View Subscriptions', 'wcs-importer' ); ?></a>, <a href="<?php echo admin_url( 'edit.php?post_type=shop_order' ); ?>"><?php _e( 'View Orders', 'wcs-importer' ); ?></a> or <a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>">Import another file</a> </p>');
+							$('.wrap').append('<p><?php _e( 'All done!', 'wcs-importer' );?> <a href="<?php echo admin_url( 'admin.php?page=subscriptions' ); ?>"><?php _e( 'View Subscriptions', 'wcs-importer' ); ?></a>, <a href="<?php echo admin_url( 'edit.php?post_type=shop_order' ); ?>"><?php _e( 'View Orders', 'wcs-importer' ); ?></a> or <a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Import another file', 'wcs-importer' ); ?></a> </p>');
 						}
 					}
 			});
