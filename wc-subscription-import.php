@@ -56,8 +56,10 @@ class WC_Subscription_Importer {
 	public static function enqueue_scripts_wcs_import() {
 		wp_register_style( 'wcs-import_admin_css', plugin_dir_url(__FILE__) . '/css/style.css' );
 		wp_enqueue_style( 'wcs-import_admin_css' );
-	}
 
+		wp_register_script( 'wcs-import_admin_js', plugin_dir_url(__FILE__) . '/js/wcs-import_ajax.js' );
+		wp_enqueue_script( 'wcs-import_admin_js' );
+	}
 	/**
 	 * Main page header
 	 *
