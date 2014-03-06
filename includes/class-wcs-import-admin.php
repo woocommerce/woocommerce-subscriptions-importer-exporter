@@ -382,131 +382,41 @@ class WCS_Admin_Importer {
 				$file_positions[] = ftell( $handle );
 			}
 			fclose( $handle );
-		} 
+		}
+
+		$array = json_encode( $file_positions );
+		$starting_row_number = json_encode( $row_start );
+
 		?>
 		<script>
 				jQuery(document).ready(function($) {
 					if ( <?php echo count( $payment_method_error ); ?> > 0 ) { <?php 
 						$method_error = json_encode( $payment_method_error );
 						$method_meta = json_encode( $payment_meta_error );
-						$errorString = "Youre importing subscriptions for " . $method_error . " without specifying " . $method_meta . " . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?"; ?>
-						if (confirm( '<?php _e( $errorString, "wcs_import" ); ?>' )){
-							<?php $this->import_ajax_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
+						$errorString = sprintf( __( "You\'re importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', $method_error ), str_replace( '"', ' ', $method_meta ) ); ?>
+
+						var import_data = {
+							file_positions: <?php echo $array; ?>,
+							total: 			<?php echo $total; ?>,
+							start_row_num: 	<?php echo $starting_row_number; ?>,
+							delimiter:		'<?php echo $delimiter; ?>',
+							file:			'<?php echo addslashes( $file ); ?>',
+							mapping: 		'<?php echo json_encode( $this->mapping ); ?>',
+							ajax_url:		'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4' ), admin_url( 'admin-ajax.php' ) ); ?>'
+						}
+
+						if ( confirm( "<?php echo $errorString; ?>" ) ){
+							$( 'body' ).trigger( 'import-start', import_data );
 						} else {
 							window.location.href = "<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>";
 						}
 					} else {
-						<?php $this->import_ajax_start( $file, $delimiter, $file_positions, $total, $row_start ); ?>
+						$( 'body' ).trigger( 'import-start', import_data );
 					}
+					
 				});
 		</script>
 <?php
-	}
-
-	/**
-	 * Sends the AJAX call and waits for the repsonse data to fill in the confirmation table.
-	 *
-	 * @since 1.0
-	 */
-	function import_ajax_start( $file, $delimiter, $file_positions, $total, $row_start ) {
-		$array = json_encode($file_positions);
-		$starting_row_number = json_encode( $row_start );
-		?>
-			jQuery(document).ready(function($) {
-				/* AJAX Request to import subscriptions */
-					var positions = <?php echo $array; ?>;
-					var total = <?php echo $total; ?>;
-					var starting_row_number = <?php echo $starting_row_number; ?>;
-					var count = 0;
-					for( var i = 0; i < positions.length; i+=2 ) {
-						ajax_import( positions[i], positions[i+1], starting_row_number[i/2] );
-					}
-
-					function ajax_import( start_pos, end_pos, row_start ) {
-						var data = {
-							action:		'wcs_import_request',
-							mapping:	'<?php echo json_encode( $this->mapping ); ?>',
-							delimiter:	'<?php echo $delimiter; ?>',
-							file:		'<?php echo addslashes( $file ); ?>',
-							start:		start_pos,
-							end:		end_pos,
-							row_num:	row_start,
-						}
-
-						$.ajax({
-							url:	'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '4' ), admin_url( 'admin-ajax.php' ) ) ; ?>',
-							type:	'POST',
-							data:	data,
-							success: function( response ) {
-								count++;
-								// Update confirmation table
-								// Get the valid JSON only from the returned string
-								if ( response.indexOf("<!--WC_START-->") >= 0 ) {
-									response = response.split("<!--WC_START-->")[1]; // Strip off before after WC_START
-								}
-								if ( response.indexOf("<!--WC_END-->") >= 0 ) {
-									response = response.split("<!--WC_END-->")[0]; // Strip off anything after WC_END
-								}
-								// Parse
-								var results = $.parseJSON( response );
-								for( var i = 0; i < results.length; i++ ){
-									var table_data = '',
-										row_classes = ( i % 2 ) ? '' : 'alternate';
-									if( results[i].status == "success" ) {
-										var warnings = results[i].warning;
-										if( warnings.length > 0 ) {
-											table_data += '<td class="row warning" rowspan="2"><strong><?php _e( 'success', 'wcs-importer' ); ?> ( !! )</strong></td>';
-											table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
-										} else {
-											table_data += '<td class="row success"><?php _e( 'success', 'wcs-importer' ); ?></td>';
-											table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
-										}
-										
-										table_data += '<td class="row">' + results[i].item + ' ( #' + results[i].item_id + ' )</td>';
-										table_data += '<td class="row">' + results[i].username + ' ( #' + results[i].user_id + ' )</td>';
-										table_data += '<td class="row column-status"><mark class="' + results[i].subscription_status + '">' + results[i].subscription_status + '</mark></td>';
-										table_data += '<td class="row">' + warnings.length + '</td>';
-
-										$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '">' + table_data + '</tr>' );
-
-										// Display Warnings
-										if( warnings.length > 0 ) {
-											var warningString = ( ( warnings.length > 1 ) ? '<?php _e( 'Warnings', 'wcs-importer' ); ?>' : '<?php _e( 'Warning', 'wcs-importer' ); ?>');
-											warningString += ': ';
-											for( var x = 0; x < warnings.length; x++ ) {
-												warningString += warnings[x];
-											}
-											$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '"><td colspan="5">' + warningString + ' [ <a href="' + results[i].edit_order + '"><?php _e( 'Edit Order', 'wcs-importer' ); ?> #' + results[i].order +'</a> ]</td></tr>');
-										}
-									} else {
-										table_data += '<td class="row error-import"><?php _e( 'failed', 'wcs-importer' ); ?></td>';
-
-										// Display Error
-										var errorString = '<?php _e( 'Error Details', 'wcs-importer' ); ?>: ';
-										for( var x = 0; x < results[i].error.length; x++ ){
-											errorString += x+1 + '. ' + results[i].error[x] + ' ';
-										}
-										table_data += '<td colspan="5">Row #' + results[i].row_number + ' from CSV <strong>failed to import</strong> with ' + results[i].error.length + ( ( results[i].error.length == 0 || results[i].error.length > 1 ) ? ' errors' : ' error') + '<br />' + errorString + '</td></tr>';
-										$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '">' + table_data + '</tr>' );
-									}
-								}
-								check_completed();
-							}
-						});
-					}
-
-					/* Check the number of requests has been completed */
-					function check_completed() {
-						if( count >= total ) {
-							$('.importer-loading').addClass('finished').removeClass('importer-loading');
-							$('.finished').html('<td colspan="6" class="row"><?php _e( 'Finished Importing', 'wcs-importer' ); ?></td>');
-
-							$('.wrap').append('<p><?php _e( 'All done!', 'wcs-importer' );?> <a href="<?php echo admin_url( 'admin.php?page=subscriptions' ); ?>"><?php _e( 'View Subscriptions', 'wcs-importer' ); ?></a>, <a href="<?php echo admin_url( 'edit.php?post_type=shop_order' ); ?>"><?php _e( 'View Orders', 'wcs-importer' ); ?></a> or <a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Import another file', 'wcs-importer' ); ?></a> </p>');
-						}
-					}
-			});
-	<?php
-
 	}
 
 	/**
