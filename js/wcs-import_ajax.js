@@ -54,10 +54,10 @@ jQuery(document).ready(function($){
 					if( results[i].status == "success" ) {
 						var warnings = results[i].warning;
 						if( warnings.length > 0 ) {
-							table_data += '<td class="row warning" rowspan="2"><strong>{success} ( !! )</strong></td>';
+							table_data += '<td class="row warning" rowspan="2"><strong>' + wcs_import_lang.success +' ( !! )</strong></td>';
 							table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
 						} else {
-							table_data += '<td class="row success">{success}</td>';
+							table_data += '<td class="row success">' + wcs_import_lang.success +'</td>';
 							table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
 						}
 					
@@ -70,23 +70,23 @@ jQuery(document).ready(function($){
 
 						// Display Warnings
 						if( warnings.length > 0 ) {
-							var warningString = ( ( warnings.length > 1 ) ? '{Warnings}' : '{Warning}');
+							var warningString = ( ( warnings.length > 1 ) ? wcs_import_lang.warnings : wcs_import_lang.warning);
+							warningString.replace( warningString, ( ( warnings.length > 1 ) ? wcs_import_lang.warnings : wcs_import_lang.warning ) );
 							warningString += ': ';
 							for( var x = 0; x < warnings.length; x++ ) {
 								warningString += warnings[x];
 							}
-							$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '"><td colspan="5">' + warningString + ' [ <a href="' + results[i].edit_order + '">{edit-order} #' + results[i].order +'</a> ]</td></tr>');
+							$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '"><td colspan="5">' + warningString + ' [ <a href="' + results[i].edit_order + '">' + wcs_import_lang.edit_order + ' #' + results[i].order +'</a> ]</td></tr>');
 						}
 					} else {
-						table_data += '<td class="row error-import">{failed}</td>';
-
+						table_data += '<td class="row error-import">' + wcs_import_lang.failed + '</td>';
 						// Display Error
 						var errorString = '';
 						for( var x = 0; x < results[i].error.length; x++ ){
 							errorString += x+1 + '. ' + results[i].error[x] + ' ';
 						}
 						//?php $error_string = sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ); 
-						table_data += '<td colspan="5">{error_string}</td>';
+						table_data += '<td colspan="5">' + wcs_import_lang.error_string + '</td>';
 						table_data = table_data.replace( "{row_number}", results[i].row_number );
 						table_data = table_data.replace( "{error_messages}", errorString );
 						$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '">' + table_data + '</tr>' );
@@ -101,9 +101,8 @@ jQuery(document).ready(function($){
 	function check_completed() {
 		if( count >= total ) {
 			$('.importer-loading').addClass('finished').removeClass('importer-loading');
-			$('.finished').html('<td colspan="6" class="row">{finished-importing}</td>');
-
-			$('.wrap').append('<p>{completed-message}</p>');
+			$('.finished').html('<td colspan="6" class="row">' + wcs_import_lang.finished_importing + '</td>');
+			$('#wcs-completed-message').show();
 		}
 	}
 
