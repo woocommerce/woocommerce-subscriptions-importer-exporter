@@ -28,6 +28,7 @@ class WC_Subscription_Importer {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts_wcs_import' ) );
 		add_action( 'wp_ajax_wcs_import_request', array( self::$wcs_importer, 'display_content' ) );
 
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts_wcs_import_localize' ) );
 		// Add the "Settings | Documentation" links on the Plugins administration screen
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), __CLASS__ . '::action_links' );
 	}
@@ -60,6 +61,25 @@ class WC_Subscription_Importer {
 		wp_register_script( 'wcs-import_admin_js', plugin_dir_url(__FILE__) . '/js/wcs-import_ajax.js' );
 		wp_enqueue_script( 'wcs-import_admin_js' );
 	}
+
+	/**
+	 *
+	 * @since 1.0
+	 */
+	public static function enqueue_scripts_wcs_import_localize() {
+		$translation_array = array( 
+			'success' 				=> __( 'success', 'wcs-importer' ),
+			'failed' 				=> __( 'failed', 'wcs-importer' ),
+			'error_string'			=> sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
+			'completed_message' 	=> __( '', 'wcs-importer' ),
+			'finished_importing' 	=> __( 'Finished Importing', 'wcs-importer' ),
+			'edit_order' 			=> __( 'Edit Order', 'wcs-importer' ),
+			'warning'				=> __( 'Warning', 'wcs-importer' ),
+			'warnings'				=> __( 'Warnings', 'wcs-importer' ),
+		);
+		wp_localize_script( 'wcs-import_admin_js', 'wcs_import_lang', $translation_array );
+	}
+
 	/**
 	 * Main page header
 	 *

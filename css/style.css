@@ -95,3 +95,7 @@
 	background-color: #ccc;
 	border-color: #ccc;
 }
+
+#wcs-completed-message {
+	display:none;
+}
