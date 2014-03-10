@@ -71,7 +71,6 @@ class WC_Subscription_Importer {
 			'success' 				=> __( 'success', 'wcs-importer' ),
 			'failed' 				=> __( 'failed', 'wcs-importer' ),
 			'error_string'			=> sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
-			'completed_message' 	=> __( '', 'wcs-importer' ),
 			'finished_importing' 	=> __( 'Finished Importing', 'wcs-importer' ),
 			'edit_order' 			=> __( 'Edit Order', 'wcs-importer' ),
 			'warning'				=> __( 'Warning', 'wcs-importer' ),
