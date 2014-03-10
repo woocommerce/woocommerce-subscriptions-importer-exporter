@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Woocommerce Subscription Importer
+Plugin Name: WooCommerce Subscriptions Importer
 Plugin URI: -
 Description: CSV Importer to bring your subscriptions to Woocommerce.
 Version: 1.0
