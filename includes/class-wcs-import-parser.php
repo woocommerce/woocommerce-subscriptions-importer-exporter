@@ -219,7 +219,7 @@ class WCS_Import_Parser {
 						$postmeta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
 					} else { // default to manual payment regardless
 						$postmeta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
-						$subscription['warning'][] = __( 'No recognisable payment method has been specified therefore default payment method being used. ', 'wcs-importer' );
+						$subscription['warning'][] = __( 'No recognisable payment method has been specified. Defaulting to manual recurring payments. ', 'wcs-importer' );
 					}
 					break;
 				case 'shipping_addresss_1':
@@ -336,7 +336,7 @@ class WCS_Import_Parser {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['subscription_status']] ) );
 			} else {
 				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
-				$subscription['warning'][] = __( 'Used default subscription status as none was given. ', 'wcs-importer' );
+				$subscription['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
 			}
 			// Add additional subscription meta data
 			$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
