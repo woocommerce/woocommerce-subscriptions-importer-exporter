@@ -81,11 +81,11 @@ jQuery(document).ready(function($){
 					} else {
 						table_data += '<td class="row error-import">' + wcs_import_lang.failed + '</td>';
 						// Display Error
-						var errorString = '';
+						var errorString = '<ul>';
 						for( var x = 0; x < results[i].error.length; x++ ){
-							errorString += x+1 + '. ' + results[i].error[x] + ' ';
+							errorString += '<li>' + results[i].error[x] + '</li>';
 						}
-						//?php $error_string = sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ); 
+						errorString += '</ul>';
 						table_data += '<td colspan="5">' + wcs_import_lang.error_string + '</td>';
 						table_data = table_data.replace( "{row_number}", results[i].row_number );
 						table_data = table_data.replace( "{error_messages}", errorString );
