@@ -32,6 +32,11 @@
 	padding: 6px 0px 4px 10px;
 }
 
+#wcs-import-progress ul {
+	list-style: inherit;
+	padding-left: 1.4em;
+}
+
 #wcs-import-progress .warning {
 	border-left: 4px solid #FFD700;
 	padding-left: 1em;
