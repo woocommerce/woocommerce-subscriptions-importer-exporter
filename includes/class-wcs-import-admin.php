@@ -461,7 +461,7 @@ class WCS_Admin_Importer {
 		<table id="wcs-import-progress" class="widefat_importer widefat">
 			<thead>
 				<tr>
-					<th class="row"><?php _e( 'Upload Status', 'wcs-importer' ); ?></th>
+					<th class="row"><?php _e( 'Import Status', 'wcs-importer' ); ?></th>
 					<th class="row"><?php _e( 'Order #', 'wcs-importer' ); ?></th>
 					<th class="row"><?php _e( 'Subscription', 'wcs-importer' ); ?></th>
 					<th class="row"><?php _e( 'User Name', 'wcs-importer' ); ?></th>
