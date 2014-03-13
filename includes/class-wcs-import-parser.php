@@ -8,6 +8,7 @@ class WCS_Import_Parser {
 	var $start_pos;
 	var $end_pos;
 	var $starting_row_number;
+	var $test_mode;
 
 	function __construct() {
 		// Order meta values
@@ -84,7 +85,7 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	function import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num ) {
+	function import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num, $test_mode ) {
 		global $woocommerce;
 		$file_path = addslashes( $file );
 		$this->delimiter = $delimiter;
@@ -92,7 +93,7 @@ class WCS_Import_Parser {
 		$this->start_pos = $start;
 		$this->end_pos = $end;
 		$this->starting_row_number = $starting_row_num;
-
+		$this->test_mode = ( $test_mode == 'true' ) ? true : false;
 		$this->import_start( $file_path );
 		return $this->results;
 	}
@@ -275,92 +276,100 @@ class WCS_Import_Parser {
 		if ( ! empty( $missing_bill_addr ) ) {
 			$subscription['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_bill_addr ), ',' ) . '. ', 'wcs-importer' );
 		}
-
-		$order_data = array(
-				'post_date'     => date( 'Y-m-d H:i:s', time() ),
-				'post_type'     => 'shop_order',
-				'post_title'    => 'Order &ndash; ' . date( 'F j, Y @ h:i A', time() ),
-				'post_status'   => 'publish',
-				'ping_status'   => 'closed',
-				'post_author'   => 1,
-				'post_password' => uniqid( 'order_' ),  // Protects the post just in case
-		);
-
-		$order_id = wp_insert_post( $order_data );
-
-		foreach ( $postmeta as $meta ) {
-			update_post_meta( $order_id, $meta['key'], $meta['value'] );
-
-			if ( '_customer_user' == $meta['key'] && $meta['value'] ) {
-				update_user_meta( $meta['value'], 'paying_customer', 1 );
-			}
-		}
-
-		// Add line item
-		$item_id = wc_add_order_item( $order_id, array(
-			'order_item_name' => $_product->get_title(),
-			'order_item_type' => 'line_item'
-		) );
-
-		// Add line item meta
-		if ( $item_id ) {
-			wc_add_order_item_meta( $item_id, '_qty', apply_filters( 'woocommerce_stock_amount', 1 ) );
-			wc_add_order_item_meta( $item_id, '_tax_class', $_product->get_tax_class() );
-			wc_add_order_item_meta( $item_id, '_product_id', $_product->id );
-			wc_add_order_item_meta( $item_id, '_variation_id', ( ! empty ($_product->variation_id ) ) ? $_product->variation_id : '');
-
-			// add the additional subscription meta data to the order
-			foreach( $this->order_item_meta_fields as $metadata ) {
-				$value = ( ! empty( $row[$this->mapping[$metadata]] ) ) ? $row[$this->mapping[$metadata]] : 0;
-				wc_add_order_item_meta( $item_id, '_' . $metadata, $value );
-			}
-
-			// Add line item meta for backorder status
-			if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) ) {
-				wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
-			}
-
-			// Update the subscription meta data with values in $subscription_meta
-			$subscription_meta = array (
-					'start_date' 	=> ( ! empty( $row[$this->mapping['subscription_start_date']] ) ) ? $row[$this->mapping['subscription_start_date']] : date('m/d/y'),
-					'expiry_date'	=> ( ! empty( $row[$this->mapping['subscription_expiry_date']] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '',
-					'end_date'		=> ( ! empty( $row[$this->mapping['subscription_end_date']] ) ) ? $row[$this->mapping['subscription_end_date']] : '',
+		// Skip this section when testing the importer for errors and/or warnings
+		if( ! $this->test_mode ) {
+		
+			$order_data = array(
+					'post_date'     => date( 'Y-m-d H:i:s', time() ),
+					'post_type'     => 'shop_order',
+					'post_title'    => 'Order &ndash; ' . date( 'F j, Y @ h:i A', time() ),
+					'post_status'   => 'publish',
+					'ping_status'   => 'closed',
+					'post_author'   => 1,
+					'post_password' => uniqid( 'order_' ),  // Protects the post just in case
 			);
 
-			$_POST['order_id'] = $order_id;
-			WC_Subscriptions_Order::prefill_order_item_meta( Array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
-			// Create pening Subscription
-			WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
-			// Update the status of the subscription order
-			if( ! empty( $this->mapping['subscription_status'] ) && $row[$this->mapping['subscription_status']] ) {
-				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['subscription_status']] ) );
+			$order_id = wp_insert_post( $order_data );
+
+			foreach ( $postmeta as $meta ) {
+				update_post_meta( $order_id, $meta['key'], $meta['value'] );
+
+				if ( '_customer_user' == $meta['key'] && $meta['value'] ) {
+					update_user_meta( $meta['value'], 'paying_customer', 1 );
+				}
+			}
+
+			// Add line item
+			$item_id = wc_add_order_item( $order_id, array(
+				'order_item_name' => $_product->get_title(),
+				'order_item_type' => 'line_item'
+			) );
+
+			// Add line item meta
+			if ( $item_id ) {
+				wc_add_order_item_meta( $item_id, '_qty', apply_filters( 'woocommerce_stock_amount', 1 ) );
+				wc_add_order_item_meta( $item_id, '_tax_class', $_product->get_tax_class() );
+				wc_add_order_item_meta( $item_id, '_product_id', $_product->id );
+				wc_add_order_item_meta( $item_id, '_variation_id', ( ! empty ($_product->variation_id ) ) ? $_product->variation_id : '');
+
+				// add the additional subscription meta data to the order
+				foreach( $this->order_item_meta_fields as $metadata ) {
+					$value = ( ! empty( $row[$this->mapping[$metadata]] ) ) ? $row[$this->mapping[$metadata]] : 0;
+					wc_add_order_item_meta( $item_id, '_' . $metadata, $value );
+				}
+
+				// Add line item meta for backorder status
+				if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) ) {
+					wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
+				}
+
+				// Update the subscription meta data with values in $subscription_meta
+				$subscription_meta = array (
+						'start_date' 	=> ( ! empty( $row[$this->mapping['subscription_start_date']] ) ) ? $row[$this->mapping['subscription_start_date']] : date('m/d/y'),
+						'expiry_date'	=> ( ! empty( $row[$this->mapping['subscription_expiry_date']] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '',
+						'end_date'		=> ( ! empty( $row[$this->mapping['subscription_end_date']] ) ) ? $row[$this->mapping['subscription_end_date']] : '',
+				);
+
+				$_POST['order_id'] = $order_id;
+				WC_Subscriptions_Order::prefill_order_item_meta( Array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
+				// Create pening Subscription
+				WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
+				// Update the status of the subscription order
+				if( ! empty( $this->mapping['subscription_status'] ) && $row[$this->mapping['subscription_status']] ) {
+					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['subscription_status']] ) );
+				} else {
+					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
+					$subscription['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
+				}
+				// Add additional subscription meta data
+				$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
+				WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
+			}
+
+			$subscription['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
+			// Check if the subscription has been successfully added
+			$key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
+			$subscription_check = WC_Subscriptions_Manager::get_subscription( $key );
+
+			if( ! empty ( $subscription_check['order_id'] ) && ! empty ( $subscription_check['product_id'] ) ) {
+				// successfully added subscription
+				// Attach information on each order to the results array
+				$subscription['status'] = 'success';
+				$subscription['order'] = $subscription_check['order_id'];
+				$subscription['subscription_status'] = $subscription_check['status'];
+				$subscription['item_id'] = ( ! empty ( $subscription_check['variation_id'] ) ) ? $subcription_check['variation_id'] : $subscription_check['product_id'];
+				array_push( $this->results, $subscription );
 			} else {
-				WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
+				$subscription['status'] = 'failed';
+				array_push( $this->results, $subscription );
+			}
+		} else {
+			if( empty( $this->mapping['subscription_status'] ) && empty( $row[$this->mapping['subscription_status']] ) ) {
 				$subscription['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
 			}
-			// Add additional subscription meta data
-			$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
-			WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
-		}
-
-		$subscription['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
-		// Check if the subscription has been successfully added
-		$key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
-		$subscription_check = WC_Subscriptions_Manager::get_subscription( $key );
-
-		if( ! empty ( $subscription_check['order_id'] ) && ! empty ( $subscription_check['product_id'] ) ) {
-			// successfully added subscription
-			// Attach information on each order to the results array
-			$subscription['status'] = 'success';
-			$subscription['order'] = $subscription_check['order_id'];
-			$subscription['subscription_status'] = $subscription_check['status'];
-			$subscription['item_id'] = ( ! empty ( $subscription_check['variation_id'] ) ) ? $subcription_check['variation_id'] : $subscription_check['product_id'];
-			array_push( $this->results, $subscription );
-		} else {
-			$subscription['status'] = 'failed';
+			$subscription['row_number'] = $this->starting_row_number;
 			array_push( $this->results, $subscription );
 		}
-
 	}
 
 	/**
