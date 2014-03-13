@@ -75,6 +75,7 @@ class WC_Subscription_Importer {
 			'edit_order' 			=> __( 'Edit Order', 'wcs-importer' ),
 			'warning'				=> __( 'Warning', 'wcs-importer' ),
 			'warnings'				=> __( 'Warnings', 'wcs-importer' ),
+			'located_at'			=> __( 'Located at rows', 'wcs-importer' ),
 		);
 		wp_localize_script( 'wcs-import_admin_js', 'wcs_import_lang', $translation_array );
 	}
