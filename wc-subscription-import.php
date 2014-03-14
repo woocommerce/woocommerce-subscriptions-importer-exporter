@@ -88,6 +88,7 @@ class WC_Subscription_Importer {
 	public static function home() {
 		echo '<div class="wrap">';
 		echo '<h2>' . __( 'Subscription CSV Importer', 'wcs-importer' ) . '</h2>';
+		if ( ! isset( $_GET['step'] ) ) :
 		?>
 		<div id="message" class="updated woocommerce-message wc-connect">
 			<div class="squeezer">
@@ -99,6 +100,7 @@ class WC_Subscription_Importer {
 			</div>
 		</div>
 		<?php
+		endif;
 		self::$wcs_importer->display_content();
 		echo '</div>';
 	}
