@@ -432,7 +432,9 @@ class WCS_Admin_Importer {
 		?>
 		<script>
 				jQuery(document).ready(function($) {
-					if ( <?php echo count( $payment_method_error ); ?> > 0 ) { <?php 
+					var test_run = <?php echo ( $this->test_import ) ? "true" : "false"; ?>;
+
+					if ( test_run == 'false' && <?php echo count( $payment_method_error ); ?> > 0 ) { <?php 
 						$method_error = json_encode( $payment_method_error );
 						$method_meta = json_encode( $payment_meta_error );
 						$errorString = sprintf( __( "You\'re importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', $method_error ), str_replace( '"', ' ', $method_meta ) ); ?>
@@ -447,7 +449,7 @@ class WCS_Admin_Importer {
 							file:			'<?php echo addslashes( $file ); ?>',
 							mapping: 		'<?php echo json_encode( $this->mapping ); ?>',
 							ajax_url:		'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '5' ), admin_url( 'admin-ajax.php' ) ); ?>',
-							test_run: 		'<?php echo ( $this->test_import ) ? "true" : "false"; ?>'
+							test_run: 		test_run
 						}
 console.log(import_data);
 						if ( confirm( "<?php echo $errorString; ?>" ) ){
