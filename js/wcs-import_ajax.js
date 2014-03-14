@@ -151,12 +151,12 @@ jQuery(document).ready(function($){
 					$('#wcs-warning-details').html( parseInt( $('#wcs-warning-details').html() ) + minor );
 					var results_text;
 					for( key in errors ) {
-						results_text += '[' + errors[key].length + '] ' + key + ' ' + wcs_import_lang.located_at+ ': { ' + errors[key].toString() + ' }<br>';
+						results_text += '[' + errors[key].length + '] ' + key + ' ' + wcs_import_lang.located_at+ ': ' + errors[key].toString() + '.<br/>';
 					}
 					$('#wcs-importer_test_errors').append( results_text );
 
 					for( warningKey in warnings ) {
-						results_text += '[' + warnings[warningKey].length + '] ' + warningKey + ' ' + wcs_import_lang.located_at + ': { ' + warnings[warningKey].toString() + ' }<br>';
+						results_text += '[' + warnings[warningKey].length + '] ' + warningKey + ' ' + wcs_import_lang.located_at + ': ' + warnings[warningKey].toString() + '.<br/>';
 					}
 					$('#wcs-importer_test_warnings').append( results_text );
 					$('input[name="delimiter"]').val( csv_delimiter );

@@ -432,25 +432,24 @@ class WCS_Admin_Importer {
 		?>
 		<script>
 				jQuery(document).ready(function($) {
-					var test_run = <?php echo ( $this->test_import ) ? "true" : "false"; ?>;
+					var import_data = {
+						file_id:		<?php echo ( ! empty( $_POST['file_id'] ) ) ? $_POST['file_id'] : ''; ?>,
+						file_url:		'<?php echo ( ! empty( $_POST['file_url'] ) ) ? $_POST['file_url'] : ''; ?>',
+						file_positions: <?php echo $array; ?>,
+						total: 			<?php echo $total; ?>,
+						start_row_num: 	<?php echo $starting_row_number; ?>,
+						delimiter:		'<?php echo $delimiter; ?>',
+						file:			'<?php echo addslashes( $file ); ?>',
+						mapping: 		'<?php echo json_encode( $this->mapping ); ?>',
+						ajax_url:		'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '5' ), admin_url( 'admin-ajax.php' ) ); ?>',
+						test_run: 		<?php echo ( $this->test_import ) ? "true" : "false"; ?>
+					}
 
-					if ( test_run == 'false' && <?php echo count( $payment_method_error ); ?> > 0 ) { <?php 
+					if ( import_data.test_run == 'false' && <?php echo count( $payment_method_error ); ?> > 0 ) { <?php 
 						$method_error = json_encode( array_unique( $payment_method_error ) );
 						$method_meta  = json_encode( array_unique( $payment_meta_error ) );
 						$errorString  = sprintf( __( "You\'re importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', $method_error ), str_replace( '"', ' ', $method_meta ) ); ?>
 
-						var import_data = {
-							file_id:		<?php echo ( ! empty( $_POST['file_id'] ) ) ? $_POST['file_id'] : ''; ?>,
-							file_url:		'<?php echo ( ! empty( $_POST['file_url'] ) ) ? $_POST['file_url'] : ''; ?>',
-							file_positions: <?php echo $array; ?>,
-							total: 			<?php echo $total; ?>,
-							start_row_num: 	<?php echo $starting_row_number; ?>,
-							delimiter:		'<?php echo $delimiter; ?>',
-							file:			'<?php echo addslashes( $file ); ?>',
-							mapping: 		'<?php echo json_encode( $this->mapping ); ?>',
-							ajax_url:		'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '5' ), admin_url( 'admin-ajax.php' ) ); ?>',
-							test_run: 		test_run
-						}
 console.log(import_data);
 						if ( confirm( "<?php echo $errorString; ?>" ) ){
 							$( 'body' ).trigger( 'import-start', import_data );
