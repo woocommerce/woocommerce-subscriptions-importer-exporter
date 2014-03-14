@@ -149,18 +149,15 @@ jQuery(document).ready(function($){
 					$('#wcs-test-ratio').html( parseInt( success/tests * 100, 10 ) );
 					$('#wcs-fatal-details').html( parseInt( $('#wcs-fatal-details').html() ) + critical );
 					$('#wcs-warning-details').html( parseInt( $('#wcs-warning-details').html() ) + minor );
-					var results_text = "<td>";
+					var results_text;
 					for( key in errors ) {
 						results_text += '[' + errors[key].length + '] ' + key + ' ' + wcs_import_lang.located_at+ ': { ' + errors[key].toString() + ' }<br>';
 					}
-					results_text += "</td>";
 					$('#wcs-importer_test_errors').append( results_text );
-					
-					results_text = '<td>';
+
 					for( warningKey in warnings ) {
 						results_text += '[' + warnings[warningKey].length + '] ' + warningKey + ' ' + wcs_import_lang.located_at + ': { ' + warnings[warningKey].toString() + ' }<br>';
 					}
-					results_text += "</td>";
 					$('#wcs-importer_test_warnings').append( results_text );
 					$('input[name="delimiter"]').val( csv_delimiter );
 					$('input[name="mapping"]').val( mapping );
