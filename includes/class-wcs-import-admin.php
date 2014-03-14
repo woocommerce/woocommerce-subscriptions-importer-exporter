@@ -435,9 +435,9 @@ class WCS_Admin_Importer {
 					var test_run = <?php echo ( $this->test_import ) ? "true" : "false"; ?>;
 
 					if ( test_run == 'false' && <?php echo count( $payment_method_error ); ?> > 0 ) { <?php 
-						$method_error = json_encode( $payment_method_error );
-						$method_meta = json_encode( $payment_meta_error );
-						$errorString = sprintf( __( "You\'re importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', $method_error ), str_replace( '"', ' ', $method_meta ) ); ?>
+						$method_error = json_encode( array_unique( $payment_method_error ) );
+						$method_meta  = json_encode( array_unique( $payment_meta_error ) );
+						$errorString  = sprintf( __( "You\'re importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', $method_error ), str_replace( '"', ' ', $method_meta ) ); ?>
 
 						var import_data = {
 							file_id:		<?php echo ( ! empty( $_POST['file_id'] ) ) ? $_POST['file_id'] : ''; ?>,
