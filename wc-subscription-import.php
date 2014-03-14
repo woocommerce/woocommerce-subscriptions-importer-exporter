@@ -88,9 +88,15 @@ class WC_Subscription_Importer {
 	public static function home() {
 		echo '<div class="wrap">';
 		echo '<h2>' . __( 'Subscription CSV Importer', 'wcs-importer' ) . '</h2>';
-		if ( ! isset( $_GET['step'] ) ) :
+		if ( ! isset( $_GET['step'] ) || isset( $_GET['cancelled'] ) ) :
 		?>
 		<div id="message" class="updated woocommerce-message wc-connect">
+			<?php if ( isset( $_GET['cancelled'] ) ) : ?>
+			<div id="message" class="updated error">
+				<p><?php _e( 'Import cancelled.', 'wcs-importer' ); ?></p>
+			</div>
+			<?php endif; ?>
+			<?php if ( ! isset( $_GET['step'] ) ) : ?>
 			<div class="squeezer">
 				<h4><?php _e( '<strong>Before you begin</strong>, please prepare your CSV file.', 'wcs-importer' ); ?></h4>
 				<p class="submit">
@@ -98,6 +104,7 @@ class WC_Subscription_Importer {
 					<a href="<?php echo plugins_url( 'wcs-import-sample.csv', __FILE__ ); ?>" class="button wcs-importer-download"><?php _e( 'Download Example CSV', 'wcs-importer' ); ?></a>
 				</p>
 			</div>
+			<?php endif; ?>
 		</div>
 		<?php
 		endif;

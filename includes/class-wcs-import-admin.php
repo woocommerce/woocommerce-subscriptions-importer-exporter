@@ -455,12 +455,11 @@ console.log(import_data);
 						if ( confirm( "<?php echo $errorString; ?>" ) ){
 							$( 'body' ).trigger( 'import-start', import_data );
 						} else {
-							window.location.href = "<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>";
+							window.location.href = "<?php echo admin_url( 'admin.php?page=import_subscription&cancelled=true' ); ?>";
 						}
 					} else {
 						$( 'body' ).trigger( 'import-start', import_data );
 					}
-					
 				});
 		</script>
 <?php
