@@ -362,7 +362,7 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	function ajax_setup() {
-		$request_limit = ( defined( 'WCS_REQ_LIMIT' ) ) ? WCS_REQ_LIMIT : 15; // May change
+		$request_limit = ( defined( 'WCS_REQ_LIMIT' ) ) ? WCS_REQ_LIMIT : 15;
 		$this->test_import = ( isset( $_POST['test-mode'] ) ) ? true : false;
 		$this->mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
 		$file_positions = $row_start = array();
