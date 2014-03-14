@@ -149,7 +149,7 @@ jQuery(document).ready(function($){
 					$('#wcs-test-ratio').html( parseInt( success/tests * 100, 10 ) );
 					$('#wcs-fatal-details').html( parseInt( $('#wcs-fatal-details').html() ) + critical );
 					$('#wcs-warning-details').html( parseInt( $('#wcs-warning-details').html() ) + minor );
-					var results_text;
+					var results_text = '';
 					for( key in errors ) {
 						results_text += '[' + errors[key].length + '] ' + key + ' ' + wcs_import_lang.located_at+ ': ' + errors[key].toString() + '.<br/>';
 					}
