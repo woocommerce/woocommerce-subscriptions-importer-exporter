@@ -56,12 +56,12 @@ class WCS_Admin_Importer {
 		$size = size_format( $bytes );
 		$upload_dir = wp_upload_dir();
 		if ( ! empty( $upload_dir['error'] ) ) : ?>
-			<div class="error"><p><?php _e('Before you can upload your import file, you will need to fix the following error:'); ?></p>
+			<div class="error"><p><?php _e( 'Before you can upload your import file, you will need to fix the following error:' ); ?></p>
 			<p><strong><?php echo $upload_dir['error']; ?></strong></p></div><?php
 		else :
 			?>
-			<p>Upload a CSV file containing details about your subscriptions to bring across to your store with WooCommerce.</p>
-			<p>Choose a CSV (.csv) file to upload, then click Upload file and import.</p>
+			<p><?php _e( 'Upload a CSV file containing details about your subscriptions to bring across to your store with WooCommerce.', 'wcs-importer' ); ?></p>
+			<p><?php _e( 'Choose a CSV (.csv) file to upload, then click Upload file and import.', 'wcs-importer' ); ?></p>
 			<form enctype="multipart/form-data" id="import-upload-form" method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
 				<table class="form-table">
 					<tbody>
@@ -345,8 +345,8 @@ class WCS_Admin_Importer {
 					<td><input type="checkbox" name="test-mode" value="wcs-import-test"></td>
 				</tr>
 				<tr>
-					<th><?php _e( 'Mapped Fields', 'wcs-importer' ); ?>:</th>
-					<td><em>Possible mapping validation</em></td>
+					<th><?php _e( 'Mapped Fields:', 'wcs-importer' ); ?></th>
+					<td><em><?php _e( 'Possible mapping validation', 'wcs-importer' ); ?></em></td>
 				</tr>
 			</table>
 			<p class="submit">
