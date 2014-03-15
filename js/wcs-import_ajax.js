@@ -45,7 +45,7 @@ jQuery(document).ready(function($){
 				count++;
 				// Update confirmation table
 				// Get the valid JSON only from the returned string
-				if( data.test_mode == 'false' ) {
+				if( data.test_mode == false ) {
 					if ( response.indexOf("<!--WCS_IMPORT_START-->") >= 0 ) {
 						response = response.split("<!--WCS_IMPORT_START-->")[1]; // Strip off before after WCS_IMPORT_START
 					}
@@ -54,7 +54,6 @@ jQuery(document).ready(function($){
 					}
 					// Parse
 					var results = $.parseJSON( response );
-					console.log("Normal mode: " + results);
 					for( var i = 0; i < results.length; i++ ){
 						var table_data = '',
 							row_classes = ( i % 2 ) ? '' : 'alternate';
