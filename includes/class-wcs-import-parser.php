@@ -156,7 +156,8 @@ class WCS_Import_Parser {
 		$subscription = array();
 		$subscription['warning'] = $subscription['error'] = array();
 		// Check Product id a woocommerce product
-		if( isset( $this->mapping['product_id'] ) && ! ( $this->check_product( $row[$this->mapping['product_id']] ) ) ) {
+
+		if( empty( $this->mapping['product_id'] ) || ! ( $this->check_product( $row[$this->mapping['product_id']] ) ) ) {
 			$subscription['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
 		}
 
@@ -278,7 +279,6 @@ class WCS_Import_Parser {
 		}
 		// Skip this section when testing the importer for errors and/or warnings
 		if( ! $this->test_mode ) {
-		
 			$order_data = array(
 					'post_date'     => date( 'Y-m-d H:i:s', time() ),
 					'post_type'     => 'shop_order',
