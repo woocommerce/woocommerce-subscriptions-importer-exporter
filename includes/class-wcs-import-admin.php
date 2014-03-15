@@ -450,7 +450,6 @@ class WCS_Admin_Importer {
 						$method_meta  = json_encode( array_unique( $payment_meta_error ) );
 						$errorString  = sprintf( __( "You\'re importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', $method_error ), str_replace( '"', ' ', $method_meta ) ); ?>
 
-console.log(import_data);
 						if ( confirm( "<?php echo $errorString; ?>" ) ){
 							$( 'body' ).trigger( 'import-start', import_data );
 						} else {
