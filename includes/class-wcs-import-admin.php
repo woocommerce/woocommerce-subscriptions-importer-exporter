@@ -108,6 +108,7 @@ class WCS_Admin_Importer {
 			$file = wp_import_handle_upload();
 			if( isset( $file['error'] ) ) {
 				$this->importer_error();
+				exit;
 			}
 			$this->id = $file['id'];
 			$file = get_attached_file( $this->id );
@@ -117,6 +118,7 @@ class WCS_Admin_Importer {
 				$file = ABSPATH . $this->file_url;
 			} else {
 				$this->importer_error();
+				exit;
 			}
 		}
 		if( $file ) {
