@@ -148,18 +148,18 @@ jQuery(document).ready(function($){
 					$('#wcs-test-ratio').html( parseInt( success/tests * 100, 10 ) );
 					$('#wcs-fatal-details').html( parseInt( $('#wcs-fatal-details').html() ) + critical );
 					$('#wcs-warning-details').html( parseInt( $('#wcs-warning-details').html() ) + minor );
-					var results_text = '<td>';
+					var results_text = '';
 					for( key in errors ) {
 						results_text += '[' + errors[key].length + '] ' + key + ' ' + wcs_import_lang.located_at+ ': ' + errors[key].toString() + '.<br/>';
 					}
-					results_text += '</td>'
-					$('#wcs-importer_test_errors').append( results_text );
-					results_text += '<td>'
+					$('#wcs-importer_test_errors td').append( results_text );
+
+					results_text = ''; //clear string so the same variable can be used for warnings and errors
 					for( warningKey in warnings ) {
 						results_text += '[' + warnings[warningKey].length + '] ' + warningKey + ' ' + wcs_import_lang.located_at + ': ' + warnings[warningKey].toString() + '.<br/>';
 					}
-					results_text += '</td>'
-					$('#wcs-importer_test_warnings').append( results_text );
+					$('#wcs-importer_test_warnings td').append( results_text );
+
 					$('input[name="delimiter"]').val( csv_delimiter );
 					$('input[name="mapping"]').val( mapping );
 					$('input[name="file_id"]').val( file_id );
@@ -173,7 +173,7 @@ jQuery(document).ready(function($){
 	/* Check the number of requests has been completed */
 	function check_completed( test_run ) {
 		if( count >= total ) {
-			if( test_run == 'false' ) {
+			if( test_run == false ) {
 				$('.importer-loading').addClass('finished').removeClass('importer-loading');
 				$('.finished').html('<td colspan="6" class="row">' + wcs_import_lang.finished_importing + '</td>');
 			}
