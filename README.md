@@ -12,7 +12,7 @@
 - List of possible fields to map to are <a href="https://github.com/thenbrent/woocommerce-subscriptions-importer/edit/master/README.md#list-of-possible-fields">below</a>
 
 ### Step 3: Completion Table
-<a href="http://tinypic.com?ref=suyil5" target="_blank"><img src="http://i59.tinypic.com/suyil5.png" border="0" alt="Image and video hosting by TinyPic"></a>
+![Completion Table Screenshot](http://i59.tinypic.com/suyil5.png)
 #### List of Warnings
 - Shipping method and/or title for the order has been set to empty.
 - No recognisable payment method has been specified therefore default payment method being used.
