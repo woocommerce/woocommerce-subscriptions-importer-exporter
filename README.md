@@ -1,5 +1,8 @@
 ## WooCommerce Subscriptions Importer
 
+### Step 0: Make sure products exist.
+  - The WooCommerce Subscriptions Importer requires an existing subscription product to exist before you can create subscriptions to that product. You can either [create a subscription](http://docs.woothemes.com/document/subscriptions/store-manager-guide/#section-1) manually if you only have a small number of different products, or use the [Product CSV Import Suite](http://www.woothemes.com/products/product-csv-import-suite/) if you need to create a large number of different subscription products.
+
 ### Step 1: Upload CSV file.
   - Locate the CSV file by searching for the file on disk or enter in the file path.
   - Specify the delimiting character that separates each column; defaults to comma character `,`
