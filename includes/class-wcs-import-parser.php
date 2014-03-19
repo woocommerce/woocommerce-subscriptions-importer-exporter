@@ -194,10 +194,22 @@ class WCS_Import_Parser {
 					$title = ( ! empty( $row[$this->mapping['shipping_method_title']] ) ) ? $row[$this->mapping['shipping_method_title']] : '';
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $method );
 					$postmeta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
+					$postmeta[] = array( 'key' => '_recurring_shipping_method', 'value' => $method );
+					$postmeta[] = array( 'key' => '_recurring_shipping_method_title', 'value' => $title );
 					if( empty( $method ) || empty( $title ) ) {
 						// set up warning message to show admin -  Do i need be more specific??
 						$subscription['warning'][] = __( 'Shipping method and/or title for the order has been set to empty. ', 'wcs-importer' );
 					}
+					break;
+				case 'order_shipping':
+					$value = empty( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$postmeta[] = array( 'key' => '_order_recurring_shipping_total', 'value' => $value );
+					break;
+				case 'order_shipping_tax':
+					$value = empty( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$postmeta[] = array( 'key' => '_order_recurring_shipping_tax_total', 'value' => $value );
 					break;
 				case 'payment_method':
 					if( strtolower( $row[$this->mapping[$column]] ) == 'paypal' && ! empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
@@ -263,7 +275,7 @@ class WCS_Import_Parser {
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				default:
-					$value = isset( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
+					$value = empty( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
 					if( empty( $value ) ) {
 						$metadata = get_user_meta( $cust_id, $column );
 						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
