@@ -320,7 +320,6 @@ class WCS_Admin_Importer {
 			}
 		}
 		// Need to check for errors
-		/*  */
 		$this->pre_import_check();
 	}
 
@@ -471,10 +470,10 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	function ajax_request_handler() {
-
 		if ( ! current_user_can( 'manage_woocommerce' ) ){
 			wp_die( "Cheatin' huh?");
 		}
+
 		@set_time_limit(0);
 		@ob_flush();
 		@flush();
@@ -574,3 +573,4 @@ class WCS_Admin_Importer {
 		<?php
 	}
 }
+?>

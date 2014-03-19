@@ -293,7 +293,6 @@ class WCS_Import_Parser {
 
 			foreach ( $postmeta as $meta ) {
 				update_post_meta( $order_id, $meta['key'], $meta['value'] );
-
 				if ( '_customer_user' == $meta['key'] && $meta['value'] ) {
 					update_user_meta( $meta['value'], 'paying_customer', 1 );
 				}
@@ -450,3 +449,4 @@ class WCS_Import_Parser {
 		}
 	}
 }
+?>
