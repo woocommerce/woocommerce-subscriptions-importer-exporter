@@ -356,7 +356,7 @@ class WCS_Import_Parser {
 				$subscription['status'] = 'success';
 				$subscription['order'] = $subscription_check['order_id'];
 				$subscription['subscription_status'] = $subscription_check['status'];
-				$subscription['item_id'] = ( ! empty ( $subscription_check['variation_id'] ) ) ? $subcription_check['variation_id'] : $subscription_check['product_id'];
+				$subscription['item_id'] = ( ! empty ( $subscription_check['variation_id'] ) ) ? $subscription_check['variation_id'] : $subscription_check['product_id'];
 				array_push( $this->results, $subscription );
 			} else {
 				$subscription['status'] = 'failed';
