@@ -274,6 +274,21 @@ class WCS_Import_Parser {
 					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : $_product->subscription_price;
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
+				case 'order_discount':
+					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$postmeta[] = array( 'key' => '_order_recurring_discount_total', 'value' => $value );
+					break;
+				case 'cart_discount':
+					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$postmeta[] = array( 'key' => '_order_recurring_discount_cart', 'value' => $value );
+					break;
+				case 'order_tax':
+					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$postmeta[] = array( 'key' => '_order_recurring_tax_total', 'value' => $value );
+					break;
 				default:
 					$value = empty( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
 					if( empty( $value ) ) {
