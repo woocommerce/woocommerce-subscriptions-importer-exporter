@@ -121,7 +121,7 @@ class WCS_Import_Parser {
 					foreach ( $header as $key => $heading ) {
 						if ( ! $heading ) continue;
 						$s_heading = strtolower( $heading );
-						$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? $this->format_data_from_csv( $postmeta[$key], $enc ) : '';
+						$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? trim( $this->format_data_from_csv( $postmeta[$key], $enc ) ) : '';
 					}
 
 					// will move to just sending $row instead of listing all these variables
