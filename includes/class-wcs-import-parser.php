@@ -215,21 +215,21 @@ class WCS_Import_Parser {
 					if( strtolower( $row[$this->mapping[$column]] ) == 'paypal' && ! empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
 						// Paypal
 						$paypal_sub_id = $row[$this->mapping['paypal_subscriber_id']];
-						$title = ( ! empty( $row[$this->mapping['payment_method_title']] ) ) ? $row[$this->mapping['payment_method_title']] : '';
+						$title = ( ! empty( $row[$this->mapping['payment_method_title']] ) ) ? $row[$this->mapping['payment_method_title']] : 'Paypal Transfer';
 						$postmeta[] = array( 'key' => '_' . $column, 'value' => 'paypal' );
 						$postmeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
 						$postmeta[] = array( 'key' => '_recurring_payment_method', 'value' => 'paypal' );
-						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => 'Paypal Transfer' );
+						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
 						$postmeta[] = array( 'key' => '_paypal_subscriber_id', 'value' => $paypal_sub_id );
 					} else if( strtolower( $row[$this->mapping[$column]] ) == 'stripe' && ! empty( $row[$this->mapping['stripe_customer_id']] ) ) {
 						// Stripe
 						$stripe_cust_id = $row[$this->mapping['stripe_customer_id']];
-						$title = ( ! empty( $row[$this->mapping['payment_method_title']] ) ) ? $row[$this->mapping['payment_method_title']] : '';
+						$title = ( ! empty( $row[$this->mapping['payment_method_title']] ) ) ? $row[$this->mapping['payment_method_title']] : 'Stripe Transfer';
 						// $stripe_cust_id will be checked before this point to make sure it's not null
 						$postmeta[] = array( 'key' => '_' . $column, 'value' => 'stripe' );
 						$postmeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
 						$postmeta[] = array( 'key' => '_recurring_payment_method', 'value' => 'stripe' );
-						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => 'Stripe Transfer' );
+						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
 						$postmeta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
 					} else { // default to manual payment regardless
 						$postmeta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
