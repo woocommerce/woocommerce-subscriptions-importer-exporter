@@ -94,10 +94,10 @@ The following columns have some requirements for acceptable values or formats.
 
 ### Accepted Subscriptions column fields
 *	product_id - this must contain either the id of a regular or variable subscription product within your store.  
-*	subscription_start_date - If provided this must be in the format MM/DD/YYYY (for example: "07/12/2014"). If not set, the current date will be used.
-*	subscription_expiry_date - If provided this must be in the format MM/DD/YYYY (for example: "07/12/2014"). If not set, the subscription expiration date will be left empty and will never expire unless updated.
-*	subscription_end_date - If provided this must be in the format MM/DD/YYYY (for example: "07/12/2014"). If not set, the subscription ending date will be left empty and won't end unless updated.
-*	subscription_status - Can be one of the values: active, pending, failed, on-hold, su
+*	subscription_start_date - If provided this must be in the format MM/DD/YYYY (for example: "07/21/2014"). If not set, the current date will be used.
+*	subscription_expiry_date - If provided this must be in the format MM/DD/YYYY (for example: "07/21/2014"). If not set, the subscription expiration date will be left empty and will not expire.
+*	subscription_end_date - If provided this must be in the format MM/DD/YYYY (for example: "07/21/2014"). If not set, the subscription end date will be left empty - this date is simply a record of a day in the past the subscription ended, either due to expiraiton or cancellation.
+*	subscription_status - Can be one of: active, expired, pending, on-hold or cancelled.
 
 ## Subscription Import Options
 * Delimiter - this allows you to specific any other character as the delimiter of the imported CSV; defaulted to the comma character.
