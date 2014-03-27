@@ -332,7 +332,7 @@ class WCS_Admin_Importer {
 	 */
 	function pre_import_check() {
 		$action = 'admin.php?page=import_subscription&amp;step=4&amp;';
-		echo '<h3>' . __( 'Step 4: Run in Test Mode?', 'wcs-importer' ) . '</h3>';
+		echo '<h3>' . __( 'Step 4: Admin Options', 'wcs-importer' ) . '</h3>';
 	?>
 		<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
 			<input type="hidden" name="file_id" value="<?php echo ( isset ( $_POST['file_id'] ) ) ? $_POST['file_id'] : ''; ?>">
@@ -347,6 +347,9 @@ class WCS_Admin_Importer {
 					<th><?php _e( 'Run in Test Mode', 'wcs-importer' ); ?>:</th>
 					<td><input type="checkbox" name="test-mode" value="wcs-import-test"></td>
 				</tr>
+				<tr>
+					<th><?php _e( 'Email new customers their temporary password?', 'wcs-importer' ); ?></th>
+					<td><input type="checkbox" name="send-reg-email" value="wcs-import-reg_email"></td>
 				<tr>
 					<th><?php _e( 'Mapped Fields:', 'wcs-importer' ); ?></th>
 					<td><em><?php _e( 'Possible mapping validation', 'wcs-importer' ); ?></em></td>
@@ -367,6 +370,7 @@ class WCS_Admin_Importer {
 	function ajax_setup() {
 		$request_limit = ( defined( 'WCS_REQ_LIMIT' ) ) ? WCS_REQ_LIMIT : 15;
 		$this->test_import = ( isset( $_POST['test-mode'] ) ) ? true : false;
+		$send_user_email = ( isset( $_POST['send-reg-email'] ) ) ? true : false;
 		$this->mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
 		$file_positions = $row_start = array();
 		$payment_method_error = $payment_meta_error = array();
@@ -445,7 +449,8 @@ class WCS_Admin_Importer {
 						file:			'<?php echo addslashes( $file ); ?>',
 						mapping: 		'<?php echo json_encode( $this->mapping ); ?>',
 						ajax_url:		'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '5' ), admin_url( 'admin-ajax.php' ) ); ?>',
-						test_run: 		<?php echo ( $this->test_import ) ? "true" : "false"; ?>
+						test_run: 		<?php echo ( $this->test_import ) ? "true" : "false"; ?>,
+						send_reg_email:	<?php echo ( $send_user_email ) ? "true" : "false"; ?>
 					}
 
 					if ( import_data.test_run == 'false' && <?php echo count( $payment_method_error ); ?> > 0 ) { <?php 
@@ -488,8 +493,9 @@ class WCS_Admin_Importer {
 			$end = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
 			$starting_row_num = absint( $_POST['row_num'] );
 			$test_mode = $_POST['test_mode'];
+			$send_email = $_POST['send_email'];
 			$this->parser = new WCS_Import_Parser();
-			$this->results = $this->parser->import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num, $test_mode );
+			$this->results = $this->parser->import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num, $test_mode, $send_email );
 			echo '<div style="display:none;">';
 			$start_tag = ( $test_mode == 'true' ) ? "<!--WCS_TEST_START-->" : "<!--WCS_IMPORT_START-->";
 			$end_tag = ( $test_mode == 'true' ) ? "<!--WCS_TEST_END-->" : "<!--WCS_IMPORT_END-->";
