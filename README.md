@@ -33,6 +33,7 @@ Importing subscriptions involves setting up a CSV file containing various column
 *	customer_id
 * customer_email
 *	customer_username
+*	customer_password
 *	billing_first_name
 *	billing_last_name
 *	billing_address_1
@@ -94,15 +95,16 @@ The following columns have some requirements for acceptable values or formats.
 
 ### Accepted Subscriptions column fields
 *	product_id - this must contain either the id of a regular or variable subscription product within your store.  
-*	subscription_start_date - If provided this must be in the format MM/DD/YYYY (for example: "07/12/2014"). If not set, the current date will be used.
-*	subscription_expiry_date - If provided this must be in the format MM/DD/YYYY (for example: "07/12/2014"). If not set, the subscription expiration date will be left empty and will never expire unless updated.
-*	subscription_end_date - If provided this must be in the format MM/DD/YYYY (for example: "07/12/2014"). If not set, the subscription ending date will be left empty and won't end unless updated.
-*	subscription_status - Can be one of the values: active, pending, failed, on-hold, su
+*	subscription_start_date - If provided this must be in the format MM/DD/YYYY (for example: "07/21/2014"). If not set, the current date will be used.
+*	subscription_expiry_date - If provided this must be in the format MM/DD/YYYY (for example: "07/21/2014"). If not set, the subscription expiration date will be left empty and will not expire.
+*	subscription_end_date - If provided this must be in the format MM/DD/YYYY (for example: "07/21/2014"). If not set, the subscription end date will be left empty - this date is simply a record of a day in the past the subscription ended, either due to expiraiton or cancellation.
+*	subscription_status - Can be one of: active, expired, pending, on-hold or cancelled.
 
 ## Subscription Import Options
 * Delimiter - this allows you to specific any other character as the delimiter of the imported CSV; defaulted to the comma character.
 *	AJAX Request Limit - the amount of CSV rows handled at once per AJAX call can be modified by defining the WCS_REQ_LIMIT constant in wp_config.php; defaults to 15.
 * Test Mode - Enabling this option places the import process in a 'Dry Run" mode where no orders are created, but if sufficient information is given, a new will be created. This is very useful for running test imports prior to the live import.
+* Send off registration email - Having this option ticked means that when the importer creates a new customer, the customer will receive a registration email containing their login details along with their temporary password.
 
 ## List of Warnings
 - Shipping method and/or title for the order has been set to empty.
