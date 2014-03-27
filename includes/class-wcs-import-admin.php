@@ -188,6 +188,7 @@ class WCS_Admin_Importer {
 									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>>customer_id</option>
 									<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
 									<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
+									<option value="customer_password" <?php selected( $header, 'customer_password' ); ?>>customer_password</option>
 									<option value="billing_first_name" <?php selected( $header, 'billing_first_name' ); ?>>billing_first_name</option>
 									<option value="billing_last_name" <?php selected( $header, 'billing_last_name' ); ?>>billing_last_name</option>
 									<option value="billing_address_1" <?php selected( $header, 'billing_address_1' ); ?>>billing_address_1</option>
@@ -263,6 +264,7 @@ class WCS_Admin_Importer {
 			'customer_id' 				  => '',
 			'customer_email' 			  => '',
 			'customer_username' 		  => '',
+			'customer_password'			  => '',
 			'billing_first_name' 		  => '',
 			'billing_last_name' 		  => '',
 			'billing_address_1' 		  => '',
