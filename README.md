@@ -29,7 +29,6 @@ The Subscriptions CSV Import suite makes it easy to import CSV to WooCommerce. H
 ## Importing Subscriptions
 Importing subscriptions involves setting up a CSV file containing various column headers. The currently supported headers fall under one of the three groups: Customers, Subscription, Orders. If any of the following values are used in the CSV as column headers, they will automatically be selected upon entering the mapping process.
 
-
 ### Customer Fields
 *	customer_id
 * customer_email
