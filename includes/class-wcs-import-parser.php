@@ -9,6 +9,7 @@ class WCS_Import_Parser {
 	var $end_pos;
 	var $starting_row_number;
 	var $test_mode;
+	var $send_registration_email;
 
 	function __construct() {
 		// Order meta values
@@ -85,7 +86,7 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	function import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num, $test_mode ) {
+	function import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num, $test_mode, $send_reg_email ) {
 		global $woocommerce;
 		$file_path = addslashes( $file );
 		$this->delimiter = $delimiter;
@@ -94,6 +95,7 @@ class WCS_Import_Parser {
 		$this->end_pos = $end;
 		$this->starting_row_number = $starting_row_num;
 		$this->test_mode = ( $test_mode == 'true' ) ? true : false;
+		$this->send_registration_email = ( $send_reg_email == 'true' ) ? true : false;
 		$this->import_start( $file_path );
 		return $this->results;
 	}
@@ -417,6 +419,7 @@ class WCS_Import_Parser {
 		$customer_email = ( ! empty ( $row[$this->mapping['customer_email']] ) ) ? $row[$this->mapping['customer_email']] : '';
 		$username = ( ! empty ( $row[$this->mapping['customer_username']] ) ) ? $row[$this->mapping['customer_username']] : '';
 		$customer_id = ( ! empty( $row[$this->mapping['customer_id']] ) ) ? $row[$this->mapping['customer_id']] : '';
+		$password = ( ! empty( $row[$this->mapping['customer_password']] ) ) ? $row[$this->mapping['customer_password']] : wp_generate_password( 12, true );
 
 		$found_customer = false;
 		if( empty( $customer_id ) ) {
@@ -432,7 +435,7 @@ class WCS_Import_Parser {
 
 			// try creating a customer from email, username and address information
 			if( ! $found_customer && is_email( $customer_email ) && ! empty( $username ) ) {
-				$found_customer = wp_create_user( $username, '1234', $customer_email );
+				$found_customer = wp_create_user( $username, $password, $customer_email );
 				// update user meta data
 				foreach( $this->user_data_titles as $key ) {
 					switch( $key ) {
@@ -463,6 +466,10 @@ class WCS_Import_Parser {
 							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : '';
 							update_user_meta( $found_customer, $key, $meta_value );
 					}
+				}
+				// send user registration email if admin as chosen to do so
+				if( $this->send_registration_email && function_exists( 'wp_new_user_notification' ) ) {
+					wp_new_user_notification( $customer_id, $password );
 				}
 			}
 			return $found_customer;

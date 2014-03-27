@@ -8,6 +8,7 @@ jQuery(document).ready(function($){
 	var test_mode;
 	var file_url;
 	var file_id;
+	var send_registration_email;
 
 	$( 'body' ).on( 'import-start', function( event, import_data ) {
 		var positions = import_data.file_positions;
@@ -20,6 +21,7 @@ jQuery(document).ready(function($){
 		test_mode = import_data.test_run;
 		file_id = import_data.file_id;
 		file_url = import_data.file_url;
+		send_registration_email = import_data.send_reg_email;
 
 		for( var i = 0; i < positions.length; i+=2 ) {
 			ajax_import( positions[i], positions[i+1], starting_row_number[i/2] );
@@ -36,6 +38,7 @@ jQuery(document).ready(function($){
 			end:		end_pos,
 			row_num:	row_start,
 			test_mode: 	test_mode,
+			send_email:	send_registration_email,
 		}
 		$.ajax({
 			url:	ajax_url,
