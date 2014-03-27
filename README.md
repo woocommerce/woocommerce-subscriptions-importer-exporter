@@ -29,10 +29,12 @@ The Subscriptions CSV Import suite makes it easy to import CSV to WooCommerce. H
 ## Importing Subscriptions
 Importing subscriptions involves setting up a CSV file containing various column headers. The currently supported headers fall under one of the three groups: Customers, Subscription, Orders. If any of the following values are used in the CSV as column headers, they will automatically be selected upon entering the mapping process.
 
+
 ### Customer Fields
 *	customer_id
 * customer_email
 *	customer_username
+*	customer_password
 *	billing_first_name
 *	billing_last_name
 *	billing_address_1
@@ -103,6 +105,7 @@ The following columns have some requirements for acceptable values or formats.
 * Delimiter - this allows you to specific any other character as the delimiter of the imported CSV; defaulted to the comma character.
 *	AJAX Request Limit - the amount of CSV rows handled at once per AJAX call can be modified by defining the WCS_REQ_LIMIT constant in wp_config.php; defaults to 15.
 * Test Mode - Enabling this option places the import process in a 'Dry Run" mode where no orders are created, but if sufficient information is given, a new will be created. This is very useful for running test imports prior to the live import.
+* Send off registration email - Having this option ticked means that when the importer creates a new customer, the customer will receive a registration email containing their login details along with their temporary password.
 
 ## List of Warnings
 - Shipping method and/or title for the order has been set to empty.
