@@ -181,7 +181,7 @@ class WCS_Import_Parser {
 			array_push( $this->results, $subscription );
 			return;
 		}
-
+error_log( $customer->roles[0] );
 		// Get product object - checked validity @ L141
 		$_product = get_product( $row[$this->mapping['product_id']] );
 		$subscription['item'] = __( $_product->get_title(), 'wcs-importer' );
@@ -467,6 +467,10 @@ class WCS_Import_Parser {
 							update_user_meta( $found_customer, $key, $meta_value );
 					}
 				}
+
+				// sets all new user's roles to the value set as default_inactive_role
+				WC_Subscriptions_Manager::make_user_inactive( $found_customer );
+
 				// send user registration email if admin as chosen to do so
 				if( $this->send_registration_email && function_exists( 'wp_new_user_notification' ) ) {
 					wp_new_user_notification( $found_customer, $password );
