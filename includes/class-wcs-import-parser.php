@@ -469,7 +469,7 @@ class WCS_Import_Parser {
 				}
 				// send user registration email if admin as chosen to do so
 				if( $this->send_registration_email && function_exists( 'wp_new_user_notification' ) ) {
-					wp_new_user_notification( $customer_id, $password );
+					wp_new_user_notification( $found_customer, $password );
 				}
 			}
 			return $found_customer;
