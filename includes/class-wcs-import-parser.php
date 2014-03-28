@@ -204,12 +204,12 @@ class WCS_Import_Parser {
 					}
 					break;
 				case 'order_shipping':
-					$value = empty( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					$postmeta[] = array( 'key' => '_order_recurring_shipping_total', 'value' => $value );
 					break;
 				case 'order_shipping_tax':
-					$value = empty( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					$postmeta[] = array( 'key' => '_order_recurring_shipping_tax_total', 'value' => $value );
 					break;
@@ -292,7 +292,7 @@ class WCS_Import_Parser {
 					$postmeta[] = array( 'key' => '_order_recurring_tax_total', 'value' => $value );
 					break;
 				default:
-					$value = empty( $row[$this->mapping[$column]] ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
 					if( empty( $value ) ) {
 						$metadata = get_user_meta( $cust_id, $column );
 						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
