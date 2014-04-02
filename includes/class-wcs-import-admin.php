@@ -350,9 +350,6 @@ class WCS_Admin_Importer {
 				<tr>
 					<th><?php _e( 'Email new customers their temporary password?', 'wcs-importer' ); ?></th>
 					<td><input type="checkbox" name="send-reg-email" value="wcs-import-reg_email"></td>
-				<tr>
-					<th><?php _e( 'Mapped Fields:', 'wcs-importer' ); ?></th>
-					<td><em><?php _e( 'Possible mapping validation', 'wcs-importer' ); ?></em></td>
 				</tr>
 			</table>
 			<p class="submit">
