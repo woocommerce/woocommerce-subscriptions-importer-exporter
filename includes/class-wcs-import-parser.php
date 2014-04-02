@@ -153,7 +153,7 @@ class WCS_Import_Parser {
 	 */
 	function import( $row ) {
 		global $woocommerce;
-
+		$download_permissions_granted = false;
 		$postmeta = array();
 		$subscription = array();
 		$subscription['warning'] = $subscription['error'] = array();
@@ -181,7 +181,7 @@ class WCS_Import_Parser {
 			array_push( $this->results, $subscription );
 			return;
 		}
-error_log( $customer->roles[0] );
+
 		// Get product object - checked validity @ L141
 		$_product = get_product( $row[$this->mapping['product_id']] );
 		$subscription['item'] = __( $_product->get_title(), 'wcs-importer' );
@@ -306,6 +306,17 @@ error_log( $customer->roles[0] );
 		if ( ! empty( $missing_bill_addr ) ) {
 			$subscription['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_bill_addr ), ',' ) . '. ', 'wcs-importer' );
 		}
+
+		// Check and set download permissions boolean, will run in test-mode
+		$download_permission = ( ! empty ( $row[$this->mapping['download_permission_granted']] ) ) ? strtolower( $row[$this->mapping['download_permission_granted']] ) : '';
+		if( strcmp( $download_permission, 'true' ) == 0 || strcmp( $download_permission, 'yes' ) == 0 ) {
+			$download_permissions_granted = true;
+			if( get_option( 'woocommerce_downloads_grant_access_after_payment' ) == 'no' ) {
+				$subscription['warning'][] = __( 'Download permissions cannot be granted because your current WooCommerce settings have disabled this feature.', 'wcs-importer' );
+				$download_permissions_granted = false;
+			}
+		}
+
 		// Skip this section when testing the importer for errors and/or warnings
 		if( ! $this->test_mode ) {
 			$order_data = array(
@@ -350,6 +361,11 @@ error_log( $customer->roles[0] );
 				if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) ) {
 					wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
 				}
+
+			// add download permissions if specified
+			if( $download_permissions_granted ) {
+				wc_downloadable_product_permissions( $order_id );
+			}
 
 				// Update the subscription meta data with values in $subscription_meta
 				$subscription_meta = array (
