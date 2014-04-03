@@ -364,10 +364,10 @@ class WCS_Import_Parser {
 					wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
 				}
 
-			// add download permissions if specified
-			if( $download_permissions_granted ) {
-				wc_downloadable_product_permissions( $order_id );
-			}
+				// add download permissions if specified
+				if( $download_permissions_granted ) {
+					wc_downloadable_product_permissions( $order_id );
+				}
 
 				// Update the subscription meta data with values in $subscription_meta
 				$subscription_meta = array (
