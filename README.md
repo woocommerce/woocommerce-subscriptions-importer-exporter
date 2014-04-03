@@ -84,7 +84,10 @@ The following columns have some requirements for acceptable values or formats.
 The following columns have some requirements for acceptable values or formats.
 *	payment_method – the currently supported payment methods are PayPal or Stripe. If anything other than paypal or stripe is used, the import will default to manual renewal.
 *	shipping_method - This should be the shipping method name as seen in the Order admin, i.e. "free_shipping", but can be any string that identifies the shipping method to you; defaults to an empty shipping method.
+*	download_permission_granted - value can be either yes or true; anything else will not grant download permissions for the subscription product in the order.
 *	All dollar amounts need to be either integer or decimal value for instance, “5.65”, “3”, “127.2” are all valid entries.
+
+
 
 ### Subscription Fields
 *	product_id
@@ -112,6 +115,7 @@ The following columns have some requirements for acceptable values or formats.
 - The following shipping address fields have been left empty: [ LIST_OF_FIELDS ].
 - The following billing address fields have been left empty: [ LIST_OF_FIELDS ].
 - Used default subscription status as none was given.
+- Download permissions cannot be granted because your current WooCommerce settings have disabled this feature.
 
 A link to edit the order is given at the end of the list of warnings.
 
