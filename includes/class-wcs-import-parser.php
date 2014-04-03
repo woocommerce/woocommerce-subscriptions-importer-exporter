@@ -331,6 +331,8 @@ class WCS_Import_Parser {
 
 			$order_id = wp_insert_post( $order_data );
 
+			$order = WC_Order( $order_id );
+
 			foreach ( $postmeta as $meta ) {
 				update_post_meta( $order_id, $meta['key'], $meta['value'] );
 				if ( '_customer_user' == $meta['key'] && $meta['value'] ) {
@@ -389,6 +391,8 @@ class WCS_Import_Parser {
 				$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
 				WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
 			}
+
+			$order->update_status( 'completed' );
 
 			$subscription['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
 			// Check if the subscription has been successfully added
