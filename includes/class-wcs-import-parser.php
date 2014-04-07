@@ -392,7 +392,11 @@ class WCS_Import_Parser {
 				WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
 			}
 
+			remove_action( 'woocommerce_order_status_pending_to_completed_notification', array( WC()->mailer()->emails['WC_Email_New_Order'], 'trigger' ) );
+			remove_action( 'woocommerce_order_status_completed_notification', array( WC()->mailer()->emails['WC_Email_Customer_Completed_Order'], 'trigger' ) );
 			$order->update_status( 'completed' );
+			add_action( 'woocommerce_order_status_pending_to_completed_notification', array( WC()->mailer()->emails['WC_Email_New_Order'], 'trigger' ) );
+			add_action( 'woocommerce_order_status_completed_notification', array( WC()->mailer()->emails['WC_Email_Customer_Completed_Order'], 'trigger' ) );
 
 			$subscription['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
 			// Check if the subscription has been successfully added
