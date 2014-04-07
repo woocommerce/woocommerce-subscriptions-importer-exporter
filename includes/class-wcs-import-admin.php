@@ -9,6 +9,12 @@ class WCS_Admin_Importer {
 	var $file_url;
 	var $test_import = false;
 
+	public function __construct() {
+
+		$this->admin_url        = admin_url( 'admin.php?page=import_subscription' );
+		$this->rows_per_request = ( defined( 'WCS_IMPORT_ROWS_PER_REQUEST' ) ) ? WCS_IMPORT_ROWS_PER_REQUEST : 20;
+	}
+
 	/**
 	 * Displays header followed by the current pages content
 	 *
