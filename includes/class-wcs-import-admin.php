@@ -3,7 +3,6 @@ global $file;
 
 class WCS_Admin_Importer {
 	var $import_results = array();
-	var $mapping;
 	var $test_import = false;
 
 	var $upload_error = '';
@@ -89,10 +88,10 @@ class WCS_Admin_Importer {
 							$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[$key], $enc ) : '';
 						}
 
-						if( strtolower( $row[$this->mapping['payment_method']] ) == 'stripe' && empty( $row[$this->mapping['stripe_customer_id']] ) ) {
+						if( strtolower( $row[ $mapped_fields['payment_method'] ] ) == 'stripe' && empty( $row[ $mapped_fields['stripe_customer_id'] ] ) ) {
 							$payment_method_error[] = 'Stripe';
 							$payment_meta_error[] = 'stripe_customer_id';
-						} else if ( strtolower( $row[$this->mapping['payment_method']] ) == 'paypal' && empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
+						} else if ( strtolower( $row[ $mapped_fields['payment_method'] ] ) == 'paypal' && empty( $row[ $mapped_fields['paypal_subscriber_id'] ] ) ) {
 							$payment_method_error[] = 'Paypal';
 							$payment_meta_error[] = 'paypal_subscriber_id';
 						}
@@ -401,8 +400,9 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	function save_mapping() {
+
 		// Possible mapping options
-		$this->mapping = array(
+		$mapped_fields = array(
 			'product_id'				  => '',
 			'customer_id' 				  => '',
 			'customer_email' 			  => '',
@@ -456,15 +456,16 @@ class WCS_Admin_Importer {
 			'download_permission_granted' => '',
 		);
 
-		$mapping = $_POST['mapto'];
+		$mapping_rules = $_POST['mapto'];
+
 		// Doesnt yet handle multiple fields mapped to the same field
-		foreach( $this->mapping as $key => $value) {
-			$m_key = array_search( $key, $mapping );
-			if( $m_key ) {
-				$this->mapping[$key] = $m_key;
+		foreach( $mapped_fields as $key => $value) {
+			$m_key = array_search( $key, $mapping_rules );
+			if ( $m_key ) {
+				$mapped_fields[$key] = $m_key;
 			}
 		}
-		// Need to check for errors
+
 		update_post_meta( $_GET['file_id'], '_mapped_rules', $mapped_fields );
 	}
 
@@ -527,9 +528,9 @@ class WCS_Admin_Importer {
 
 		@set_time_limit(0);
 
-		if( isset( $_POST['file'] ) && isset( $_POST['row_num'] ) && isset( $_POST['mapping'] ) ) {
+		if( isset( $_POST['file_id'] ) && isset( $_POST['row_num'] ) ) {
 			$file = stripslashes($_POST['file']);
-			$mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
+			$mapping = get_post_meta( absint( $_POST['file_id'] ), '_mapped_rules', true );
 			$start = ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0;
 			$end = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
 			$starting_row_num = absint( $_POST['row_num'] );
