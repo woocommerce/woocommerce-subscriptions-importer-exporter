@@ -13,6 +13,8 @@ class WCS_Admin_Importer {
 
 		$this->admin_url        = admin_url( 'admin.php?page=import_subscription' );
 		$this->rows_per_request = ( defined( 'WCS_IMPORT_ROWS_PER_REQUEST' ) ) ? WCS_IMPORT_ROWS_PER_REQUEST : 20;
+
+		add_action( 'wp_ajax_wcs_import_request', array( &$this, 'ajax_request_handler' ) );
 	}
 
 	/**
@@ -40,9 +42,6 @@ class WCS_Admin_Importer {
 		case 4 :
 			$this->wcs_import_results();
 			$this->ajax_setup();
-			break;
-		case 5:
-			$this->ajax_request_handler();
 			break;
 		default : //default to home page
 			$this->upload_page();
@@ -451,7 +450,7 @@ class WCS_Admin_Importer {
 						delimiter:		'<?php echo $delimiter; ?>',
 						file:			'<?php echo addslashes( $file ); ?>',
 						mapping: 		'<?php echo json_encode( $this->mapping ); ?>',
-						ajax_url:		'<?php echo add_query_arg( array( 'import_page' => 'subscription_csv', 'step' => '5' ), admin_url( 'admin-ajax.php' ) ); ?>',
+						ajax_url:		'<?php echo admin_url( 'admin-ajax.php' ); ?>',
 						test_run: 		<?php echo ( $this->test_import ) ? "true" : "false"; ?>,
 						send_reg_email:	<?php echo ( $send_user_email ) ? "true" : "false"; ?>
 					}

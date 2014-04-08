@@ -26,7 +26,6 @@ class WC_Subscription_Importer {
 		add_action( 'admin_menu', array( __CLASS__, 'add_sub_menu' ), 10 );
 		add_action( 'admin_init', array( __CLASS__, 'add_import_tool' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts_wcs_import' ) );
-		add_action( 'wp_ajax_wcs_import_request', array( self::$wcs_importer, 'display_content' ) );
 
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts_wcs_import_localize' ) );
 		// Add the "Settings | Documentation" links on the Plugins administration screen
