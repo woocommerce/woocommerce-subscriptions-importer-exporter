@@ -14,7 +14,27 @@ class WCS_Admin_Importer {
 		$this->admin_url        = admin_url( 'admin.php?page=import_subscription' );
 		$this->rows_per_request = ( defined( 'WCS_IMPORT_ROWS_PER_REQUEST' ) ) ? WCS_IMPORT_ROWS_PER_REQUEST : 20;
 
+		add_action( 'admin_menu', array( __CLASS__, 'add_sub_menu' ), 10 );
+		add_action( 'admin_init', array( __CLASS__, 'add_import_tool' ) );
+
 		add_action( 'wp_ajax_wcs_import_request', array( &$this, 'ajax_request_handler' ) );
+	}
+
+	/**
+	 * Add menu item under Woocommerce > Subscription CSV Importer
+	 *
+	 * @since 1.0
+	 */
+	public static function add_sub_menu() {
+		$menu = add_submenu_page('woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( &$this, 'display_content' ) );
+	}
+
+	/**
+	 *
+	 * @since 1.0
+	 */
+	public static function add_import_tool() {
+		register_importer( 'woocommerce_subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-importer' ), array( &$this, 'display_content' ) );
 	}
 
 	/**
@@ -24,6 +44,29 @@ class WCS_Admin_Importer {
 	 */
 	public function display_content() {
 		global $file;
+
+		echo '<div class="wrap">';
+		echo '<h2>' . __( 'Subscription CSV Importer', 'wcs-importer' ) . '</h2>';
+		if ( ! isset( $_GET['step'] ) || isset( $_GET['cancelled'] ) ) :
+		?>
+		<div id="message" class="updated woocommerce-message wc-connect">
+			<?php if ( isset( $_GET['cancelled'] ) ) : ?>
+			<div id="message" class="updated error">
+				<p><?php _e( 'Import cancelled.', 'wcs-importer' ); ?></p>
+			</div>
+			<?php endif; ?>
+			<?php if ( ! isset( $_GET['step'] ) ) : ?>
+			<div class="squeezer">
+				<h4><?php _e( '<strong>Before you begin</strong>, please prepare your CSV file.', 'wcs-importer' ); ?></h4>
+				<p class="submit">
+					<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a>
+					<a href="<?php echo plugins_url( 'wcs-import-sample.csv', __FILE__ ); ?>" class="button wcs-importer-download"><?php _e( 'Download Example CSV', 'wcs-importer' ); ?></a>
+				</p>
+			</div>
+			<?php endif; ?>
+		</div>
+		<?php
+		endif;
 
 		$page = ( isset($_GET['step'] ) ) ? $_GET['step'] : 1;
 		switch( $page ) {
@@ -47,6 +90,8 @@ class WCS_Admin_Importer {
 			$this->upload_page();
 			break;
 		}
+
+		echo '</div>';
 	}
 
 	/**
