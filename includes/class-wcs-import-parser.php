@@ -142,7 +142,7 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	function format_data_from_csv( $data, $enc ) {
+	public static function format_data_from_csv( $data, $enc ) {
 		return ( $enc == 'UTF-8' ) ? $data : utf8_encode( $data );
 	}
 
