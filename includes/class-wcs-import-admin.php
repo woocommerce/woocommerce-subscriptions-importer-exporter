@@ -46,7 +46,7 @@ class WCS_Admin_Importer {
 	 */
 	public static function enqueue_scripts() {
 
-		wp_register_style( 'wcs-import_admin_css', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/style.css' );
+		wp_register_style( 'wcs-import_admin_css', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/wcs-importer.css' );
 		wp_enqueue_style( 'wcs-import_admin_css' );
 
 		wp_register_script( 'wcs-import_admin_js', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
