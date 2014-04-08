@@ -138,7 +138,7 @@ class WCS_Admin_Importer {
 					'ajax_url'         => admin_url( 'admin-ajax.php' ),
 					'rows_per_request' => $this->rows_per_request,
 					'test_mode'        =>( 'yes' == $_GET['test_mode'] ) ? "true" : "false",
-					'email_password'   =>( 'yes' == $_GET['email_password'] ) ? "true" : "false",
+					'email_customer'   =>( 'yes' == $_GET['email_customer'] ) ? "true" : "false",
 					'cancelled_url'    => add_query_arg( 'cancelled', 'true', $this->admin_url ),
 					'total'            => $total,
 				);
@@ -245,7 +245,7 @@ class WCS_Admin_Importer {
 						<tr>
 							<th><?php _e( 'Email passwords?', 'wcs-importer' ); ?></th>
 							<td>
-								<input type="checkbox" name="email_password" value="yes" <?php checked( $email_password, 'yes' ); ?> />
+								<input type="checkbox" name="email_customer" value="yes" <?php checked( $email_customer, 'yes' ); ?> />
 								<em><?php _e( 'If importing new users, you can email customers their temporary password.', 'wcs-importer' ); ?></em>
 							</td>
 						</tr>
@@ -301,7 +301,7 @@ class WCS_Admin_Importer {
 			'step'           => '3',
 			'file_id'        => $file_id,
 			'test_mode'      => $_GET['test_mode'],
-			'email_password' => $_GET['email_password'],
+			'email_customer' => $_GET['email_customer'],
 		);
 		$action = add_query_arg( $url_params, $this->admin_url );
 
@@ -482,7 +482,7 @@ class WCS_Admin_Importer {
 			$next_step_url_params = array(
 				'file_id'        => isset( $_GET['file_id'] ) ? $_GET['file_id'] : 0,
 				'test_mode'      => isset( $_REQUEST['test_mode'] ) ? $_REQUEST['test_mode'] : 'no',
-				'email_password' => isset( $_REQUEST['email_password'] ) ? $_REQUEST['email_password'] : 'no',
+				'email_customer' => isset( $_REQUEST['email_customer'] ) ? $_REQUEST['email_customer'] : 'no',
 			);
 
 			if ( 'upload_file' == $_POST['action'] ) {
@@ -534,9 +534,9 @@ class WCS_Admin_Importer {
 			$end = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
 			$starting_row_num = absint( $_POST['row_num'] );
 			$test_mode = $_POST['test_mode'];
-			$send_email = $_POST['send_email'];
+			$email_customer = isset( $_POST['email_customer'] ) ? $_POST['email_customer'] : false;
 			$this->parser = new WCS_Import_Parser();
-			$this->results = $this->parser->import_data( $file, $mapping, $start, $end, $starting_row_num, $test_mode, $send_email );
+			$this->results = $this->parser->import_data( $file, $mapping, $start, $end, $starting_row_num, $test_mode, $email_customer );
 
 			header( 'Content-Type: application/json; charset=utf-8' );
 			echo json_encode( $this->results );
@@ -557,7 +557,7 @@ class WCS_Admin_Importer {
 				'step'           => '3',
 				'file_id'        => $_GET['file_id'],
 				'test_mode'      => 'no',
-				'email_password' => $_GET['email_password'],
+				'email_customer' => $_GET['email_customer'],
 			);
 
 			$action = add_query_arg( $url_params, $this->admin_url );

@@ -26,7 +26,7 @@ jQuery(document).ready(function($){
 			end:		end_pos,
 			row_num:	row_start
 			test_mode:	wcs_script_data.test_mode,
-			send_email:	wcs_script_data.email_password,
+			email_customer:	wcs_script_data.email_customer,
 		}
 		$.ajax({
 			url:	wcs_script_data.ajax_url,

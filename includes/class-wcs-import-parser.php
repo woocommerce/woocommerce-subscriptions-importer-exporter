@@ -8,7 +8,7 @@ class WCS_Import_Parser {
 	var $end_pos;
 	var $starting_row_number;
 	var $test_mode;
-	var $send_registration_email;
+	var $email_customer;
 
 	function __construct() {
 		// Order meta values
@@ -85,7 +85,7 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	function import_data( $file, $mapping, $start, $end, $starting_row_num, $test_mode, $send_reg_email ) {
+	function import_data( $file, $mapping, $start, $end, $starting_row_num, $test_mode, $email_customer ) {
 		global $woocommerce;
 		$file_path = addslashes( $file );
 		$this->mapping = $mapping;
@@ -93,7 +93,7 @@ class WCS_Import_Parser {
 		$this->end_pos = $end;
 		$this->starting_row_number = $starting_row_num;
 		$this->test_mode = ( $test_mode == 'true' ) ? true : false;
-		$this->send_registration_email = ( $send_reg_email == 'true' ) ? true : false;
+		$this->email_customer = ( $email_customer == 'true' ) ? true : false;
 		$this->import_start( $file_path );
 		return $this->results;
 	}
@@ -494,7 +494,7 @@ class WCS_Import_Parser {
 				WC_Subscriptions_Manager::make_user_inactive( $found_customer );
 
 				// send user registration email if admin as chosen to do so
-				if( $this->send_registration_email && function_exists( 'wp_new_user_notification' ) ) {
+				if( $this->email_customer && function_exists( 'wp_new_user_notification' ) ) {
 					wp_new_user_notification( $found_customer, $password );
 				}
 			}
