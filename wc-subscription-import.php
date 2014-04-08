@@ -23,9 +23,21 @@ class WC_Subscription_Importer {
 
 	public static function init() {
 
-		self::$wcs_importer = new WCS_Admin_Importer();
+		// Create the importer on admin side only
+		add_filter( 'admin_init', __CLASS__ . '::setup_importer', 1 );
+
 		// Add the "Settings | Documentation" links on the Plugins administration screen
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), __CLASS__ . '::action_links' );
+	}
+
+	/**
+	 * Create an instance of the importer on admin pages.
+	 *
+	 * @param mixed $links
+	 * @since 1.0
+	 */
+	public static function setup_importer() {
+		self::$wcs_importer = new WCS_Admin_Importer();
 	}
 
 	/**
