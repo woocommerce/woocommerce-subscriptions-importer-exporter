@@ -49,7 +49,7 @@ class WCS_Admin_Importer {
 		wp_register_style( 'wcs-import_admin_css', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/style.css' );
 		wp_enqueue_style( 'wcs-import_admin_css' );
 
-		wp_register_script( 'wcs-import_admin_js', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-import_ajax.js' );
+		wp_register_script( 'wcs-import_admin_js', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
 		wp_enqueue_script( 'wcs-import_admin_js' );
 
 		$translation_array = array(
