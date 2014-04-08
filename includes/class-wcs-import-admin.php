@@ -155,6 +155,20 @@ class WCS_Admin_Importer {
 								<small><?php printf( __('Maximum size: %s' ), $size ); ?></small>
 							</td>
 						</tr>
+						<tr>
+							<th><?php _e( 'Run in Test Mode', 'wcs-importer' ); ?>:</th>
+							<td>
+								<input type="checkbox" name="test_mode" value="yes" <?php checked( $test_mode, 'yes' ); ?> />
+								<em><?php _e( 'Check your CSV file for errors and warnings without creating subscriptions, users or orders.', 'wcs-importer' ); ?></em>
+							</td>
+						</tr>
+						<tr>
+							<th><?php _e( 'Email passwords?', 'wcs-importer' ); ?></th>
+							<td>
+								<input type="checkbox" name="email_password" value="yes" <?php checked( $email_password, 'yes' ); ?> />
+								<em><?php _e( 'If importing new users, you can email customers their temporary password.', 'wcs-importer' ); ?></em>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 				<p class="submit">
@@ -363,40 +377,6 @@ class WCS_Admin_Importer {
 		}
 		// Need to check for errors
 		update_post_meta( $_GET['file_id'], '_mapped_rules', $mapped_fields );
-
-		$this->pre_import_check();
-	}
-
-	/**
-	 * Checks if the admin wants to run the importer in test mode before creating WC Orders
-	 * containing Subscriptions.
-	 * @since 1.0
-	 */
-	function pre_import_check() {
-		$action = 'admin.php?page=import_subscription&amp;step=4&amp;';
-		echo '<h3>' . __( 'Step 4: Admin Options', 'wcs-importer' ) . '</h3>';
-	?>
-		<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
-			<input type="hidden" name="file_id" value="<?php echo ( isset ( $_POST['file_id'] ) ) ? $_POST['file_id'] : ''; ?>">
-			<input type="hidden" name="mapping" value='<?php echo json_encode( $this->mapping ); ?>'>
-			<table class="form-table">
-				<tr>
-					<td colspan="2"><em><?php echo sprintf( __( 'Test mode will present a list of critical errors and warnings found throughout the importing process without creating the subscription orders. %s It is highly recommended to make use of this feature to ensure no unexpected outcomes are a result of using of the WooCommerce Subscription Importer.', 'wcs-importer' ), '<br>' ); ?></em></td>
-				</tr>
-				<tr>
-					<th><?php _e( 'Run in Test Mode', 'wcs-importer' ); ?>:</th>
-					<td><input type="checkbox" name="test-mode" value="wcs-import-test"></td>
-				</tr>
-				<tr>
-					<th><?php _e( 'Email new customers their temporary password?', 'wcs-importer' ); ?></th>
-					<td><input type="checkbox" name="send-reg-email" value="wcs-import-reg_email"></td>
-				</tr>
-			</table>
-			<p class="submit">
-				<input type="submit" class="button" value="<?php esc_attr_e( 'Continue', 'wcs-importer' ); ?>" />
-			</p>
-		</form>
-	<?php
 	}
 
 	/**
