@@ -17,7 +17,7 @@ class WCS_Admin_Importer {
 		add_action( 'admin_menu', array( __CLASS__, 'add_sub_menu' ), 10 );
 		add_action( 'admin_init', array( __CLASS__, 'add_import_tool' ) );
 
-		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts_wcs_import' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
 		add_action( 'wp_ajax_wcs_import_request', array( &$this, 'ajax_request_handler' ) );
 	}
@@ -43,7 +43,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	public static function enqueue_scripts_wcs_import() {
+	public static function enqueue_scripts() {
 		wp_register_style( 'wcs-import_admin_css', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/style.css' );
 		wp_enqueue_style( 'wcs-import_admin_css' );
 
