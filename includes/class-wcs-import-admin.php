@@ -11,23 +11,15 @@ class WCS_Admin_Importer {
 		$this->admin_url        = admin_url( 'admin.php?page=import_subscription' );
 		$this->rows_per_request = ( defined( 'WCS_IMPORT_ROWS_PER_REQUEST' ) ) ? WCS_IMPORT_ROWS_PER_REQUEST : 20;
 
-		add_action( 'admin_menu', array( __CLASS__, 'add_sub_menu' ), 10 );
+		add_action( 'admin_init', array( &$this, 'post_request_handler' ) );
+
 		add_action( 'admin_init', array( __CLASS__, 'add_import_tool' ) );
 
-		add_action( 'admin_init', array( &$this, 'post_request_handler' ) );
+		add_action( 'admin_menu', array( __CLASS__, 'add_sub_menu' ), 10 );
 
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
 		add_action( 'wp_ajax_wcs_import_request', array( &$this, 'ajax_request_handler' ) );
-	}
-
-	/**
-	 * Add menu item under Woocommerce > Subscription CSV Importer
-	 *
-	 * @since 1.0
-	 */
-	public static function add_sub_menu() {
-		$menu = add_submenu_page('woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( &$this, 'admin_page' ) );
 	}
 
 	/**
@@ -36,6 +28,20 @@ class WCS_Admin_Importer {
 	 */
 	public static function add_import_tool() {
 		register_importer( 'woocommerce_subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-importer' ), array( &$this, 'admin_page' ) );
+	}
+
+	/**
+	 * Add menu item under Woocommerce > Subscription CSV Importer
+	 *
+	 * @since 1.0
+	 */
+<<<<<<< HEAD
+	public static function add_sub_menu() {
+		$menu = add_submenu_page('woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( &$this, 'admin_page' ) );
+=======
+	public function add_sub_menu() {
+		add_submenu_page( 'woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( &$this, 'admin_page' ) );
+>>>>>>> 8ebdad7... fixup! Reordering things in WCS_Admin_Importer
 	}
 
 	/**
@@ -204,6 +210,8 @@ class WCS_Admin_Importer {
 	 */
 	private function upload_page() {
 
+		$upload_dir = wp_upload_dir();
+
 		if ( ! empty( $this->upload_error ) ) : ?>
 	<div id="message" class="error">
 		<p><?php printf( __( 'Error uploading file: %s', 'wcs-importer' ), $this->upload_error ); ?></p>
@@ -211,7 +219,6 @@ class WCS_Admin_Importer {
 		<?php endif;
 
 		echo '<h3>' . __( 'Step 1: Upload CSV File', 'wcs-importer' ) . '</h3>';
-		$upload_dir = wp_upload_dir();
 		if ( ! empty( $upload_dir['error'] ) ) : ?>
 			<div class="error"><p><?php _e( 'Before you can upload your import file, you will need to fix the following error:' ); ?></p>
 			<p><strong><?php echo $upload_dir['error']; ?></strong></p></div><?php
@@ -394,6 +401,74 @@ class WCS_Admin_Importer {
 	}
 
 	/**
+	 * Shows information dependant on whether $_POST['test-mode'] is set or not.
+	 * If set, the admin is provided with a list of critical errors and non-critical warnings
+	 * @since 1.0
+	 */
+	private function import_page() {
+
+		if ( 'yes' == $_GET['test_mode'] ):
+
+			$url_params = array(
+				'step'           => '3',
+				'file_id'        => $_GET['file_id'],
+				'test_mode'      => 'no',
+				'email_customer' => $_GET['email_customer'],
+			);
+
+			$action = add_query_arg( $url_params, $this->admin_url );
+			?>
+			<h3><?php _e( 'Test Run Results', 'wcs-importer' ); ?></h3>
+			<table id="wcs-import-progress" class="widefat_importer widefat">
+				<thead>
+					<tr>
+						<th class="row" colspan="2"><?php _e( 'Importer Test Results', 'wcs-importer' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="alternate">
+						<th><strong><?php _e( 'Results', 'wcs-importer' ); ?></strong></th>
+						<td id="wcs-importer_test_results"><strong><?php echo sprintf( __( '%s0%s tests passed, %s0%s tests failed ( %s0%s of the CSV will be imported ).', 'wcs-importer' ), '<span id="wcs-test-passed">', '</span>', '<span id="wcs-test-failed">', '</span>', '<span id="wcs-test-ratio">', '</span>%' ); ?></strong></td>
+					</tr>
+					<tr>
+						<th><strong><?php _e( 'Details', 'wcs-importer' ); ?></strong></th>
+						<td id="wcs-importer_test_details"><strong><?php echo sprintf( __( '%s0%s fatal errors and %s0%s warnings found.', 'wcs-importer' ), '<span id="wcs-fatal-details">', '</span>', '<span id="wcs-warning-details">', '</span>' ); ?></strong></td>
+					</tr>
+					<tr class="alternate" id="wcs-importer_test_errors"><th><?php _e( 'Error Messages', 'wcs-importer' ); ?>:</th><td></td></tr>
+					<tr id="wcs-importer_test_warnings"><th><?php _e( 'Warnings', 'wcs-importer' ); ?>:</th><td></td></tr>
+				</tbody>
+			</table>
+			<div id="wcs-completed-message">
+				<p><?php _e( 'Test Finished!', 'wcs-importer' );?></p>
+				<a class="button" href="<?php echo esc_attr( wp_nonce_url( $action, 'import-upload' ) ); ?> "><?php _e( 'Run Import' , 'wcs-importer' ); ?></a>
+			</div>
+		<?php else : ?>
+			<h3><?php _e( 'Importing Results', 'wcs-importer' ); ?></h3>
+			<table id="wcs-import-progress" class="widefat_importer widefat">
+				<thead>
+					<tr>
+						<th class="row"><?php _e( 'Import Status', 'wcs-importer' ); ?></th>
+						<th class="row"><?php _e( 'Order #', 'wcs-importer' ); ?></th>
+						<th class="row"><?php _e( 'Subscription', 'wcs-importer' ); ?></th>
+						<th class="row"><?php _e( 'User Name', 'wcs-importer' ); ?></th>
+						<th class="row"><?php _e( 'Subscription Status', 'wcs-importer' ); ?></th>
+						<th class="row"><?php _e( 'Number of Warnings', 'wcs-importer' ); ?></th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr class="importer-loading">
+						<td colspan="6"></td>
+					</tr>
+				</tfoot>
+				<tbody></tbody>
+			</table>
+			<p id="wcs-completed-message">
+				<?php printf( __( 'Import Complete! %sView Subscriptions%s, %sView Orders%s or %sImport another file%s.', 'wcs-importer' ), '<a href="' . admin_url( 'admin.php?page=subscriptions' ) . '">', '</a>', '<a href="' . admin_url( 'edit.php?post_type=shop_order' ) . '">', '</a>', '<a href="' . $this->admin_url . '">', '</a>' ); ?>
+			</p>
+		<?php endif;
+	}
+
+	/**
 	 * Checks the mapping provides enough information to continue importing subscriptions
 	 *
 	 * @since 1.0
@@ -542,74 +617,6 @@ class WCS_Admin_Importer {
 			echo json_encode( $this->results );
 		}
 		exit; // End
-	}
-
-	/**
-	 * Shows information dependant on whether $_POST['test-mode'] is set or not.
-	 * If set, the admin is provided with a list of critical errors and non-critical warnings
-	 * @since 1.0
-	 */
-	private function import_page() {
-
-		if ( 'yes' == $_GET['test_mode'] ):
-
-			$url_params = array(
-				'step'           => '3',
-				'file_id'        => $_GET['file_id'],
-				'test_mode'      => 'no',
-				'email_customer' => $_GET['email_customer'],
-			);
-
-			$action = add_query_arg( $url_params, $this->admin_url );
-			?>
-			<h3><?php _e( 'Test Run Results', 'wcs-importer' ); ?></h3>
-			<table id="wcs-import-progress" class="widefat_importer widefat">
-				<thead>
-					<tr>
-						<th class="row" colspan="2"><?php _e( 'Importer Test Results', 'wcs-importer' ); ?></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="alternate">
-						<th><strong><?php _e( 'Results', 'wcs-importer' ); ?></strong></th>
-						<td id="wcs-importer_test_results"><strong><?php echo sprintf( __( '%s0%s tests passed, %s0%s tests failed ( %s0%s of the CSV will be imported ).', 'wcs-importer' ), '<span id="wcs-test-passed">', '</span>', '<span id="wcs-test-failed">', '</span>', '<span id="wcs-test-ratio">', '</span>%' ); ?></strong></td>
-					</tr>
-					<tr>
-						<th><strong><?php _e( 'Details', 'wcs-importer' ); ?></strong></th>
-						<td id="wcs-importer_test_details"><strong><?php echo sprintf( __( '%s0%s fatal errors and %s0%s warnings found.', 'wcs-importer' ), '<span id="wcs-fatal-details">', '</span>', '<span id="wcs-warning-details">', '</span>' ); ?></strong></td>
-					</tr>
-					<tr class="alternate" id="wcs-importer_test_errors"><th><?php _e( 'Error Messages', 'wcs-importer' ); ?>:</th><td></td></tr>
-					<tr id="wcs-importer_test_warnings"><th><?php _e( 'Warnings', 'wcs-importer' ); ?>:</th><td></td></tr>
-				</tbody>
-			</table>
-			<div id="wcs-completed-message">
-				<p><?php _e( 'Test Finished!', 'wcs-importer' );?></p>
-				<a class="button" href="<?php echo esc_attr( wp_nonce_url( $action, 'import-upload' ) ); ?> "><?php _e( 'Run Import' , 'wcs-importer' ); ?></a>
-			</div>
-		<?php else : ?>
-			<h3><?php _e( 'Importing Results', 'wcs-importer' ); ?></h3>
-			<table id="wcs-import-progress" class="widefat_importer widefat">
-				<thead>
-					<tr>
-						<th class="row"><?php _e( 'Import Status', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Order #', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Subscription', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'User Name', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Subscription Status', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Number of Warnings', 'wcs-importer' ); ?></th>
-					</tr>
-				</thead>
-				<tfoot>
-					<tr class="importer-loading">
-						<td colspan="6"></td>
-					</tr>
-				</tfoot>
-				<tbody></tbody>
-			</table>
-			<p id="wcs-completed-message">
-				<?php printf( __( 'Import Complete! %sView Subscriptions%s, %sView Orders%s or %sImport another file%s.', 'wcs-importer' ), '<a href="' . admin_url( 'admin.php?page=subscriptions' ) . '">', '</a>', '<a href="' . admin_url( 'edit.php?post_type=shop_order' ) . '">', '</a>', '<a href="' . $this->admin_url . '">', '</a>' ); ?>
-			</p>
-		<?php endif;
 	}
 
 	/**
