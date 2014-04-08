@@ -20,7 +20,6 @@ jQuery(document).ready(function($){
 	function ajax_import( start_pos, end_pos, row_start ) {
 		var data = {
 			action:		'wcs_import_request',
-			mapping:	mapping,
 			file:		file_name,
 			start:		start_pos,
 			end:		end_pos,
@@ -135,7 +134,6 @@ jQuery(document).ready(function($){
 					}
 					$('#wcs-importer_test_warnings td').append( results_text );
 
-					$('input[name="mapping"]').val( mapping );
 					$('input[name="file_id"]').val( wcs_script_data.file_id );
 					$('input[name="file_url"]').val( file_url );
 					check_completed();
