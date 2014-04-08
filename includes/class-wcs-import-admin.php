@@ -12,11 +12,11 @@ class WCS_Admin_Importer {
 
 		add_action( 'admin_init', array( &$this, 'post_request_handler' ) );
 
-		add_action( 'admin_init', array( __CLASS__, 'add_import_tool' ) );
+		add_action( 'admin_init', array( &$this, 'add_import_tool' ) );
 
-		add_action( 'admin_menu', array( __CLASS__, 'add_sub_menu' ), 10 );
+		add_action( 'admin_menu', array( &$this, 'add_sub_menu' ), 10 );
 
-		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
 
 		add_action( 'wp_ajax_wcs_import_request', array( &$this, 'ajax_request_handler' ) );
 	}
@@ -25,7 +25,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	public static function add_import_tool() {
+	public function add_import_tool() {
 		register_importer( 'woocommerce_subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-importer' ), array( &$this, 'admin_page' ) );
 	}
 
@@ -34,7 +34,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	public static function add_sub_menu() {
+	public function add_sub_menu() {
 		add_submenu_page( 'woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( &$this, 'admin_page' ) );
 	}
 
@@ -42,7 +42,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	public static function enqueue_scripts() {
+	public function enqueue_scripts() {
 
 		if ( isset( $_GET['page'] ) && 'import_subscription' == $_GET['page'] ) {
 
