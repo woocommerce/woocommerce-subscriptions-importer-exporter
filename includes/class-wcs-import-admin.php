@@ -3,7 +3,6 @@ global $file;
 
 class WCS_Admin_Importer {
 	var $id;
-	var $delimiter;
 	var $import_results = array();
 	var $mapping;
 	var $test_import = false;
@@ -154,10 +153,6 @@ class WCS_Admin_Importer {
 								<small><?php printf( __('Maximum size: %s' ), $size ); ?></small>
 							</td>
 						</tr>
-						<tr>
-							<th><label><?php _e( 'Delimiter', 'wcs-importer' ); ?></label><br/></th>
-							<td><input type="text" name="delimiter" placeholder="," size="2" /></td>
-						</tr>
 					</tbody>
 				</table>
 				<p class="submit">
@@ -213,7 +208,6 @@ class WCS_Admin_Importer {
 		<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
 			<input type="hidden" name="file_id" value="<?php echo $this->id; ?>">
 			<input type="hidden" name="action" value="field_mapping" />
-			<input type="hidden" name="delimiter" value="<?php echo $this->delimiter; ?>">
 			<table class="widefat widefat_importer">
 				<thead>
 					<tr>
@@ -382,7 +376,6 @@ class WCS_Admin_Importer {
 	?>
 		<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
 			<input type="hidden" name="file_id" value="<?php echo ( isset ( $_POST['file_id'] ) ) ? $_POST['file_id'] : ''; ?>">
-			<input type="hidden" name="delimiter" value="<?php echo ( isset ( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ''; ?>">
 			<input type="hidden" name="mapping" value='<?php echo json_encode( $this->mapping ); ?>'>
 			<table class="form-table">
 				<tr>
@@ -416,7 +409,6 @@ class WCS_Admin_Importer {
 		$this->mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
 		$file_positions = $row_start = array();
 		$payment_method_error = $payment_meta_error = array();
-		$delimiter = ( ! empty( $_POST['delimiter'] ) ) ? $_POST['delimiter'] : ',';
 
 		$file = get_attached_file( $_POST['file_id'] );
 		$enc = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
@@ -432,8 +424,8 @@ class WCS_Admin_Importer {
 		if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
 			$row = $raw_headers = array();
 
-			$header = fgetcsv( $handle, 0, $delimiter );
-			while ( ( $postmeta = fgetcsv( $handle, 0, $delimiter ) ) !== FALSE ) {
+			$header = fgetcsv( $handle, 0 );
+			while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== FALSE ) {
 				$count++;
 				foreach ( $header as $key => $heading ) {
 					if ( ! $heading ) continue;
@@ -482,7 +474,6 @@ class WCS_Admin_Importer {
 						file_positions: <?php echo $array; ?>,
 						total: 			<?php echo $total; ?>,
 						start_row_num: 	<?php echo $starting_row_number; ?>,
-						delimiter:		'<?php echo $delimiter; ?>',
 						file:			'<?php echo addslashes( $file ); ?>',
 						mapping: 		'<?php echo json_encode( $this->mapping ); ?>',
 						ajax_url:		'<?php echo admin_url( 'admin-ajax.php' ); ?>',
@@ -556,7 +547,7 @@ class WCS_Admin_Importer {
 	}
 
 	/**
-	 * AJAX request holding the file, delimiter and mapping information is sent to this function.
+	 * AJAX request holding the file and mapping information is sent to this function.
 	 *
 	 * @since 1.0
 	 */
@@ -570,14 +561,13 @@ class WCS_Admin_Importer {
 		if( isset( $_POST['file'] ) && isset( $_POST['row_num'] ) && isset( $_POST['mapping'] ) ) {
 			$file = stripslashes($_POST['file']);
 			$mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
-			$delimiter = $_POST['delimiter'];
 			$start = ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0;
 			$end = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
 			$starting_row_num = absint( $_POST['row_num'] );
 			$test_mode = $_POST['test_mode'];
 			$send_email = $_POST['send_email'];
 			$this->parser = new WCS_Import_Parser();
-			$this->results = $this->parser->import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num, $test_mode, $send_email );
+			$this->results = $this->parser->import_data( $file, $mapping, $start, $end, $starting_row_num, $test_mode, $send_email );
 
 			header( 'Content-Type: application/json; charset=utf-8' );
 			echo json_encode( $this->results );
@@ -596,7 +586,6 @@ class WCS_Admin_Importer {
 			<h3><?php _e( 'Test Run Results', 'wcs-importer' ); ?></h3>
 			<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
 				<input type="hidden" name="file_id" value="">
-				<input type="hidden" name="delimiter" value="">
 				<input type="hidden" name="mapping" value="">
 				<table id="wcs-import-progress" class="widefat_importer widefat">
 					<thead>
