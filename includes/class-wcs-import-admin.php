@@ -187,7 +187,7 @@ class WCS_Admin_Importer {
 					foreach ( $header as $key => $heading ) {
 						if ( ! $heading ) continue;
 						$s_heading = strtolower( $heading );
-						$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? $this->format_data_from_csv( $postmeta[$key], $enc ) : '';
+						$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[$key], $enc ) : '';
 						$raw_headers[ $s_heading ] = $heading;
 					}
 					break;
@@ -196,14 +196,6 @@ class WCS_Admin_Importer {
 			}
 			$this->mapping_page( $row );
 		}
-	}
-
-	/**
-	 *
-	 * @since 1.0
-	 */
-	function format_data_from_csv( $data, $enc ) {
-		return ( $enc == 'UTF-8' ) ? $data : utf8_encode( $data );
 	}
 
 	/**
@@ -447,7 +439,7 @@ class WCS_Admin_Importer {
 				foreach ( $header as $key => $heading ) {
 					if ( ! $heading ) continue;
 					$s_heading = strtolower( $heading );
-					$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? $this->format_data_from_csv( $postmeta[$key], $enc ) : '';
+					$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[$key], $enc ) : '';
 				}
 
 				if( strtolower( $row[$this->mapping['payment_method']] ) == 'stripe' && empty( $row[$this->mapping['stripe_customer_id']] ) ) {
