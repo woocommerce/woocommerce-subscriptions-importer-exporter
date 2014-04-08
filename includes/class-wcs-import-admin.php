@@ -618,19 +618,5 @@ class WCS_Admin_Importer {
 		}
 		exit; // End
 	}
-
-	/**
-	 * Handles displaying an error message throughout the process of importing subscriptions.
-	 *
-	 * @since 1.0
-	 */
-	function importer_error() {
-		global $file;
-		?>
-		<h3><?php _e( 'Error while uploading File', 'wcs-importer' ); ?></h3>
-		<p><?php printf( __( 'Error message: %s', 'wcs-importer' ), $file['error'] ); ?></p>
-		<p><a href="<?php echo $this->admin_url; ?>"><?php _e( 'Import another file', 'wcs-importer' ); ?></a></p>
-		<?php
-	}
 }
 ?>
