@@ -26,7 +26,7 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	public static function add_sub_menu() {
-		$menu = add_submenu_page('woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( &$this, 'display_content' ) );
+		$menu = add_submenu_page('woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( &$this, 'admin_page' ) );
 	}
 
 	/**
@@ -34,7 +34,7 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	public static function add_import_tool() {
-		register_importer( 'woocommerce_subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-importer' ), array( &$this, 'display_content' ) );
+		register_importer( 'woocommerce_subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-importer' ), array( &$this, 'admin_page' ) );
 	}
 
 	/**
@@ -42,7 +42,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	public function display_content() {
+	public function admin_page() {
 		global $file;
 
 		echo '<div class="wrap">';
@@ -83,7 +83,7 @@ class WCS_Admin_Importer {
 			$this->check_mapping();
 			break;
 		case 4 :
-			$this->wcs_import_results();
+			$this->import_page();
 			$this->ajax_setup();
 			break;
 		default : //default to home page
@@ -194,7 +194,7 @@ class WCS_Admin_Importer {
 				}
 				fclose( $handle );
 			}
-			$this->map_fields( $row );
+			$this->mapping_page( $row );
 		}
 	}
 
@@ -211,7 +211,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	function map_fields( $row ) {
+	function mapping_page( $row ) {
 		$action = 'admin.php?page=import_subscription&amp;step=3&amp;';
 		$row_number = 1;
 		?>
@@ -553,7 +553,7 @@ class WCS_Admin_Importer {
 	 * If set, the admin is provided with a list of critical errors and non-critical warnings
 	 * @since 1.0
 	 */
-	function wcs_import_results() { 
+	function import_page() {
 		$action = 'admin.php?page=import_subscription&amp;step=4&amp;';
 		if ( isset( $_POST['test-mode'] ) ): ?>
 			<h3><?php _e( 'Test Run Results', 'wcs-importer' ); ?></h3>
