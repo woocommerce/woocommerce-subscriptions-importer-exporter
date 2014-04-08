@@ -17,6 +17,9 @@ class WCS_Admin_Importer {
 		add_action( 'admin_menu', array( __CLASS__, 'add_sub_menu' ), 10 );
 		add_action( 'admin_init', array( __CLASS__, 'add_import_tool' ) );
 
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts_wcs_import' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts_wcs_import_localize' ) );
+
 		add_action( 'wp_ajax_wcs_import_request', array( &$this, 'ajax_request_handler' ) );
 	}
 
@@ -35,6 +38,36 @@ class WCS_Admin_Importer {
 	 */
 	public static function add_import_tool() {
 		register_importer( 'woocommerce_subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-importer' ), array( &$this, 'admin_page' ) );
+	}
+
+	/**
+	 *
+	 * @since 1.0
+	 */
+	public static function enqueue_scripts_wcs_import() {
+		wp_register_style( 'wcs-import_admin_css', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/style.css' );
+		wp_enqueue_style( 'wcs-import_admin_css' );
+
+		wp_register_script( 'wcs-import_admin_js', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-import_ajax.js' );
+		wp_enqueue_script( 'wcs-import_admin_js' );
+	}
+
+	/**
+	 *
+	 * @since 1.0
+	 */
+	public static function enqueue_scripts_wcs_import_localize() {
+		$translation_array = array( 
+			'success' 				=> __( 'success', 'wcs-importer' ),
+			'failed' 				=> __( 'failed', 'wcs-importer' ),
+			'error_string'			=> sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
+			'finished_importing' 	=> __( 'Finished Importing', 'wcs-importer' ),
+			'edit_order' 			=> __( 'Edit Order', 'wcs-importer' ),
+			'warning'				=> __( 'Warning', 'wcs-importer' ),
+			'warnings'				=> __( 'Warnings', 'wcs-importer' ),
+			'located_at'			=> __( 'Located at rows', 'wcs-importer' ),
+		);
+		wp_localize_script( 'wcs-import_admin_js', 'wcs_import_lang', $translation_array );
 	}
 
 	/**
