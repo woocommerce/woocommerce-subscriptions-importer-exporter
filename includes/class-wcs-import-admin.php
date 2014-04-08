@@ -291,7 +291,7 @@ class WCS_Admin_Importer {
 					foreach ( $column_headers as $key => $column_header ) {
 						if ( ! $column_header ) continue;
 						$column_header = strtolower( $column_header );
-						$row[ $column_header ] = ( isset( $postmeta[ $key ] ) ) ? WCS_Importer::format_data_from_csv( $postmeta[ $key ], $enc ) : '';
+						$row[ $column_header ] = ( isset( $postmeta[ $key ] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[ $key ], $enc ) : '';
 					}
 					break;
 				}
