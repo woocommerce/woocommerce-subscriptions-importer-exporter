@@ -1,30 +1,21 @@
 jQuery(document).ready(function($){
 	var count = 0;
-	var mapping;
-	var ajax_url;
-	var total;
-	var file_name;
-	var test_mode;
-	var file_url;
-	var file_id;
-	var send_registration_email;
 
-	$( 'body' ).on( 'import-start', function( event, import_data ) {
-		var positions = import_data.file_positions;
-		var starting_row_number = import_data.start_row_num;
-		total = import_data.total;
-		mapping = import_data.mapping;
-		ajax_url = import_data.ajax_url;
-		file_name = import_data.file;
-		test_mode = import_data.test_run;
-		file_id = import_data.file_id;
-		file_url = import_data.file_url;
-		send_registration_email = import_data.send_reg_email;
-
-		for( var i = 0; i < positions.length; i+=2 ) {
-			ajax_import( positions[i], positions[i+1], starting_row_number[i/2] );
+	if ( wcs_import_data.test_mode == 'false' && wcs_import_data.error_message.length > 0 ) {
+		if ( confirm( wcs_import_data.error_message ) ){
+			run_import();
+		} else {
+			window.location.href = wcs_import_data.cancelled_url;
 		}
-	});
+	} else {
+		run_import();
+	}
+
+	function run_import() {
+		for( var i = 0; i < wcs_script_data.file_positions.length; i+=2 ) {
+			ajax_import( wcs_script_data.file_positions[i], wcs_script_data.file_positions[i+1], wcs_script_data.start_row_num[i/2] );
+		}
+	}
 
 	function ajax_import( start_pos, end_pos, row_start ) {
 		var data = {
@@ -33,19 +24,19 @@ jQuery(document).ready(function($){
 			file:		file_name,
 			start:		start_pos,
 			end:		end_pos,
-			row_num:	row_start,
-			test_mode: 	test_mode,
-			send_email:	send_registration_email,
+			row_num:	row_start
+			test_mode:	wcs_script_data.test_mode,
+			send_email:	wcs_script_data.email_password,
 		}
 		$.ajax({
-			url:	ajax_url,
+			url:	wcs_script_data.ajax_url,
 			type:	'POST',
 			data:	data,
 			success: function( results ) {
 				count++;
 				// Update confirmation table
 				// Get the valid JSON only from the returned string
-				if( data.test_mode == false ) {
+				if( wcs_script_data.test_mode == "false" ) {
 					// Parse
 					for( var i = 0; i < results.length; i++ ){
 						var table_data = '',
@@ -91,7 +82,7 @@ jQuery(document).ready(function($){
 							$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '">' + table_data + '</tr>' );
 						}
 					}
-					check_completed( data.test_mode );
+					check_completed();
 				} else {
 					var success = 0, 
 						failed = 0, 
@@ -145,18 +136,18 @@ jQuery(document).ready(function($){
 					$('#wcs-importer_test_warnings td').append( results_text );
 
 					$('input[name="mapping"]').val( mapping );
-					$('input[name="file_id"]').val( file_id );
+					$('input[name="file_id"]').val( wcs_script_data.file_id );
 					$('input[name="file_url"]').val( file_url );
-					check_completed( data.test_mode );
+					check_completed();
 				}
 			}
 		});
 	}
 
 	/* Check the number of requests has been completed */
-	function check_completed( test_run ) {
-		if( count >= total ) {
-			if( test_run == false ) {
+	function check_completed() {
+		if( count >= wcs_script_data.total ) {
+			if( wcs_script_data.test_mode == "false" ) {
 				$('.importer-loading').addClass('finished').removeClass('importer-loading');
 				$('.finished').html('<td colspan="6" class="row">' + wcs_script_data.finished_importing + '</td>');
 			}

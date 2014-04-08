@@ -56,6 +56,69 @@ class WCS_Admin_Importer {
 				wp_register_script( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
 				wp_enqueue_script( 'wcs-importer-admin' );
 
+				$file_id = absint( $_GET['file_id'] );
+				$file    = get_attached_file( $_GET['file_id'] );
+				$enc     = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
+
+				if ( $enc ) {
+					setlocale( LC_ALL, 'en_US.' . $enc );
+				}
+
+				@ini_set( 'auto_detect_line_endings', true );
+
+				$file_positions = $row_start = array();
+				$payment_method_error = $payment_meta_error = array();
+
+				$count = 0;
+				$total = 0;
+				$previous_pos = 0;
+				$position = 0;
+				$row_start[] = 1;
+
+				$mapped_fields = get_post_meta( $file_id, '_mapped_rules', true );
+
+				if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
+					$row = $raw_headers = array();
+
+					$header = fgetcsv( $handle, 0 );
+					while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== FALSE ) {
+						$count++;
+						foreach ( $header as $key => $heading ) {
+							if ( ! $heading ) continue;
+							$s_heading = strtolower( $heading );
+							$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[$key], $enc ) : '';
+						}
+
+						if( strtolower( $row[$this->mapping['payment_method']] ) == 'stripe' && empty( $row[$this->mapping['stripe_customer_id']] ) ) {
+							$payment_method_error[] = 'Stripe';
+							$payment_meta_error[] = 'stripe_customer_id';
+						} else if ( strtolower( $row[$this->mapping['payment_method']] ) == 'paypal' && empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
+							$payment_method_error[] = 'Paypal';
+							$payment_meta_error[] = 'paypal_subscriber_id';
+						}
+
+						if ( $count >= $request_limit ) {
+							$previous_pos = $position;
+							$position = ftell( $handle );
+							$row_start[] = end( $row_start ) + $count;
+							reset( $row_start );
+							$count = 0;
+							$total++;
+							// Import rows between $previous_position $position
+							$file_positions[] = $previous_pos;
+							$file_positions[] = $position;
+						}
+					}
+
+					// Account for the remainder
+					if ( $count > 0 ) {
+						$total++;
+						$file_positions[] = $position;
+						$file_positions[] = ftell( $handle );
+					}
+					fclose( $handle );
+				}
+
 				$script_data = array(
 					'success' 				=> __( 'success', 'wcs-importer' ),
 					'failed' 				=> __( 'failed', 'wcs-importer' ),
@@ -65,6 +128,19 @@ class WCS_Admin_Importer {
 					'warning'				=> __( 'Warning', 'wcs-importer' ),
 					'warnings'				=> __( 'Warnings', 'wcs-importer' ),
 					'located_at'			=> __( 'Located at rows', 'wcs-importer' ),
+					'error_message'         => $error_message,
+
+					// Data for procesing the file
+					'file_id'          => absint( $_GET['file_id'] ),
+					'file_positions'   => json_encode( $file_positions ),
+					'start_row_num'    => json_encode( $row_start ),
+					'rows_in_file'     => $rows_in_file,
+					'ajax_url'         => admin_url( 'admin-ajax.php' ),
+					'rows_per_request' => $this->rows_per_request,
+					'test_mode'        =>( 'yes' == $_GET['test_mode'] ) ? "true" : "false",
+					'email_password'   =>( 'yes' == $_GET['email_password'] ) ? "true" : "false",
+					'cancelled_url'    => add_query_arg( 'cancelled', 'true', $this->admin_url ),
+					'total'            => $total,
 				);
 
 				wp_localize_script( 'wcs-importer-admin', 'wcs_script_data', $script_data );
@@ -114,7 +190,6 @@ class WCS_Admin_Importer {
 				break;
 			case 3 :
 				$this->import_page();
-				$this->ajax_setup();
 				break;
 			default : //default to home page
 				$this->upload_page();
@@ -391,108 +466,6 @@ class WCS_Admin_Importer {
 		}
 		// Need to check for errors
 		update_post_meta( $_GET['file_id'], '_mapped_rules', $mapped_fields );
-	}
-
-	/**
-	 * Sets up the AJAX requests and calls import_ajax_start( .. )
-	 *
-	 * @since 1.0
-	 */
-	function ajax_setup() {
-		$request_limit = ( defined( 'WCS_REQ_LIMIT' ) ) ? WCS_REQ_LIMIT : 15;
-		$this->test_import = ( isset( $_POST['test-mode'] ) ) ? true : false;
-		$send_user_email = ( isset( $_POST['send-reg-email'] ) ) ? true : false;
-		$this->mapping = json_decode( stripslashes( $_POST['mapping'] ), true );
-		$file_positions = $row_start = array();
-		$payment_method_error = $payment_meta_error = array();
-
-		$file = get_attached_file( $_POST['file_id'] );
-		$enc = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
-		if ( $enc ) setlocale( LC_ALL, 'en_US.' . $enc );
-		@ini_set( 'auto_detect_line_endings', true );
-
-		$count = 0;
-		$total = 0;
-		$previous_pos = 0;
-		$position = 0;
-		$row_start[] = 1;
-
-		if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
-			$row = $raw_headers = array();
-
-			$header = fgetcsv( $handle, 0 );
-			while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== FALSE ) {
-				$count++;
-				foreach ( $header as $key => $heading ) {
-					if ( ! $heading ) continue;
-					$s_heading = strtolower( $heading );
-					$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[$key], $enc ) : '';
-				}
-
-				if( strtolower( $row[$this->mapping['payment_method']] ) == 'stripe' && empty( $row[$this->mapping['stripe_customer_id']] ) ) {
-					$payment_method_error[] = 'Stripe';
-					$payment_meta_error[] = 'stripe_customer_id';
-				} else if ( strtolower( $row[$this->mapping['payment_method']] ) == 'paypal' && empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
-					$payment_method_error[] = 'Paypal';
-					$payment_meta_error[] = 'paypal_subscriber_id';
-				}
-
-				if ( $count >= $request_limit ) {
-					$previous_pos = $position;
-					$position = ftell( $handle );
-					$row_start[] = end( $row_start ) + $count;
-					reset( $row_start );
-					$count = 0;
-					$total++;
-					// Import rows between $previous_position $position
-					$file_positions[] = $previous_pos;
-					$file_positions[] = $position;
-				}
-			}
-
-			// Account for the remainder
-			if ( $count > 0 ) {
-				$total++;
-				$file_positions[] = $position;
-				$file_positions[] = ftell( $handle );
-			}
-			fclose( $handle );
-		}
-
-		$array = json_encode( $file_positions );
-		$starting_row_number = json_encode( $row_start );
-
-		?>
-		<script>
-				jQuery(document).ready(function($) {
-					var import_data = {
-						file_id:		<?php echo ( ! empty( $_POST['file_id'] ) ) ? $_POST['file_id'] : ''; ?>,
-						file_positions: <?php echo $array; ?>,
-						total: 			<?php echo $total; ?>,
-						start_row_num: 	<?php echo $starting_row_number; ?>,
-						file:			'<?php echo addslashes( $file ); ?>',
-						mapping: 		'<?php echo json_encode( $this->mapping ); ?>',
-						ajax_url:		'<?php echo admin_url( 'admin-ajax.php' ); ?>',
-						test_run: 		<?php echo ( $this->test_import ) ? "true" : "false"; ?>,
-						send_reg_email:	<?php echo ( $send_user_email ) ? "true" : "false"; ?>
-					}
-
-					if ( import_data.test_run == 'false' && <?php echo count( $payment_method_error ); ?> > 0 ) { <?php
-						$method_error = json_encode( array_unique( $payment_method_error ) );
-						$method_meta  = json_encode( array_unique( $payment_meta_error ) );
-						$errorString  = sprintf( __( "You\'re importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', $method_error ), str_replace( '"', ' ', $method_meta ) ); ?>
-
-						if ( confirm( "<?php echo $errorString; ?>" ) ){
-							$( 'body' ).trigger( 'import-start', import_data );
-						} else {
-							window.location.href = "<?php echo add_query_arg( array( 'cancelled' => 'true', $this->admin_url ) ); ?>";
-						}
-					} else {
-						$( 'body' ).trigger( 'import-start', import_data );
-					}
-				});
-		</script>
-<?php
 	}
 
 	/**
