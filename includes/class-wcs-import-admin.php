@@ -132,7 +132,6 @@ class WCS_Admin_Importer {
 		<?php endif;
 
 		echo '<h3>' . __( 'Step 1: Upload CSV File', 'wcs-importer' ) . '</h3>';
-		$action = 'admin.php?page=import_subscription&amp;step=2&amp;';
 		$upload_dir = wp_upload_dir();
 		if ( ! empty( $upload_dir['error'] ) ) : ?>
 			<div class="error"><p><?php _e( 'Before you can upload your import file, you will need to fix the following error:' ); ?></p>
@@ -141,7 +140,8 @@ class WCS_Admin_Importer {
 			?>
 			<p><?php _e( 'Upload a CSV file containing details about your subscriptions to bring across to your store with WooCommerce.', 'wcs-importer' ); ?></p>
 			<p><?php _e( 'Choose a CSV (.csv) file to upload, then click Upload file and import.', 'wcs-importer' ); ?></p>
-			<form enctype="multipart/form-data" id="import-upload-form" method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
+			<form enctype="multipart/form-data" id="import-upload-form" method="post" action="<?php echo esc_attr( $this->admin_url ); ?>">
+				<?php wp_nonce_field( 'import-upload' ); ?>
 				<table class="form-table">
 					<tbody>
 						<tr>
@@ -220,7 +220,8 @@ class WCS_Admin_Importer {
 		$row_number = 1;
 		?>
 		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs-importer' ); ?></h3>
-		<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
+		<form method="post" action="<?php echo esc_attr( $action ); ?>">
+			<?php wp_nonce_field( 'import-upload' ); ?>
 			<input type="hidden" name="file_id" value="<?php echo $this->id; ?>">
 			<input type="hidden" name="action" value="field_mapping" />
 			<table class="widefat widefat_importer">
