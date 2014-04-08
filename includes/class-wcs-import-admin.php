@@ -526,7 +526,7 @@ class WCS_Admin_Importer {
 						if ( confirm( "<?php echo $errorString; ?>" ) ){
 							$( 'body' ).trigger( 'import-start', import_data );
 						} else {
-							window.location.href = "<?php echo admin_url( 'admin.php?page=import_subscription&cancelled=true' ); ?>";
+							window.location.href = "<?php echo add_query_arg( array( 'cancelled' => 'true', $this->admin_url ) ); ?>";
 						}
 					} else {
 						$( 'body' ).trigger( 'import-start', import_data );
@@ -600,7 +600,7 @@ class WCS_Admin_Importer {
 					</tbody>
 				</table>
 				<div id="wcs-completed-message">
-					<p><?php _e( 'Test Finished!', 'wcs-importer' );?> <a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Back to Home', 'wcs-importer' ); ?></a></p>
+					<p><?php _e( 'Test Finished!', 'wcs-importer' );?> <a href="<?php echo $this->admin_url; ?>"><?php _e( 'Back to Home', 'wcs-importer' ); ?></a></p>
 					<input type="submit" class="button" value="<?php esc_attr_e( 'Continue Importing' , 'wcs-importer' ); ?>">
 				</div>
 			</form>
@@ -624,7 +624,7 @@ class WCS_Admin_Importer {
 				</tfoot>
 				<tbody></tbody>
 			</table>
-			<p id="wcs-completed-message"><?php _e( 'All done!', 'wcs-importer' );?> <a href="<?php echo admin_url( 'admin.php?page=subscriptions' ); ?>"><?php _e( 'View Subscriptions', 'wcs-importer' ); ?></a>, <a href="<?php echo admin_url( 'edit.php?post_type=shop_order' ); ?>"><?php _e( 'View Orders', 'wcs-importer' ); ?></a> or <a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Import another file', 'wcs-importer' ); ?></a></p>
+			<p id="wcs-completed-message"><?php _e( 'All done!', 'wcs-importer' );?> <a href="<?php echo admin_url( 'admin.php?page=subscriptions' ); ?>"><?php _e( 'View Subscriptions', 'wcs-importer' ); ?></a>, <a href="<?php echo admin_url( 'edit.php?post_type=shop_order' ); ?>"><?php _e( 'View Orders', 'wcs-importer' ); ?></a> or <a href="<?php echo $this->admin_url; ?>"><?php _e( 'Import another file', 'wcs-importer' ); ?></a></p>
 		<?php endif;
 	}
 
@@ -638,7 +638,7 @@ class WCS_Admin_Importer {
 		?>
 		<h3><?php _e( 'Error while uploading File', 'wcs-importer' ); ?></h3>
 		<p>Error message: <?php _e( $file['error'], 'wcs-importer' ); ?></p>
-		<p><a href="<?php echo admin_url( 'admin.php?page=import_subscription' ); ?>"><?php _e( 'Import another file', 'wcs-importer' ); ?></a></p>
+		<p><a href="<?php echo $this->admin_url; ?>"><?php _e( 'Import another file', 'wcs-importer' ); ?></a></p>
 		<?php
 	}
 }
