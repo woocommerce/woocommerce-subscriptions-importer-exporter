@@ -1,5 +1,4 @@
 <?php 
-global $woocommerce;
 
 class WCS_Import_Parser {
 	var $mapped_fields = array();
@@ -150,7 +149,6 @@ class WCS_Import_Parser {
 	 * @since 1.0
 	 */
 	function import( $row ) {
-		global $woocommerce;
 		$download_permissions_granted = false;
 		$postmeta = array();
 		$subscription = array();

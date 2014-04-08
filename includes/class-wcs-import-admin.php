@@ -136,7 +136,6 @@ class WCS_Admin_Importer {
 					'file_id'          => absint( $_GET['file_id'] ),
 					'file_positions'   => $file_positions,
 					'start_row_num'    => $row_start,
-					'rows_in_file'     => $rows_in_file,
 					'ajax_url'         => admin_url( 'admin-ajax.php' ),
 					'rows_per_request' => $this->rows_per_request,
 					'test_mode'        =>( 'yes' == $_GET['test_mode'] ) ? "true" : "false",
