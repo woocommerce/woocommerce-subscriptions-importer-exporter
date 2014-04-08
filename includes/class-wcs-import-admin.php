@@ -9,6 +9,8 @@ class WCS_Admin_Importer {
 	var $file_url;
 	var $test_import = false;
 
+	var $upload_error = '';
+
 	public function __construct() {
 
 		$this->admin_url        = admin_url( 'admin.php?page=import_subscription' );
@@ -16,6 +18,8 @@ class WCS_Admin_Importer {
 
 		add_action( 'admin_menu', array( __CLASS__, 'add_sub_menu' ), 10 );
 		add_action( 'admin_init', array( __CLASS__, 'add_import_tool' ) );
+
+		add_action( 'admin_init', array( &$this, 'post_request_handler' ) );
 
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
@@ -99,16 +103,10 @@ class WCS_Admin_Importer {
 		case 1 : //Step: Upload File
 			$this->upload_page();
 			break;
-		case 2 : // Handle upload and map fields
-			check_admin_referer( 'import-upload' );
-			if( isset( $_POST['action'] ) ) {
-				$this->handle_file();
-			}
+		case 2 : // check mapping
+			$this->mapping_page();
 			break;
-		case 3 : // check mapping
-			$this->check_mapping();
-			break;
-		case 4 :
+		case 3 :
 			$this->import_page();
 			$this->ajax_setup();
 			break;
@@ -126,6 +124,13 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	static function upload_page() { 
+
+		if ( ! empty( $this->upload_error ) ) : ?>
+	<div id="message" class="error">
+		<p><?php printf( __( 'Error uploading file: %s', 'wcs-importer' ), $this->upload_error ); ?></p>
+	</div>
+		<?php endif;
+
 		echo '<h3>' . __( 'Step 1: Upload CSV File', 'wcs-importer' ) . '</h3>';
 		$action = 'admin.php?page=import_subscription&amp;step=2&amp;';
 		$size = size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) );
@@ -146,7 +151,7 @@ class WCS_Admin_Importer {
 							</th>
 							<td>
 								<input type="file" id="upload" name="import" size="25" />
-								<input type="hidden" name="action" value="save" />
+								<input type="hidden" name="action" value="upload_file" />
 								<small><?php printf( __('Maximum size: %s' ), $size ); ?></small>
 							</td>
 						</tr>
@@ -173,67 +178,50 @@ class WCS_Admin_Importer {
 	}
 
 	/**
+	 * Step 2: Once uploaded file is recognised, the admin will be required to map CSV columns to the required fields.
 	 *
 	 * @since 1.0
 	 */
-	function handle_file() {
-		global $file;
-		if ( empty( $_POST['file_url'] ) ) {
-			$file = wp_import_handle_upload();
-			if( isset( $file['error'] ) ) {
-				$this->importer_error();
-				exit;
-			}
-			$this->id = $file['id'];
-			$file = get_attached_file( $this->id );
-		} else {
-			if ( file_exists( ABSPATH . $_POST['file_url'] ) ) {
-				$this->file_url = esc_attr( $_POST['file_url'] );
-				$file = ABSPATH . $this->file_url;
-			} else {
-				$this->importer_error();
-				exit;
-			}
-		}
-		if( $file ) {
-			$this->delimiter = ( ! empty( $_POST['delimiter'] ) ) ? stripslashes( trim( $_POST['delimiter'] ) ) : ',';
+	function mapping_page() {
+
+		$file_id = absint( $_GET['file_id'] );
+
+		$file = get_attached_file( $file_id );
+
+		if ( $file ) {
 
 			$enc = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
-			if ( $enc ) setlocale( LC_ALL, 'en_US.' . $enc );
+
+			if ( $enc ) {
+				setlocale( LC_ALL, 'en_US.' . $enc );
+			}
+
 			@ini_set( 'auto_detect_line_endings', true );
 
 			// Get headers
 			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
-				$row = $raw_headers = array();
+				$row = array();
 
-				$header = fgetcsv( $handle, 0, $this->delimiter );
-				while ( ( $postmeta = fgetcsv( $handle, 0, $this->delimiter ) ) !== false ) {
-					foreach ( $header as $key => $heading ) {
-						if ( ! $heading ) continue;
-						$s_heading = strtolower( $heading );
-						$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[$key], $enc ) : '';
-						$raw_headers[ $s_heading ] = $heading;
+				$column_headers = fgetcsv( $handle, 0 );
+				while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== false ) {
+					foreach ( $column_headers as $key => $column_header ) {
+						if ( ! $column_header ) continue;
+						$column_header = strtolower( $column_header );
+						$row[ $column_header ] = ( isset( $postmeta[ $key ] ) ) ? WCS_Importer::format_data_from_csv( $postmeta[ $key ], $enc ) : '';
 					}
 					break;
 				}
 				fclose( $handle );
 			}
-			$this->mapping_page( $row );
 		}
-	}
 
-	/**
-	 * Step 2: Once uploaded file is recognised, the admin will be required to map CSV columns to the required fields.
-	 *
-	 * @since 1.0
-	 */
-	function mapping_page( $row ) {
 		$action = 'admin.php?page=import_subscription&amp;step=3&amp;';
 		$row_number = 1;
 		?>
 		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs-importer' ); ?></h3>
 		<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
 			<input type="hidden" name="file_id" value="<?php echo $this->id; ?>">
+			<input type="hidden" name="action" value="field_mapping" />
 			<input type="hidden" name="file_url" value="<?php echo $this->file_url; ?>">
 			<input type="hidden" name="delimiter" value="<?php echo $this->delimiter; ?>">
 			<table class="widefat widefat_importer">
@@ -323,7 +311,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	function check_mapping() {
+	function save_mapping() {
 		// Possible mapping options
 		$this->mapping = array(
 			'product_id'				  => '',
@@ -388,6 +376,8 @@ class WCS_Admin_Importer {
 			}
 		}
 		// Need to check for errors
+		update_post_meta( $_GET['file_id'], '_mapped_rules', $mapped_fields );
+
 		$this->pre_import_check();
 	}
 
@@ -532,6 +522,53 @@ class WCS_Admin_Importer {
 				});
 		</script>
 <?php
+	}
+
+	/**
+	 * Displays header followed by the current pages content
+	 *
+	 * @since 1.0
+	 */
+	public function post_request_handler() {
+
+		if ( isset( $_GET['page'] ) && 'import_subscription' == $_GET['page'] && isset( $_POST['action'] ) ) {
+
+			check_admin_referer( 'import-upload' );
+
+			$next_step_url_params = array(
+				'file_id'        => isset( $_GET['file_id'] ) ? $_GET['file_id'] : 0,
+				'test_mode'      => isset( $_REQUEST['test_mode'] ) ? $_REQUEST['test_mode'] : 'no',
+				'email_password' => isset( $_REQUEST['email_password'] ) ? $_REQUEST['email_password'] : 'no',
+			);
+
+			if ( 'upload_file' == $_POST['action'] ) {
+
+				$file = wp_import_handle_upload();
+
+				if ( isset( $file['error'] ) ) {
+
+					$this->upload_error = $file['error'];
+
+				} else { // Successful upload, let's move onto the next step
+
+					$next_step_url_params['step'] = '2';
+					$next_step_url_params['file_id'] = $file['id'];
+					wp_redirect( add_query_arg( $next_step_url_params, $this->admin_url ) );
+					exit;
+
+				}
+
+			} elseif ( 'field_mapping' == $_POST['action'] ) {
+
+				$this->save_mapping();
+
+				$next_step_url_params['step'] = 3;
+
+				wp_redirect( add_query_arg( $next_step_url_params, $this->admin_url ) );
+
+				exit();
+			}
+		}
 	}
 
 	/**
