@@ -46,24 +46,30 @@ class WCS_Admin_Importer {
 	 */
 	public static function enqueue_scripts() {
 
-		wp_register_style( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/wcs-importer.css' );
-		wp_enqueue_style( 'wcs-import-admin' );
+		if ( isset( $_GET['page'] ) && 'import_subscription' == $_GET['page'] ) {
 
-		wp_register_script( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
-		wp_enqueue_script( 'wcs-importer-admin' );
+			wp_register_style( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/wcs-importer.css' );
+			wp_enqueue_style( 'wcs-import-admin' );
 
-		$script_data = array(
-			'success' 				=> __( 'success', 'wcs-importer' ),
-			'failed' 				=> __( 'failed', 'wcs-importer' ),
-			'error_string'			=> sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
-			'finished_importing' 	=> __( 'Finished Importing', 'wcs-importer' ),
-			'edit_order' 			=> __( 'Edit Order', 'wcs-importer' ),
-			'warning'				=> __( 'Warning', 'wcs-importer' ),
-			'warnings'				=> __( 'Warnings', 'wcs-importer' ),
-			'located_at'			=> __( 'Located at rows', 'wcs-importer' ),
-		);
+			if ( isset( $_GET['step'] ) && 3 == absint( $_GET['step'] )  ) {
 
-		wp_localize_script( 'wcs-importer-admin', 'wcs_script_data', $script_data );
+				wp_register_script( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
+				wp_enqueue_script( 'wcs-importer-admin' );
+
+				$script_data = array(
+					'success' 				=> __( 'success', 'wcs-importer' ),
+					'failed' 				=> __( 'failed', 'wcs-importer' ),
+					'error_string'			=> sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
+					'finished_importing' 	=> __( 'Finished Importing', 'wcs-importer' ),
+					'edit_order' 			=> __( 'Edit Order', 'wcs-importer' ),
+					'warning'				=> __( 'Warning', 'wcs-importer' ),
+					'warnings'				=> __( 'Warnings', 'wcs-importer' ),
+					'located_at'			=> __( 'Located at rows', 'wcs-importer' ),
+				);
+
+				wp_localize_script( 'wcs-importer-admin', 'wcs_script_data', $script_data );
+			}
+		}
 	}
 
 	/**
