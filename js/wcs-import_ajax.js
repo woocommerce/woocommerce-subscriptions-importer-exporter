@@ -59,7 +59,7 @@ jQuery(document).ready(function($){
 								table_data += '<td class="row success">' + wcs_import_lang.success +'</td>';
 								table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
 							}
-					
+
 							table_data += '<td class="row">' + results[i].item + ' ( #' + results[i].item_id + ' )</td>';
 							table_data += '<td class="row">' + results[i].username + ' ( #' + results[i].user_id + ' )</td>';
 							table_data += '<td class="row column-status"><mark class="' + results[i].subscription_status + '">' + results[i].subscription_status + '</mark></td>';

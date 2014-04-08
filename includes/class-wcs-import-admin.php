@@ -46,13 +46,14 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	public static function enqueue_scripts() {
+
 		wp_register_style( 'wcs-import_admin_css', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/style.css' );
 		wp_enqueue_style( 'wcs-import_admin_css' );
 
 		wp_register_script( 'wcs-import_admin_js', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-import_ajax.js' );
 		wp_enqueue_script( 'wcs-import_admin_js' );
 
-		$translation_array = array( 
+		$translation_array = array(
 			'success' 				=> __( 'success', 'wcs-importer' ),
 			'failed' 				=> __( 'failed', 'wcs-importer' ),
 			'error_string'			=> sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
@@ -96,21 +97,22 @@ class WCS_Admin_Importer {
 		<?php
 		endif;
 
-		$page = ( isset($_GET['step'] ) ) ? $_GET['step'] : 1;
+		$page = ( isset( $_GET['step'] ) ) ? $_GET['step'] : 1;
+
 		switch( $page ) {
-		case 1 : //Step: Upload File
-			$this->upload_page();
-			break;
-		case 2 : // check mapping
-			$this->mapping_page();
-			break;
-		case 3 :
-			$this->import_page();
-			$this->ajax_setup();
-			break;
-		default : //default to home page
-			$this->upload_page();
-			break;
+			case 1 : //Step: Upload File
+				$this->upload_page();
+				break;
+			case 2 : // check mapping
+				$this->mapping_page();
+				break;
+			case 3 :
+				$this->import_page();
+				$this->ajax_setup();
+				break;
+			default : //default to home page
+				$this->upload_page();
+				break;
 		}
 
 		echo '</div>';
@@ -121,7 +123,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	static function upload_page() { 
+	static function upload_page() {
 
 		if ( ! empty( $this->upload_error ) ) : ?>
 	<div id="message" class="error">
@@ -481,7 +483,7 @@ class WCS_Admin_Importer {
 						send_reg_email:	<?php echo ( $send_user_email ) ? "true" : "false"; ?>
 					}
 
-					if ( import_data.test_run == 'false' && <?php echo count( $payment_method_error ); ?> > 0 ) { <?php 
+					if ( import_data.test_run == 'false' && <?php echo count( $payment_method_error ); ?> > 0 ) { <?php
 						$method_error = json_encode( array_unique( $payment_method_error ) );
 						$method_meta  = json_encode( array_unique( $payment_meta_error ) );
 						$errorString  = sprintf( __( "You\'re importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', $method_error ), str_replace( '"', ' ', $method_meta ) ); ?>
@@ -611,7 +613,7 @@ class WCS_Admin_Importer {
 					<input type="submit" class="button" value="<?php esc_attr_e( 'Continue Importing' , 'wcs-importer' ); ?>">
 				</div>
 			</form>
-		<?php else : ?> 
+		<?php else : ?>
 			<h3><?php _e( 'Importing Results', 'wcs-importer' ); ?></h3>
 			<table id="wcs-import-progress" class="widefat_importer widefat">
 				<thead>
