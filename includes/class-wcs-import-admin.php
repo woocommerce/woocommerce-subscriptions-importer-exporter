@@ -46,13 +46,11 @@ class WCS_Admin_Importer {
 
 		if ( isset( $_GET['page'] ) && 'import_subscription' == $_GET['page'] ) {
 
-			wp_register_style( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/wcs-importer.css' );
-			wp_enqueue_style( 'wcs-import-admin' );
+			wp_enqueue_style( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/wcs-importer.css' );
 
 			if ( isset( $_GET['step'] ) && 3 == absint( $_GET['step'] )  ) {
 
-				wp_register_script( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
-				wp_enqueue_script( 'wcs-importer-admin' );
+				wp_enqueue_script( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
 
 				$file_id = absint( $_GET['file_id'] );
 				$file    = get_attached_file( $_GET['file_id'] );
