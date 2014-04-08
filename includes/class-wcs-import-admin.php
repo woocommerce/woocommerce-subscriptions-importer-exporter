@@ -2,7 +2,6 @@
 global $file;
 
 class WCS_Admin_Importer {
-	var $id;
 	var $import_results = array();
 	var $mapping;
 	var $test_import = false;
@@ -216,13 +215,19 @@ class WCS_Admin_Importer {
 			}
 		}
 
-		$action = 'admin.php?page=import_subscription&amp;step=3&amp;';
+		$url_params = array(
+			'step'           => '3',
+			'file_id'        => $file_id,
+			'test_mode'      => $_GET['test_mode'],
+			'email_password' => $_GET['email_password'],
+		);
+		$action = add_query_arg( $url_params, $this->admin_url );
+
 		$row_number = 1;
 		?>
 		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs-importer' ); ?></h3>
 		<form method="post" action="<?php echo esc_attr( $action ); ?>">
 			<?php wp_nonce_field( 'import-upload' ); ?>
-			<input type="hidden" name="file_id" value="<?php echo $this->id; ?>">
 			<input type="hidden" name="action" value="field_mapping" />
 			<table class="widefat widefat_importer">
 				<thead>
@@ -563,36 +568,42 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	private function import_page() {
-		$action = 'admin.php?page=import_subscription&amp;step=4&amp;';
-		if ( isset( $_POST['test-mode'] ) ): ?>
+
+		if ( 'yes' == $_GET['test_mode'] ):
+
+			$url_params = array(
+				'step'           => '3',
+				'file_id'        => $_GET['file_id'],
+				'test_mode'      => 'no',
+				'email_password' => $_GET['email_password'],
+			);
+
+			$action = add_query_arg( $url_params, $this->admin_url );
+			?>
 			<h3><?php _e( 'Test Run Results', 'wcs-importer' ); ?></h3>
-			<form method="post" action="<?php echo esc_attr(wp_nonce_url($action, 'import-upload')); ?>">
-				<input type="hidden" name="file_id" value="">
-				<input type="hidden" name="mapping" value="">
-				<table id="wcs-import-progress" class="widefat_importer widefat">
-					<thead>
-						<tr>
-							<th class="row" colspan="2"><?php _e( 'Importer Test Results', 'wcs-importer' ); ?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="alternate">
-							<th><strong><?php _e( 'Results', 'wcs-importer' ); ?></strong></th>
-							<td id="wcs-importer_test_results"><strong><?php echo sprintf( __( '%s0%s tests passed, %s0%s tests failed ( %s0%s of the CSV will be imported ).', 'wcs-importer' ), '<span id="wcs-test-passed">', '</span>', '<span id="wcs-test-failed">', '</span>', '<span id="wcs-test-ratio">', '</span>%' ); ?></strong></td>
-						</tr>
-						<tr>
-							<th><strong><?php _e( 'Details', 'wcs-importer' ); ?></strong></th>
-							<td id="wcs-importer_test_details"><strong><?php echo sprintf( __( '%s0%s fatal errors and %s0%s warnings found.', 'wcs-importer' ), '<span id="wcs-fatal-details">', '</span>', '<span id="wcs-warning-details">', '</span>' ); ?></strong></td>
-						</tr>
-						<tr class="alternate" id="wcs-importer_test_errors"><th><?php _e( 'Error Messages', 'wcs-importer' ); ?>:</th><td></td></tr>
-						<tr id="wcs-importer_test_warnings"><th><?php _e( 'Warnings', 'wcs-importer' ); ?>:</th><td></td></tr>
-					</tbody>
-				</table>
-				<div id="wcs-completed-message">
-					<p><?php _e( 'Test Finished!', 'wcs-importer' );?> <a href="<?php echo $this->admin_url; ?>"><?php _e( 'Back to Home', 'wcs-importer' ); ?></a></p>
-					<input type="submit" class="button" value="<?php esc_attr_e( 'Continue Importing' , 'wcs-importer' ); ?>">
-				</div>
-			</form>
+			<table id="wcs-import-progress" class="widefat_importer widefat">
+				<thead>
+					<tr>
+						<th class="row" colspan="2"><?php _e( 'Importer Test Results', 'wcs-importer' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="alternate">
+						<th><strong><?php _e( 'Results', 'wcs-importer' ); ?></strong></th>
+						<td id="wcs-importer_test_results"><strong><?php echo sprintf( __( '%s0%s tests passed, %s0%s tests failed ( %s0%s of the CSV will be imported ).', 'wcs-importer' ), '<span id="wcs-test-passed">', '</span>', '<span id="wcs-test-failed">', '</span>', '<span id="wcs-test-ratio">', '</span>%' ); ?></strong></td>
+					</tr>
+					<tr>
+						<th><strong><?php _e( 'Details', 'wcs-importer' ); ?></strong></th>
+						<td id="wcs-importer_test_details"><strong><?php echo sprintf( __( '%s0%s fatal errors and %s0%s warnings found.', 'wcs-importer' ), '<span id="wcs-fatal-details">', '</span>', '<span id="wcs-warning-details">', '</span>' ); ?></strong></td>
+					</tr>
+					<tr class="alternate" id="wcs-importer_test_errors"><th><?php _e( 'Error Messages', 'wcs-importer' ); ?>:</th><td></td></tr>
+					<tr id="wcs-importer_test_warnings"><th><?php _e( 'Warnings', 'wcs-importer' ); ?>:</th><td></td></tr>
+				</tbody>
+			</table>
+			<div id="wcs-completed-message">
+				<p><?php _e( 'Test Finished!', 'wcs-importer' );?></p>
+				<a class="button" href="<?php echo esc_attr( wp_nonce_url( $action, 'import-upload' ) ); ?> "><?php _e( 'Run Import' , 'wcs-importer' ); ?></a>
+			</div>
 		<?php else : ?>
 			<h3><?php _e( 'Importing Results', 'wcs-importer' ); ?></h3>
 			<table id="wcs-import-progress" class="widefat_importer widefat">
@@ -613,7 +624,9 @@ class WCS_Admin_Importer {
 				</tfoot>
 				<tbody></tbody>
 			</table>
-			<p id="wcs-completed-message"><?php _e( 'All done!', 'wcs-importer' );?> <a href="<?php echo admin_url( 'admin.php?page=subscriptions' ); ?>"><?php _e( 'View Subscriptions', 'wcs-importer' ); ?></a>, <a href="<?php echo admin_url( 'edit.php?post_type=shop_order' ); ?>"><?php _e( 'View Orders', 'wcs-importer' ); ?></a> or <a href="<?php echo $this->admin_url; ?>"><?php _e( 'Import another file', 'wcs-importer' ); ?></a></p>
+			<p id="wcs-completed-message">
+				<?php printf( __( 'Import Complete! %sView Subscriptions%s, %sView Orders%s or %sImport another file%s.', 'wcs-importer' ), '<a href="' . admin_url( 'admin.php?page=subscriptions' . '">', '</a>', '<a href="' . admin_url( 'edit.php?post_type=shop_order' . '">', '</a>', '<a href="' . $this->admin_url . '">', '</a>' ); ?>
+			</p>
 		<?php endif;
 	}
 
