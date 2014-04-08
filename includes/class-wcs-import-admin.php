@@ -93,7 +93,7 @@ class WCS_Admin_Importer {
 							$payment_meta_error[] = 'paypal_subscriber_id';
 						}
 
-						if ( $count >= $request_limit ) {
+						if ( $count >= $this->rows_per_request ) {
 							$previous_pos = $position;
 							$position = ftell( $handle );
 							$row_start[] = end( $row_start ) + $count;
@@ -113,6 +113,12 @@ class WCS_Admin_Importer {
 						$file_positions[] = ftell( $handle );
 					}
 					fclose( $handle );
+				}
+
+				if ( count( $payment_method_error ) > 0 ) {
+					$error_message = sprintf( __( "You're importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', array_unique( $payment_method_error ) ), str_replace( '"', ' ', array_unique( $payment_meta_error ) ) );
+				} else {
+					$error_message = '';
 				}
 
 				$script_data = array(
