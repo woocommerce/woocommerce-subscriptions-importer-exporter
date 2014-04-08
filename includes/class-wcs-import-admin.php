@@ -134,8 +134,8 @@ class WCS_Admin_Importer {
 
 					// Data for procesing the file
 					'file_id'          => absint( $_GET['file_id'] ),
-					'file_positions'   => json_encode( $file_positions ),
-					'start_row_num'    => json_encode( $row_start ),
+					'file_positions'   => $file_positions,
+					'start_row_num'    => $row_start,
 					'rows_in_file'     => $rows_in_file,
 					'ajax_url'         => admin_url( 'admin-ajax.php' ),
 					'rows_per_request' => $this->rows_per_request,
