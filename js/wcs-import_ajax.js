@@ -44,19 +44,12 @@ jQuery(document).ready(function($){
 			url:	ajax_url,
 			type:	'POST',
 			data:	data,
-			success: function( response ) {
+			success: function( results ) {
 				count++;
 				// Update confirmation table
 				// Get the valid JSON only from the returned string
 				if( data.test_mode == false ) {
-					if ( response.indexOf("<!--WCS_IMPORT_START-->") >= 0 ) {
-						response = response.split("<!--WCS_IMPORT_START-->")[1]; // Strip off before after WCS_IMPORT_START
-					}
-					if ( response.indexOf("<!--WCS_IMPORT_END-->") >= 0 ) {
-						response = response.split("<!--WCS_IMPORT_END-->")[0]; // Strip off anything after WCS_IMPORT_END
-					}
 					// Parse
-					var results = $.parseJSON( response );
 					for( var i = 0; i < results.length; i++ ){
 						var table_data = '',
 							row_classes = ( i % 2 ) ? '' : 'alternate';
@@ -111,16 +104,7 @@ jQuery(document).ready(function($){
 
 					var errors = [], 
 						warnings = [];
-					
 
-					if ( response.indexOf("<!--WCS_TEST_START-->") >= 0 ) {
-						response = response.split("<!--WCS_TEST_START-->")[1]; // Strip off before after WCS_TEST_START
-					}
-					if ( response.indexOf("<!--WCS_TEST_END-->") >= 0 ) {
-						response = response.split("<!--WCS_TEST_END-->")[0]; // Strip off anything after WCS_TEST_END
-					}
-
-					var results = $.parseJSON( response );
 					for( var i = 0; i < results.length; i++ ) {
 						tests++;
 						if( results[i].error.length > 0 ) {

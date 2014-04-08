@@ -484,8 +484,6 @@ class WCS_Admin_Importer {
 		}
 
 		@set_time_limit(0);
-		@ob_flush();
-		@flush();
 
 		if( isset( $_POST['file'] ) && isset( $_POST['row_num'] ) && isset( $_POST['mapping'] ) ) {
 			$file = stripslashes($_POST['file']);
@@ -498,11 +496,9 @@ class WCS_Admin_Importer {
 			$send_email = $_POST['send_email'];
 			$this->parser = new WCS_Import_Parser();
 			$this->results = $this->parser->import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num, $test_mode, $send_email );
-			echo '<div style="display:none;">';
-			$start_tag = ( $test_mode == 'true' ) ? "<!--WCS_TEST_START-->" : "<!--WCS_IMPORT_START-->";
-			$end_tag = ( $test_mode == 'true' ) ? "<!--WCS_TEST_END-->" : "<!--WCS_IMPORT_END-->";
-			echo $start_tag . json_encode( $this->results ) . $end_tag;
-			echo '</div>';
+
+			header( 'Content-Type: application/json; charset=utf-8' );
+			echo json_encode( $this->results );
 		}
 		exit; // End
 	}
