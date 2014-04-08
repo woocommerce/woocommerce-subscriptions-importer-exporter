@@ -86,7 +86,7 @@ class WCS_Admin_Importer {
 				<h4><?php _e( '<strong>Before you begin</strong>, please prepare your CSV file.', 'wcs-importer' ); ?></h4>
 				<p class="submit">
 					<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a>
-					<a href="<?php echo plugins_url( 'wcs-import-sample.csv', __FILE__ ); ?>" class="button wcs-importer-download"><?php _e( 'Download Example CSV', 'wcs-importer' ); ?></a>
+					<a href="<?php echo plugins_url( 'wcs-import-sample.csv', WC_Subscription_Importer::$plugin_file ); ?>" class="button wcs-importer-download"><?php _e( 'Download Example CSV', 'wcs-importer' ); ?></a>
 				</p>
 			</div>
 			<?php endif; ?>
