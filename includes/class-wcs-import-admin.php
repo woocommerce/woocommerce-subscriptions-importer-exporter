@@ -123,7 +123,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	static function upload_page() {
+	private function upload_page() {
 
 		if ( ! empty( $this->upload_error ) ) : ?>
 	<div id="message" class="error">
@@ -183,7 +183,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	function mapping_page() {
+	private function mapping_page() {
 
 		$file_id = absint( $_GET['file_id'] );
 
@@ -562,7 +562,7 @@ class WCS_Admin_Importer {
 	 * If set, the admin is provided with a list of critical errors and non-critical warnings
 	 * @since 1.0
 	 */
-	function import_page() {
+	private function import_page() {
 		$action = 'admin.php?page=import_subscription&amp;step=4&amp;';
 		if ( isset( $_POST['test-mode'] ) ): ?>
 			<h3><?php _e( 'Test Run Results', 'wcs-importer' ); ?></h3>
