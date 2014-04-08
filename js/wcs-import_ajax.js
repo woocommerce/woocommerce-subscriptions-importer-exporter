@@ -3,7 +3,6 @@ jQuery(document).ready(function($){
 	var mapping;
 	var ajax_url;
 	var total;
-	var csv_delimiter;
 	var file_name;
 	var test_mode;
 	var file_url;
@@ -16,7 +15,6 @@ jQuery(document).ready(function($){
 		total = import_data.total;
 		mapping = import_data.mapping;
 		ajax_url = import_data.ajax_url;
-		csv_delimiter = import_data.delimiter;
 		file_name = import_data.file;
 		test_mode = import_data.test_run;
 		file_id = import_data.file_id;
@@ -32,7 +30,6 @@ jQuery(document).ready(function($){
 		var data = {
 			action:		'wcs_import_request',
 			mapping:	mapping,
-			delimiter:	csv_delimiter,
 			file:		file_name,
 			start:		start_pos,
 			end:		end_pos,
@@ -147,7 +144,6 @@ jQuery(document).ready(function($){
 					}
 					$('#wcs-importer_test_warnings td').append( results_text );
 
-					$('input[name="delimiter"]').val( csv_delimiter );
 					$('input[name="mapping"]').val( mapping );
 					$('input[name="file_id"]').val( file_id );
 					$('input[name="file_url"]').val( file_url );

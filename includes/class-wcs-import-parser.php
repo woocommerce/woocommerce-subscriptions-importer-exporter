@@ -2,7 +2,6 @@
 global $woocommerce;
 
 class WCS_Import_Parser {
-	var $delimiter;
 	var $mapping = array();
 	var $results = array();
 	var $start_pos;
@@ -86,10 +85,9 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	function import_data( $file, $delimiter, $mapping, $start, $end, $starting_row_num, $test_mode, $send_reg_email ) {
+	function import_data( $file, $mapping, $start, $end, $starting_row_num, $test_mode, $send_reg_email ) {
 		global $woocommerce;
 		$file_path = addslashes( $file );
-		$this->delimiter = $delimiter;
 		$this->mapping = $mapping;
 		$this->start_pos = $start;
 		$this->end_pos = $end;
@@ -113,13 +111,13 @@ class WCS_Import_Parser {
 		if ( $file ) {
 			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
 				$row = array();
-				$header = fgetcsv( $handle, 0, $this->delimiter );
+				$header = fgetcsv( $handle, 0 );
 
 				if( $this->start_pos != 0 ) {
 					fseek( $handle, $this->start_pos );
 				}
 
-				while ( ( $postmeta = fgetcsv( $handle, 0, $this->delimiter ) ) !== false ) {
+				while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== false ) {
 					foreach ( $header as $key => $heading ) {
 						if ( ! $heading ) continue;
 						$s_heading = strtolower( $heading );
