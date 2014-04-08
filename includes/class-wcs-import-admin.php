@@ -49,8 +49,8 @@ class WCS_Admin_Importer {
 		wp_register_style( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/wcs-importer.css' );
 		wp_enqueue_style( 'wcs-import-admin' );
 
-		wp_register_script( 'wcs-import_admin_js', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
-		wp_enqueue_script( 'wcs-import_admin_js' );
+		wp_register_script( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
+		wp_enqueue_script( 'wcs-importer-admin' );
 
 		$translation_array = array(
 			'success' 				=> __( 'success', 'wcs-importer' ),
@@ -62,7 +62,7 @@ class WCS_Admin_Importer {
 			'warnings'				=> __( 'Warnings', 'wcs-importer' ),
 			'located_at'			=> __( 'Located at rows', 'wcs-importer' ),
 		);
-		wp_localize_script( 'wcs-import_admin_js', 'wcs_import_lang', $translation_array );
+		wp_localize_script( 'wcs-importer-admin', 'wcs_import_lang', $translation_array );
 	}
 
 	/**
