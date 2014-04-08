@@ -34,13 +34,8 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-<<<<<<< HEAD
 	public static function add_sub_menu() {
-		$menu = add_submenu_page('woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( &$this, 'admin_page' ) );
-=======
-	public function add_sub_menu() {
 		add_submenu_page( 'woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( &$this, 'admin_page' ) );
->>>>>>> 8ebdad7... fixup! Reordering things in WCS_Admin_Importer
 	}
 
 	/**
