@@ -3,7 +3,6 @@ global $file;
 
 class WCS_Admin_Importer {
 	var $import_results = array();
-	var $test_import = false;
 
 	var $upload_error = '';
 
@@ -231,7 +230,7 @@ class WCS_Admin_Importer {
 							<td>
 								<input type="file" id="upload" name="import" size="25" />
 								<input type="hidden" name="action" value="upload_file" />
-								<small><?php printf( __('Maximum size: %s' ), size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) ) ); ?></small>
+								<small><?php printf( __( 'Maximum size: %s' ), size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) ) ); ?></small>
 							</td>
 						</tr>
 						<tr>
@@ -529,15 +528,15 @@ class WCS_Admin_Importer {
 		@set_time_limit(0);
 
 		if( isset( $_POST['file_id'] ) && isset( $_POST['row_num'] ) ) {
-			$file = stripslashes($_POST['file']);
-			$mapping = get_post_meta( absint( $_POST['file_id'] ), '_mapped_rules', true );
-			$start = ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0;
-			$end = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
-			$starting_row_num = absint( $_POST['row_num'] );
-			$test_mode = $_POST['test_mode'];
-			$email_customer = isset( $_POST['email_customer'] ) ? $_POST['email_customer'] : false;
+			$file_path          = get_attached_file( absint( $_POST['file_id'] ) );
+			$mapped_fields      = get_post_meta( absint( $_POST['file_id'] ), '_mapped_rules', true );
+			$file_pointer_start = ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0;
+			$file_pointer_end   = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
+			$starting_row_num   = absint( $_POST['row_num'] );
+			$test_mode          = isset( $_POST['test_mode'] ) ? $_POST['test_mode'] : false;
+			$email_customer     = isset( $_POST['email_customer'] ) ? $_POST['email_customer'] : false;
 			$this->parser = new WCS_Import_Parser();
-			$this->results = $this->parser->import_data( $file, $mapping, $start, $end, $starting_row_num, $test_mode, $email_customer );
+			$this->results = $this->parser->import_data( $file_path, $mapped_fields, $file_pointer_start, $file_pointer_end, $starting_row_num, $test_mode, $email_customer );
 
 			header( 'Content-Type: application/json; charset=utf-8' );
 			echo json_encode( $this->results );

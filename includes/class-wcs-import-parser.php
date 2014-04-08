@@ -2,10 +2,10 @@
 global $woocommerce;
 
 class WCS_Import_Parser {
-	var $mapping = array();
+	var $mapped_fields = array();
 	var $results = array();
-	var $start_pos;
-	var $end_pos;
+	var $file_pointer_start_position;
+	var $file_pointer_end_position;
 	var $starting_row_number;
 	var $test_mode;
 	var $email_customer;
@@ -85,12 +85,12 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	function import_data( $file, $mapping, $start, $end, $starting_row_num, $test_mode, $email_customer ) {
+	function import_data( $file, $mapped_fields, $file_pointer_start_position, $file_pointer_end_position, $starting_row_num, $test_mode, $email_customer ) {
 		global $woocommerce;
 		$file_path = addslashes( $file );
-		$this->mapping = $mapping;
-		$this->start_pos = $start;
-		$this->end_pos = $end;
+		$this->mapped_fields = $mapped_fields;
+		$this->file_pointer_start_position = $file_pointer_start_position;
+		$this->file_pointer_end_position = $file_pointer_end_position;
 		$this->starting_row_number = $starting_row_num;
 		$this->test_mode = ( $test_mode == 'true' ) ? true : false;
 		$this->email_customer = ( $email_customer == 'true' ) ? true : false;
@@ -113,8 +113,8 @@ class WCS_Import_Parser {
 				$row = array();
 				$header = fgetcsv( $handle, 0 );
 
-				if( $this->start_pos != 0 ) {
-					fseek( $handle, $this->start_pos );
+				if( $this->file_pointer_start_position != 0 ) {
+					fseek( $handle, $this->file_pointer_start_position );
 				}
 
 				while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== false ) {
@@ -127,7 +127,7 @@ class WCS_Import_Parser {
 					// will move to just sending $row instead of listing all these variables
 					$this->starting_row_number++;
 					$this->import( $row );
-					if( ftell( $handle ) >= $this->end_pos ) {
+					if( ftell( $handle ) >= $this->file_pointer_end_position ) {
 						break;
 					}
 				}
@@ -157,7 +157,7 @@ class WCS_Import_Parser {
 		$subscription['warning'] = $subscription['error'] = array();
 		// Check Product id a woocommerce product
 
-		if( empty( $this->mapping['product_id'] ) || ! ( $this->check_product( $row[$this->mapping['product_id']] ) ) ) {
+		if( empty( $this->mapped_fields['product_id'] ) || ! ( $this->check_product( $row[$this->mapped_fields['product_id']] ) ) ) {
 			$subscription['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
 		}
 
@@ -181,7 +181,7 @@ class WCS_Import_Parser {
 		}
 
 		// Get product object - checked validity @ L141
-		$_product = get_product( $row[$this->mapping['product_id']] );
+		$_product = get_product( $row[$this->mapped_fields['product_id']] );
 		$subscription['item'] = __( $_product->get_title(), 'wcs-importer' );
 
 		$missing_ship_addr = $missing_bill_addr = array();
@@ -190,8 +190,8 @@ class WCS_Import_Parser {
 		foreach( $this->order_meta_fields as $column ) {
 			switch( $column ) {
 				case 'shipping_method':
-					$method = ( ! empty( $row[$this->mapping['shipping_method']] ) ) ? $row[$this->mapping['shipping_method']] : '';
-					$title = ( ! empty( $row[$this->mapping['shipping_method_title']] ) ) ? $row[$this->mapping['shipping_method_title']] : '';
+					$method = ( ! empty( $row[$this->mapped_fields['shipping_method']] ) ) ? $row[$this->mapped_fields['shipping_method']] : '';
+					$title = ( ! empty( $row[$this->mapped_fields['shipping_method_title']] ) ) ? $row[$this->mapped_fields['shipping_method_title']] : '';
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $method );
 					$postmeta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
 					$postmeta[] = array( 'key' => '_recurring_shipping_method', 'value' => $method );
@@ -202,29 +202,29 @@ class WCS_Import_Parser {
 					}
 					break;
 				case 'order_shipping':
-					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					$postmeta[] = array( 'key' => '_order_recurring_shipping_total', 'value' => $value );
 					break;
 				case 'order_shipping_tax':
-					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					$postmeta[] = array( 'key' => '_order_recurring_shipping_tax_total', 'value' => $value );
 					break;
 				case 'payment_method':
-					if( strtolower( $row[$this->mapping[$column]] ) == 'paypal' && ! empty( $row[$this->mapping['paypal_subscriber_id']] ) ) {
+					if( strtolower( $row[$this->mapped_fields[$column]] ) == 'paypal' && ! empty( $row[$this->mapped_fields['paypal_subscriber_id']] ) ) {
 						// Paypal
-						$paypal_sub_id = $row[$this->mapping['paypal_subscriber_id']];
-						$title = ( ! empty( $row[$this->mapping['payment_method_title']] ) ) ? $row[$this->mapping['payment_method_title']] : 'Paypal Transfer';
+						$paypal_sub_id = $row[$this->mapped_fields['paypal_subscriber_id']];
+						$title = ( ! empty( $row[$this->mapped_fields['payment_method_title']] ) ) ? $row[$this->mapped_fields['payment_method_title']] : 'Paypal Transfer';
 						$postmeta[] = array( 'key' => '_' . $column, 'value' => 'paypal' );
 						$postmeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
 						$postmeta[] = array( 'key' => '_recurring_payment_method', 'value' => 'paypal' );
 						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
 						$postmeta[] = array( 'key' => '_paypal_subscriber_id', 'value' => $paypal_sub_id );
-					} else if( strtolower( $row[$this->mapping[$column]] ) == 'stripe' && ! empty( $row[$this->mapping['stripe_customer_id']] ) ) {
+					} else if( strtolower( $row[$this->mapped_fields[$column]] ) == 'stripe' && ! empty( $row[$this->mapped_fields['stripe_customer_id']] ) ) {
 						// Stripe
-						$stripe_cust_id = $row[$this->mapping['stripe_customer_id']];
-						$title = ( ! empty( $row[$this->mapping['payment_method_title']] ) ) ? $row[$this->mapping['payment_method_title']] : 'Stripe Transfer';
+						$stripe_cust_id = $row[$this->mapped_fields['stripe_customer_id']];
+						$title = ( ! empty( $row[$this->mapped_fields['payment_method_title']] ) ) ? $row[$this->mapped_fields['payment_method_title']] : 'Stripe Transfer';
 						// $stripe_cust_id will be checked before this point to make sure it's not null
 						$postmeta[] = array( 'key' => '_' . $column, 'value' => 'stripe' );
 						$postmeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
@@ -241,7 +241,7 @@ class WCS_Import_Parser {
 				case 'shipping_postcode':
 				case 'shipping_state':
 				case 'shipping_country':
-					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
 					if( empty( $value ) ) {
 						$metadata = get_user_meta( $cust_id, $column );
 						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
@@ -256,7 +256,7 @@ class WCS_Import_Parser {
 				case 'billing_postcode':
 				case 'billing_state':
 				case 'billing_country':
-					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
 					if( empty( $value ) ) {
 						$metadata = get_user_meta( $cust_id, $column );
 						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
@@ -271,26 +271,26 @@ class WCS_Import_Parser {
 					break;
 				case 'order_total':
 				case 'order_recurring_total':
-					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : $_product->subscription_price;
+					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : $_product->subscription_price;
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				case 'order_discount':
-					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					$postmeta[] = array( 'key' => '_order_recurring_discount_total', 'value' => $value );
 					break;
 				case 'cart_discount':
-					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					$postmeta[] = array( 'key' => '_order_recurring_discount_cart', 'value' => $value );
 					break;
 				case 'order_tax':
-					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
 					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
 					$postmeta[] = array( 'key' => '_order_recurring_tax_total', 'value' => $value );
 					break;
 				default:
-					$value = ( ! empty( $row[$this->mapping[$column]] ) ) ? $row[$this->mapping[$column]] : '';
+					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
 					if( empty( $value ) ) {
 						$metadata = get_user_meta( $cust_id, $column );
 						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
@@ -306,7 +306,7 @@ class WCS_Import_Parser {
 		}
 
 		// Check and set download permissions boolean, will run in test-mode
-		$download_permission = ( ! empty ( $row[$this->mapping['download_permission_granted']] ) ) ? strtolower( $row[$this->mapping['download_permission_granted']] ) : '';
+		$download_permission = ( ! empty ( $row[$this->mapped_fields['download_permission_granted']] ) ) ? strtolower( $row[$this->mapped_fields['download_permission_granted']] ) : '';
 		if( strcmp( $download_permission, 'true' ) == 0 || strcmp( $download_permission, 'yes' ) == 0 ) {
 			$download_permissions_granted = true;
 			if( get_option( 'woocommerce_downloads_grant_access_after_payment' ) == 'no' ) {
@@ -353,7 +353,7 @@ class WCS_Import_Parser {
 
 				// add the additional subscription meta data to the order
 				foreach( $this->order_item_meta_fields as $metadata ) {
-					$value = ( ! empty( $row[$this->mapping[$metadata]] ) ) ? $row[$this->mapping[$metadata]] : 0;
+					$value = ( ! empty( $row[$this->mapped_fields[$metadata]] ) ) ? $row[$this->mapped_fields[$metadata]] : 0;
 					wc_add_order_item_meta( $item_id, '_' . $metadata, $value );
 				}
 
@@ -369,9 +369,9 @@ class WCS_Import_Parser {
 
 				// Update the subscription meta data with values in $subscription_meta
 				$subscription_meta = array (
-						'start_date' 	=> ( ! empty( $row[$this->mapping['subscription_start_date']] ) ) ? $row[$this->mapping['subscription_start_date']] : date('m/d/y'),
-						'expiry_date'	=> ( ! empty( $row[$this->mapping['subscription_expiry_date']] ) ) ? $row[$this->mapping['subscription_expiry_date']] : '',
-						'end_date'		=> ( ! empty( $row[$this->mapping['subscription_end_date']] ) ) ? $row[$this->mapping['subscription_end_date']] : '',
+						'start_date' 	=> ( ! empty( $row[$this->mapped_fields['subscription_start_date']] ) ) ? $row[$this->mapped_fields['subscription_start_date']] : date('m/d/y'),
+						'expiry_date'	=> ( ! empty( $row[$this->mapped_fields['subscription_expiry_date']] ) ) ? $row[$this->mapped_fields['subscription_expiry_date']] : '',
+						'end_date'		=> ( ! empty( $row[$this->mapped_fields['subscription_end_date']] ) ) ? $row[$this->mapped_fields['subscription_end_date']] : '',
 				);
 
 				$_POST['order_id'] = $order_id;
@@ -379,8 +379,8 @@ class WCS_Import_Parser {
 				// Create pening Subscription
 				WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
 				// Update the status of the subscription order
-				if( ! empty( $this->mapping['subscription_status'] ) && $row[$this->mapping['subscription_status']] ) {
-					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapping['subscription_status']] ) );
+				if( ! empty( $this->mapped_fields['subscription_status'] ) && $row[$this->mapped_fields['subscription_status']] ) {
+					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapped_fields['subscription_status']] ) );
 				} else {
 					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
 					$subscription['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
@@ -414,7 +414,7 @@ class WCS_Import_Parser {
 				array_push( $this->results, $subscription );
 			}
 		} else {
-			if( empty( $this->mapping['subscription_status'] ) && empty( $row[$this->mapping['subscription_status']] ) ) {
+			if( empty( $this->mapped_fields['subscription_status'] ) && empty( $row[$this->mapped_fields['subscription_status']] ) ) {
 				$subscription['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
 			}
 			$subscription['row_number'] = $this->starting_row_number;
@@ -438,10 +438,10 @@ class WCS_Import_Parser {
 	 * @since 1.0
 	 */
 	function check_customer( $row ) {
-		$customer_email = ( ! empty ( $row[$this->mapping['customer_email']] ) ) ? $row[$this->mapping['customer_email']] : '';
-		$username = ( ! empty ( $row[$this->mapping['customer_username']] ) ) ? $row[$this->mapping['customer_username']] : '';
-		$customer_id = ( ! empty( $row[$this->mapping['customer_id']] ) ) ? $row[$this->mapping['customer_id']] : '';
-		$password = ( ! empty( $row[$this->mapping['customer_password']] ) ) ? $row[$this->mapping['customer_password']] : wp_generate_password( 12, true );
+		$customer_email = ( ! empty ( $row[$this->mapped_fields['customer_email']] ) ) ? $row[$this->mapped_fields['customer_email']] : '';
+		$username = ( ! empty ( $row[$this->mapped_fields['customer_username']] ) ) ? $row[$this->mapped_fields['customer_username']] : '';
+		$customer_id = ( ! empty( $row[$this->mapped_fields['customer_id']] ) ) ? $row[$this->mapped_fields['customer_id']] : '';
+		$password = ( ! empty( $row[$this->mapped_fields['customer_password']] ) ) ? $row[$this->mapped_fields['customer_password']] : wp_generate_password( 12, true );
 
 		$found_customer = false;
 		if( empty( $customer_id ) ) {
@@ -463,11 +463,11 @@ class WCS_Import_Parser {
 					switch( $key ) {
 						case 'billing_email':
 							// user billing email if set in csv otherwise use the user's account email
-							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : $customer_email;
+							$meta_value = ( ! empty( $row[$this->mapped_fields[$key]] ) ) ? $row[$this->mapped_fields[$key]] : $customer_email;
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
 						case 'billing_first_name':
-							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : $username;
+							$meta_value = ( ! empty( $row[$this->mapped_fields[$key]] ) ) ? $row[$this->mapped_fields[$key]] : $username;
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
 						case 'shipping_addresss_1':
@@ -477,15 +477,15 @@ class WCS_Import_Parser {
 						case 'shipping_state':
 						case 'shipping_country':
 							// Set the shipping address fields to match the billing fields if not specified in CSV
-							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : '';
+							$meta_value = ( ! empty( $row[$this->mapped_fields[$key]] ) ) ? $row[$this->mapped_fields[$key]] : '';
 							if( empty ( $meta_value ) ) {
 								$n_key = str_replace( "shipping", "billing", $key );
-								$meta_value = ( ! empty( $row[ $this->mapping[$n_key]] ) ) ? $row[$this->mapping[$n_key]] : '';
+								$meta_value = ( ! empty( $row[ $this->mapped_fields[$n_key]] ) ) ? $row[$this->mapped_fields[$n_key]] : '';
 							}
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
 						default:
-							$meta_value = ( ! empty( $row[$this->mapping[$key]] ) ) ? $row[$this->mapping[$key]] : '';
+							$meta_value = ( ! empty( $row[$this->mapped_fields[$key]] ) ) ? $row[$this->mapped_fields[$key]] : '';
 							update_user_meta( $found_customer, $key, $meta_value );
 					}
 				}
