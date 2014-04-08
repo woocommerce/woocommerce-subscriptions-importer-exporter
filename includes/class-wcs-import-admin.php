@@ -607,7 +607,7 @@ class WCS_Admin_Importer {
 				<tbody></tbody>
 			</table>
 			<p id="wcs-completed-message">
-				<?php printf( __( 'Import Complete! %sView Subscriptions%s, %sView Orders%s or %sImport another file%s.', 'wcs-importer' ), '<a href="' . admin_url( 'admin.php?page=subscriptions' . '">', '</a>', '<a href="' . admin_url( 'edit.php?post_type=shop_order' . '">', '</a>', '<a href="' . $this->admin_url . '">', '</a>' ); ?>
+				<?php printf( __( 'Import Complete! %sView Subscriptions%s, %sView Orders%s or %sImport another file%s.', 'wcs-importer' ), '<a href="' . admin_url( 'admin.php?page=subscriptions' ) . '">', '</a>', '<a href="' . admin_url( 'edit.php?post_type=shop_order' ) . '">', '</a>', '<a href="' . $this->admin_url . '">', '</a>' ); ?>
 			</p>
 		<?php endif;
 	}
