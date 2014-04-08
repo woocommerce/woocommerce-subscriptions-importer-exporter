@@ -223,6 +223,8 @@ class WCS_Admin_Importer {
 		);
 		$action = add_query_arg( $url_params, $this->admin_url );
 
+		$button_text = ( 'yes' == $_GET['test_mode'] ) ? __( 'Test CSV', 'wcs-importer' ) : __( 'Run Import', 'wcs-importer' );
+
 		$row_number = 1;
 		?>
 		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs-importer' ); ?></h3>
@@ -305,7 +307,7 @@ class WCS_Admin_Importer {
 				</tbody>
 			</table>
 			<p class="submit">
-				<input type="submit" class="button" value="<?php esc_attr_e( 'Submit', 'wcs-importer' ); ?>" />
+				<input type="submit" class="button" value="<?php echo esc_attr( $button_text ); ?>" />
 			</p>
 		</form>
 		<?php
