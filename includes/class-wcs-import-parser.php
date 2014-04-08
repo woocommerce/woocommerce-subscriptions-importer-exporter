@@ -180,7 +180,7 @@ class WCS_Import_Parser {
 
 		// Get product object - checked validity @ L141
 		$_product = get_product( $row[$this->mapped_fields['product_id']] );
-		$subscription['item'] = __( $_product->get_title(), 'wcs-importer' );
+		$subscription['item'] = $_product->get_title();
 
 		$missing_ship_addr = $missing_bill_addr = array();
 
