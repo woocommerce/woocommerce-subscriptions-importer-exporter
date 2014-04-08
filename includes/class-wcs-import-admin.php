@@ -205,6 +205,10 @@ class WCS_Admin_Importer {
 
 		$upload_dir = wp_upload_dir();
 
+		// Set defaults for admin flags
+		$test_mode      = ( isset( $_POST['test_mode'] ) ) ? $_POST['test_mode'] : 'yes';
+		$email_customer = ( isset( $_POST['email_customer'] ) ) ? $_POST['email_customer'] : 'no';
+
 		if ( ! empty( $this->upload_error ) ) : ?>
 	<div id="message" class="error">
 		<p><?php printf( __( 'Error uploading file: %s', 'wcs-importer' ), $this->upload_error ); ?></p>
