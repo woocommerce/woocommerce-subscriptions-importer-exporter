@@ -133,7 +133,6 @@ class WCS_Admin_Importer {
 
 		echo '<h3>' . __( 'Step 1: Upload CSV File', 'wcs-importer' ) . '</h3>';
 		$action = 'admin.php?page=import_subscription&amp;step=2&amp;';
-		$size = size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) );
 		$upload_dir = wp_upload_dir();
 		if ( ! empty( $upload_dir['error'] ) ) : ?>
 			<div class="error"><p><?php _e( 'Before you can upload your import file, you will need to fix the following error:' ); ?></p>
@@ -147,12 +146,12 @@ class WCS_Admin_Importer {
 					<tbody>
 						<tr>
 							<th>
-								<label for="upload"><?php _e( 'Choose a file from your computer:' ); ?></label>
+								<label for="upload"><?php _e( 'Choose a file:' ); ?></label>
 							</th>
 							<td>
 								<input type="file" id="upload" name="import" size="25" />
 								<input type="hidden" name="action" value="upload_file" />
-								<small><?php printf( __('Maximum size: %s' ), $size ); ?></small>
+								<small><?php printf( __('Maximum size: %s' ), size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) ) ); ?></small>
 							</td>
 						</tr>
 						<tr>
