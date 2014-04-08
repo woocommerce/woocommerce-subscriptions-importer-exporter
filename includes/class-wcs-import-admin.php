@@ -1,5 +1,4 @@
 <?php
-global $file;
 
 class WCS_Admin_Importer {
 	var $import_results = array();
@@ -158,7 +157,6 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	public function admin_page() {
-		global $file;
 
 		echo '<div class="wrap">';
 		echo '<h2>' . __( 'Subscription CSV Importer', 'wcs-importer' ) . '</h2>';
