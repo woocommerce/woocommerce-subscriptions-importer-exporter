@@ -52,7 +52,7 @@ class WCS_Admin_Importer {
 		wp_register_script( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
 		wp_enqueue_script( 'wcs-importer-admin' );
 
-		$translation_array = array(
+		$script_data = array(
 			'success' 				=> __( 'success', 'wcs-importer' ),
 			'failed' 				=> __( 'failed', 'wcs-importer' ),
 			'error_string'			=> sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
@@ -62,7 +62,8 @@ class WCS_Admin_Importer {
 			'warnings'				=> __( 'Warnings', 'wcs-importer' ),
 			'located_at'			=> __( 'Located at rows', 'wcs-importer' ),
 		);
-		wp_localize_script( 'wcs-importer-admin', 'wcs_import_lang', $translation_array );
+
+		wp_localize_script( 'wcs-importer-admin', 'wcs_script_data', $script_data );
 	}
 
 	/**

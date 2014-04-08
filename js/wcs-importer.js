@@ -53,10 +53,10 @@ jQuery(document).ready(function($){
 						if( results[i].status == "success" ) {
 							var warnings = results[i].warning;
 							if( warnings.length > 0 ) {
-								table_data += '<td class="row warning" rowspan="2"><strong>' + wcs_import_lang.success +' ( !! )</strong></td>';
+								table_data += '<td class="row warning" rowspan="2"><strong>' + wcs_script_data.success +' ( !! )</strong></td>';
 								table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
 							} else {
-								table_data += '<td class="row success">' + wcs_import_lang.success +'</td>';
+								table_data += '<td class="row success">' + wcs_script_data.success +'</td>';
 								table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
 							}
 
@@ -69,23 +69,23 @@ jQuery(document).ready(function($){
 
 							// Display Warnings
 							if( warnings.length > 0 ) {
-								var warningString = ( ( warnings.length > 1 ) ? wcs_import_lang.warnings : wcs_import_lang.warning);
-								warningString.replace( warningString, ( ( warnings.length > 1 ) ? wcs_import_lang.warnings : wcs_import_lang.warning ) );
+								var warningString = ( ( warnings.length > 1 ) ? wcs_script_data.warnings : wcs_script_data.warning);
+								warningString.replace( warningString, ( ( warnings.length > 1 ) ? wcs_script_data.warnings : wcs_script_data.warning ) );
 								warningString += ': ';
 								for( var x = 0; x < warnings.length; x++ ) {
 									warningString += warnings[x];
 								}
-								$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '"><td colspan="5">' + warningString + ' [ <a href="' + results[i].edit_order + '">' + wcs_import_lang.edit_order + ' #' + results[i].order +'</a> ]</td></tr>');
+								$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '"><td colspan="5">' + warningString + ' [ <a href="' + results[i].edit_order + '">' + wcs_script_data.edit_order + ' #' + results[i].order +'</a> ]</td></tr>');
 							}
 						} else {
-							table_data += '<td class="row error-import">' + wcs_import_lang.failed + '</td>';
+							table_data += '<td class="row error-import">' + wcs_script_data.failed + '</td>';
 							// Display Error
 							var errorString = '<ul>';
 							for( var x = 0; x < results[i].error.length; x++ ){
 								errorString += '<li>' + results[i].error[x] + '</li>';
 							}
 							errorString += '</ul>';
-							table_data += '<td colspan="5">' + wcs_import_lang.error_string + '</td>';
+							table_data += '<td colspan="5">' + wcs_script_data.error_string + '</td>';
 							table_data = table_data.replace( "{row_number}", results[i].row_number );
 							table_data = table_data.replace( "{error_messages}", errorString );
 							$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '">' + table_data + '</tr>' );
@@ -134,13 +134,13 @@ jQuery(document).ready(function($){
 					$('#wcs-warning-details').html( parseInt( $('#wcs-warning-details').html() ) + minor );
 					var results_text = '';
 					for( key in errors ) {
-						results_text += '[' + errors[key].length + '] ' + key + ' ' + wcs_import_lang.located_at+ ': ' + errors[key].toString() + '.<br/>';
+						results_text += '[' + errors[key].length + '] ' + key + ' ' + wcs_script_data.located_at+ ': ' + errors[key].toString() + '.<br/>';
 					}
 					$('#wcs-importer_test_errors td').append( results_text );
 
 					results_text = ''; //clear string so the same variable can be used for warnings and errors
 					for( warningKey in warnings ) {
-						results_text += '[' + warnings[warningKey].length + '] ' + warningKey + ' ' + wcs_import_lang.located_at + ': ' + warnings[warningKey].toString() + '.<br/>';
+						results_text += '[' + warnings[warningKey].length + '] ' + warningKey + ' ' + wcs_script_data.located_at + ': ' + warnings[warningKey].toString() + '.<br/>';
 					}
 					$('#wcs-importer_test_warnings td').append( results_text );
 
@@ -158,7 +158,7 @@ jQuery(document).ready(function($){
 		if( count >= total ) {
 			if( test_run == false ) {
 				$('.importer-loading').addClass('finished').removeClass('importer-loading');
-				$('.finished').html('<td colspan="6" class="row">' + wcs_import_lang.finished_importing + '</td>');
+				$('.finished').html('<td colspan="6" class="row">' + wcs_script_data.finished_importing + '</td>');
 			}
 			$('#wcs-completed-message').show();
 		}
