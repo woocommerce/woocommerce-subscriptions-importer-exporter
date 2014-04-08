@@ -635,7 +635,7 @@ class WCS_Admin_Importer {
 		global $file;
 		?>
 		<h3><?php _e( 'Error while uploading File', 'wcs-importer' ); ?></h3>
-		<p>Error message: <?php _e( $file['error'], 'wcs-importer' ); ?></p>
+		<p><?php printf( __( 'Error message: %s', 'wcs-importer' ), $file['error'] ); ?></p>
 		<p><a href="<?php echo $this->admin_url; ?>"><?php _e( 'Import another file', 'wcs-importer' ); ?></a></p>
 		<?php
 	}
