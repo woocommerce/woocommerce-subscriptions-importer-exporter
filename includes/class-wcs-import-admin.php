@@ -156,11 +156,10 @@ class WCS_Admin_Importer {
 		$payment_method = ( ! empty ( $row[$mapped_fields['payment_method']] ) ) ? strtolower( $row[$mapped_fields['payment_method']] ) : '';
 
 		if( ! empty( $payment_method ) && array_key_exists( $payment_method, $supported_gateways ) ) {
-			$meta_amount = $supported_gateways[$payment_method];
-			for( $num = 1; $num <= $meta_amount; $num++ ) {
-				if ( empty ( $row[$supported_gateways[$payment_method . '_' . $num]] ) ) {
+			foreach( $supported_gateways[$payment_method] as $meta_data ) {
+				if ( empty ( $row[$mapped_fields[$meta_data]] ) ) {
 					$has_missing_meta = true;
-					$meta_error[] = $supported_gateways[$payment_method . '_' . $num];
+					$meta_error[] = $meta_data;
 				}
 			}
 			if( $has_missing_meta ) {
