@@ -327,8 +327,8 @@ class WCS_Import_Parser {
 			);
 
 			$order_id = wp_insert_post( $order_data );
+			$subscription_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
 
-			$order = WC_Order( $order_id );
 
 			foreach ( $postmeta as $meta ) {
 				update_post_meta( $order_id, $meta['key'], $meta['value'] );
@@ -389,9 +389,10 @@ class WCS_Import_Parser {
 				}
 
 				// Add additional subscription meta data
-				$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
-				WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
+				WC_Subscriptions_Manager::update_subscription( $subscription_key, $subscription_meta );
 			}
+
+			$order = new WC_Order( $order_id );
 
 			remove_action( 'woocommerce_order_status_pending_to_completed_notification', array( WC()->mailer()->emails['WC_Email_New_Order'], 'trigger' ) );
 			remove_action( 'woocommerce_order_status_completed_notification', array( WC()->mailer()->emails['WC_Email_Customer_Completed_Order'], 'trigger' ) );
@@ -402,8 +403,7 @@ class WCS_Import_Parser {
 			$result['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
 
 			// Check if the subscription has been successfully added
-			$key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
-			$subscription = WC_Subscriptions_Manager::get_subscription( $key );
+			$subscription = WC_Subscriptions_Manager::get_subscription( $subscription_key );
 
 			// Successfully added subscription. Attach information on each order to the results array.
 			if( ! empty ( $subscription['order_id'] ) && ! empty ( $subscription['product_id'] ) ) {
