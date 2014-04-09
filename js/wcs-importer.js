@@ -12,9 +12,18 @@ jQuery(document).ready(function($){
 	}
 
 	function run_import() {
-		for( var i = 0; i < wcs_script_data.file_positions.length; i+=2 ) {
-			ajax_import( wcs_script_data.file_positions[i], wcs_script_data.file_positions[i+1], wcs_script_data.start_row_num[i/2] );
-		}
+		var counter = 0;
+		var interval = setInterval(function(){
+
+			ajax_import( wcs_script_data.file_positions[counter], wcs_script_data.file_positions[counter+1], wcs_script_data.start_row_num[counter/2] );
+
+			counter += 2;
+
+			if(counter >= wcs_script_data.file_positions.length) {
+				clearInterval(interval);
+			}
+
+		}, 500);
 	}
 
 	function ajax_import( start_pos, end_pos, row_start ) {
