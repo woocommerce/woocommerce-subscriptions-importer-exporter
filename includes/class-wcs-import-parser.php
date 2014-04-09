@@ -151,6 +151,8 @@ class WCS_Import_Parser {
 	 * @since 1.0
 	 */
 	private static function import_subscription( $subscription_details ) {
+		global $wpdb;
+
 		$download_permissions_granted = false;
 		$order_meta = array();
 		$result['warning'] = $result['error'] = array();
@@ -329,13 +331,19 @@ class WCS_Import_Parser {
 			$order_id = wp_insert_post( $order_data );
 			$subscription_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
 
+			$order_meta_insert_query = "INSERT INTO $wpdb->postmeta (post_id, meta_key, meta_value) VALUES\n";
 
-			foreach ( $postmeta as $meta ) {
-				update_post_meta( $order_id, $meta['key'], $meta['value'] );
+			foreach ( $order_meta as $meta ) {
+				$order_meta_insert_query .= $wpdb->prepare( "(%d,%s,%s),\n", $order_id, $meta['key'], $meta['value'] );
 				if ( '_customer_user' == $meta['key'] && $meta['value'] ) {
 					update_user_meta( $meta['value'], 'paying_customer', 1 );
 				}
 			}
+
+			// Replace the last comma with a semicolon
+			$order_meta_insert_query = substr_replace( $order_meta_insert_query, ';', strrpos( $order_meta_insert_query, ',' ), 1 );
+
+			$wpdb->query( $order_meta_insert_query );
 
 			// Add line item
 			$item_id = wc_add_order_item( $order_id, array(
