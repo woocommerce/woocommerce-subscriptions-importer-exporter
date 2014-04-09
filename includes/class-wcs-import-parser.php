@@ -316,9 +316,10 @@ class WCS_Import_Parser {
 		// Skip this section when testing the importer for errors and/or warnings
 		if( ! self::$test_mode ) {
 			$order_data = array(
-					'post_date'     => date( 'Y-m-d H:i:s', time() ),
+					'post_date'     => current_time( 'mysql' ),
+					'post_date_gmt' => current_time( 'mysql', 1 ),
 					'post_type'     => 'shop_order',
-					'post_title'    => 'Order &ndash; ' . date( 'F j, Y @ h:i A', time() ),
+					'post_title'    => 'Order &ndash; ' . date( 'F j, Y @ h:i A', current_time( 'timestamp' ) ),
 					'post_status'   => 'publish',
 					'ping_status'   => 'closed',
 					'post_author'   => 1,
