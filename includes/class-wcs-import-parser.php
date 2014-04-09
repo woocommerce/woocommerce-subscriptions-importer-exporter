@@ -329,9 +329,13 @@ class WCS_Import_Parser {
 
 		// Skip this section when testing the importer for errors and/or warnings
 		if( ! self::$test_mode ) {
+
+			$start_date     = ( ! empty( $subscription_details[self::$mapped_fields['subscription_start_date']] ) ) ? get_date_from_gmt( date( 'Y-m-d H:i:s', strtotime( $subscription_details[self::$mapped_fields['subscription_start_date']] ) ) ) : current_time( 'mysql' );
+			$start_date_gmt = ( ! empty( $subscription_details[self::$mapped_fields['subscription_start_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_start_date']] : current_time( 'mysql', 1 );
+
 			$order_data = array(
-					'post_date'     => current_time( 'mysql' ),
-					'post_date_gmt' => current_time( 'mysql', 1 ),
+					'post_date'     => $start_date,
+					'post_date_gmt' => $start_date_gmt,
 					'post_type'     => 'shop_order',
 					'post_title'    => 'Order &ndash; ' . date( 'F j, Y @ h:i A', current_time( 'timestamp' ) ),
 					'post_status'   => 'publish',
@@ -381,7 +385,7 @@ class WCS_Import_Parser {
 
 				// Update the subscription meta data with values in $subscription_meta
 				$subscription_meta = array (
-						'start_date' 	=> ( ! empty( $subscription_details[self::$mapped_fields['subscription_start_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_start_date']] : date('m/d/y'),
+						'start_date'    => $start_date_gmt,
 						'expiry_date'	=> ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_expiry_date']] : '',
 						'end_date'		=> ( ! empty( $subscription_details[self::$mapped_fields['subscription_end_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_end_date']] : '',
 				);
