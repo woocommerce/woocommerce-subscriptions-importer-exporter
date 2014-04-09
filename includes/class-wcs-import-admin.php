@@ -613,11 +613,10 @@ class WCS_Admin_Importer {
 			$starting_row_num   = absint( $_POST['row_num'] );
 			$test_mode          = isset( $_POST['test_mode'] ) ? $_POST['test_mode'] : false;
 			$email_customer     = isset( $_POST['email_customer'] ) ? $_POST['email_customer'] : false;
-			$this->parser = new WCS_Import_Parser();
-			$this->results = $this->parser->import_data( $file_path, $mapped_fields, $file_pointer_start, $file_pointer_end, $starting_row_num, $test_mode, $email_customer );
+			$results = WCS_Import_Parser::import_data( $file_path, $mapped_fields, $file_pointer_start, $file_pointer_end, $starting_row_num, $test_mode, $email_customer );
 
 			header( 'Content-Type: application/json; charset=utf-8' );
-			echo json_encode( $this->results );
+			echo json_encode( $results );
 		}
 		exit; // End
 	}
