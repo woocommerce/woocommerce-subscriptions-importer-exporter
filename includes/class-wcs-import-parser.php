@@ -329,8 +329,7 @@ class WCS_Import_Parser {
 			$order_id = wp_insert_post( $order_data );
 			$subscription_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
 
-
-			foreach ( $postmeta as $meta ) {
+			foreach ( $order_meta as $meta ) {
 				update_post_meta( $order_id, $meta['key'], $meta['value'] );
 				if ( '_customer_user' == $meta['key'] && $meta['value'] ) {
 					update_user_meta( $meta['value'], 'paying_customer', 1 );
