@@ -150,7 +150,7 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	private static function import( $subscription_details ) {
+	private static function import_subscription( $subscription_details ) {
 		$download_permissions_granted = false;
 		$order_meta = array();
 		$result['warning'] = $result['error'] = array();
