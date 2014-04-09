@@ -85,13 +85,8 @@ class WCS_Admin_Importer {
 							$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[$key], $enc ) : '';
 						}
 
-						if( strtolower( $row[ $mapped_fields['payment_method'] ] ) == 'stripe' && empty( $row[ $mapped_fields['stripe_customer_id'] ] ) ) {
-							$payment_method_error[] = 'Stripe';
-							$payment_meta_error[] = 'stripe_customer_id';
-						} else if ( strtolower( $row[ $mapped_fields['payment_method'] ] ) == 'paypal' && empty( $row[ $mapped_fields['paypal_subscriber_id'] ] ) ) {
-							$payment_method_error[] = 'Paypal';
-							$payment_meta_error[] = 'paypal_subscriber_id';
-						}
+						// Checks the row for missing required payment meta
+						$this->check_row_payment_meta( $row, $mapped_fields, $payment_method_error, $payment_meta_error );
 
 						if ( $count >= $this->rows_per_request ) {
 							$previous_pos = $position;
@@ -146,6 +141,33 @@ class WCS_Admin_Importer {
 
 				wp_localize_script( 'wcs-importer-admin', 'wcs_script_data', $script_data );
 			}
+		}
+	}
+
+	/* From the list of supported payment gateways, check if there's a row in the csv
+	 * that is missing crucial data needed for importing. Add missing information to
+	 * both &method_error and &meta_error arrays.
+	 * 
+	 * @since 1.0
+	 */
+	function check_row_payment_meta( $row, $mapped_fields, &$method_error, &$meta_error ) {
+		$has_missing_meta = false;
+		$supported_gateways = WCS_Import_Parser::$supported_payment_gateways;
+		$payment_method = ( ! empty ( $row[$mapped_fields['payment_method']] ) ) ? strtolower( $row[$mapped_fields['payment_method']] ) : '';
+
+		if( ! empty( $payment_method ) && array_key_exists( $payment_method, $supported_gateways ) ) {
+			$meta_amount = $supported_gateways[$payment_method];
+			for( $num = 1; $num <= $meta_amount; $num++ ) {
+				if ( empty ( $row[$supported_gateways[$payment_method . '_' . $num]] ) ) {
+					$has_missing_meta = true;
+					$meta_error[] = $supported_gateways[$payment_method . '_' . $num];
+				}
+			}
+			if( $has_missing_meta ) {
+				$method_error[] = $row[$mapped_fields['payment_method']];
+			}
+		} else {
+			// unsupported value for payment gateway
 		}
 	}
 
@@ -376,6 +398,8 @@ class WCS_Admin_Importer {
 									<option value="shipping_method_title" <?php selected( $header, 'shipping_method_title' ); ?>>shipping_method_title</option>
 									<option value="stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
 									<option value="paypal_subscriber_id" <?php selected( $header, 'paypal_subscriber_id' ); ?>>paypal_subscriber_id</option>
+									<option value="authorize_net_cim_payment_profile_id" <?php selected( $header, 'authorize_net_cim_payment_profile_id' ); ?>>authorize_net_cim_payment_profile_id</option>
+									<option value="authorize_net_cim_profile_id" <?php selected( $header, 'authorize_net_cim_profile_id' ); ?>>authorize_net_cim_profile_id</option>
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
 								</optgroup>
 								<optgroup label="<?php _e( 'Subscription Status', 'wcs-importer' ); ?>">
@@ -477,57 +501,59 @@ class WCS_Admin_Importer {
 
 		// Possible mapping options
 		$mapped_fields = array(
-			'product_id'				  => '',
-			'customer_id' 				  => '',
-			'customer_email' 			  => '',
-			'customer_username' 		  => '',
-			'customer_password'			  => '',
-			'billing_first_name' 		  => '',
-			'billing_last_name' 		  => '',
-			'billing_address_1' 		  => '',
-			'billing_address_2' 		  => '',
-			'billing_city' 				  => '',
-			'billing_state' 			  => '',
-			'billing_postcode' 			  => '',
-			'billing_country' 			  => '',
-			'billing_email' 			  => '',
-			'billing_phone' 			  => '',
-			'billing_company'			  => '',
-			'shipping_first_name' 		  => '',
-			'shipping_last_name' 		  => '',
-			'shipping_company' 			  => '',
-			'shipping_address_1' 		  => '',
-			'shipping_address_2' 		  => '',
-			'shipping_city' 			  => '',
-			'shipping_state' 			  => '',
-			'shipping_postcode' 		  => '',
-			'shipping_country' 			  => '',
-			'subscription_status'		  => '',
-			'subscription_start_date' 	  => '',
-			'subscription_expiry_date'	  => '',
-			'subscription_end_date'		  => '',
-			'payment_method' 			  => '',
-			'shipping_method' 			  => '',
-			'shipping_method_title'		  => '',
-			'recurring_line_total' 		  => '',
-			'recurring_line_tax' 		  => '',
-			'recurring_line_subtotal' 	  => '',
-			'recurring_line_subtotal_tax' => '',
-			'line_total' 				  => '',
-			'line_tax' 					  => '',
-			'line_subtotal' 			  => '',
-			'line_subtotal_tax' 		  => '',
-			'order_discount' 			  => '',
-			'cart_discount' 			  => '',
-			'order_shipping_tax' 		  => '',
-			'order_shipping'			  => '',
-			'order_tax'					  => '',
-			'order_total' 				  => '',
-			'order_recurring_total'		  => '',
-			'stripe_customer_id'		  => '',
-			'paypal_subscriber_id'		  => '',
-			'payment_method_title'		  => '',
-			'download_permission_granted' => '',
+			'product_id'						   => '',
+			'customer_id' 						   => '',
+			'customer_email' 					   => '',
+			'customer_username' 				   => '',
+			'customer_password'					   => '',
+			'billing_first_name' 				   => '',
+			'billing_last_name' 				   => '',
+			'billing_address_1' 				   => '',
+			'billing_address_2' 				   => '',
+			'billing_city' 						   => '',
+			'billing_state' 					   => '',
+			'billing_postcode' 					   => '',
+			'billing_country' 					   => '',
+			'billing_email' 					   => '',
+			'billing_phone' 					   => '',
+			'billing_company'					   => '',
+			'shipping_first_name' 				   => '',
+			'shipping_last_name' 				   => '',
+			'shipping_company' 					   => '',
+			'shipping_address_1' 				   => '',
+			'shipping_address_2' 				   => '',
+			'shipping_city' 					   => '',
+			'shipping_state' 					   => '',
+			'shipping_postcode' 				   => '',
+			'shipping_country' 					   => '',
+			'subscription_status'				   => '',
+			'subscription_start_date'			   => '',
+			'subscription_expiry_date'			   => '',
+			'subscription_end_date'				   => '',
+			'payment_method' 					   => '',
+			'shipping_method' 					   => '',
+			'shipping_method_title'				   => '',
+			'recurring_line_total' 				   => '',
+			'recurring_line_tax' 				   => '',
+			'recurring_line_subtotal' 			   => '',
+			'recurring_line_subtotal_tax'		   => '',
+			'line_total' 						   => '',
+			'line_tax' 							   => '',
+			'line_subtotal' 					   => '',
+			'line_subtotal_tax' 				   => '',
+			'order_discount' 					   => '',
+			'cart_discount' 					   => '',
+			'order_shipping_tax' 				   => '',
+			'order_shipping'					   => '',
+			'order_tax'							   => '',
+			'order_total' 						   => '',
+			'order_recurring_total'				   => '',
+			'stripe_customer_id'				   => '',
+			'paypal_subscriber_id'				   => '',
+			'payment_method_title'				   => '',
+			'authorize_net_cim_payment_profile_id' => '',
+			'authorize_net_cim_profile_id'		   => '',
+			'download_permission_granted'		   => '',
 		);
 
 		$mapping_rules = $_POST['mapto'];
