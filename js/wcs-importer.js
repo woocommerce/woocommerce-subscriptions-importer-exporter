@@ -1,29 +1,14 @@
 jQuery(document).ready(function($){
-	var count = 0;
+	var counter = 0;
 
 	if ( wcs_script_data.test_mode == 'false' && wcs_script_data.error_message.length > 0 ) {
 		if ( confirm( wcs_script_data.error_message ) ){
-			run_import();
+			ajax_import( wcs_script_data.file_positions[counter], wcs_script_data.file_positions[counter+1], wcs_script_data.start_row_num[counter/2] );
 		} else {
 			window.location.href = wcs_script_data.cancelled_url;
 		}
 	} else {
-		run_import();
-	}
-
-	function run_import() {
-		var counter = 0;
-		var interval = setInterval(function(){
-
-			ajax_import( wcs_script_data.file_positions[counter], wcs_script_data.file_positions[counter+1], wcs_script_data.start_row_num[counter/2] );
-
-			counter += 2;
-
-			if(counter >= wcs_script_data.file_positions.length) {
-				clearInterval(interval);
-			}
-
-		}, 500);
+		ajax_import( wcs_script_data.file_positions[counter], wcs_script_data.file_positions[counter+1], wcs_script_data.start_row_num[counter/2] );
 	}
 
 	function ajax_import( start_pos, end_pos, row_start ) {
@@ -41,7 +26,6 @@ jQuery(document).ready(function($){
 			type:	'POST',
 			data:	data,
 			success: function( results ) {
-				count++;
 				// Update confirmation table
 				// Get the valid JSON only from the returned string
 				if( wcs_script_data.test_mode == "false" ) {
@@ -90,7 +74,6 @@ jQuery(document).ready(function($){
 							$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '">' + table_data + '</tr>' );
 						}
 					}
-					check_completed();
 				} else {
 					var success = 0,
 						failed = 0,
@@ -143,21 +126,22 @@ jQuery(document).ready(function($){
 					}
 					$('#wcs-importer_test_warnings td').append( results_text );
 
-					check_completed();
 				}
+
+				counter += 2;
+
+				if( ( counter / 2 ) >= wcs_script_data.total ) {
+					if( wcs_script_data.test_mode == "false" ) {
+						$('.importer-loading').addClass('finished').removeClass('importer-loading');
+						$('.finished').html('<td colspan="6" class="row">' + wcs_script_data.finished_importing + '</td>');
+					}
+					$('#wcs-completed-message').show();
+				} else {
+					ajax_import( wcs_script_data.file_positions[counter], wcs_script_data.file_positions[counter+1], wcs_script_data.start_row_num[counter/2] );
+				}
+
 			}
 		});
-	}
-
-	/* Check the number of requests has been completed */
-	function check_completed() {
-		if( count >= wcs_script_data.total ) {
-			if( wcs_script_data.test_mode == "false" ) {
-				$('.importer-loading').addClass('finished').removeClass('importer-loading');
-				$('.finished').html('<td colspan="6" class="row">' + wcs_script_data.finished_importing + '</td>');
-			}
-			$('#wcs-completed-message').show();
-		}
 	}
 
 });
