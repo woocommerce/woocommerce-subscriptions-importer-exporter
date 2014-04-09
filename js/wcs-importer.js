@@ -130,26 +130,18 @@ jQuery(document).ready(function($){
 
 				counter += 2;
 
-				if ( ! check_completed() ) {
+				if( ( counter / 2 ) >= wcs_script_data.total ) {
+					if( wcs_script_data.test_mode == "false" ) {
+						$('.importer-loading').addClass('finished').removeClass('importer-loading');
+						$('.finished').html('<td colspan="6" class="row">' + wcs_script_data.finished_importing + '</td>');
+					}
+					$('#wcs-completed-message').show();
+				} else {
 					ajax_import( wcs_script_data.file_positions[counter], wcs_script_data.file_positions[counter+1], wcs_script_data.start_row_num[counter/2] );
 				}
 
 			}
 		});
-	}
-
-	/* Check the number of requests has been completed */
-	function check_completed() {
-		if( ( counter / 2 ) >= wcs_script_data.total ) {
-			if( wcs_script_data.test_mode == "false" ) {
-				$('.importer-loading').addClass('finished').removeClass('importer-loading');
-				$('.finished').html('<td colspan="6" class="row">' + wcs_script_data.finished_importing + '</td>');
-			}
-			$('#wcs-completed-message').show();
-			return true;
-		}
-
-		return false;
 	}
 
 });
