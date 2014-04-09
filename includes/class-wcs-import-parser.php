@@ -78,6 +78,16 @@ class WCS_Import_Parser {
 		"line_subtotal_tax",
 	);
 
+	static $supported_payment_gateways = array (
+		'paypal'            => 1,
+		'paypal_1'          => 'paypal_subscriber_id',
+		'stripe'            => 1,
+		'stripe_1'          => 'stripe_customer_id',
+		'authorize.net'     => 2,
+		'authorize.net_1'   => 'authorize_net_cim_profile_id',
+		'authorize.net_2'   => 'authorize_net_cim_payment_profile_id',
+	);
+
 	/**
 	 *
 	 * @since 1.0
@@ -210,28 +220,37 @@ class WCS_Import_Parser {
 					$order_meta[] = array( 'key' => '_order_recurring_shipping_tax_total', 'value' => $value );
 					break;
 				case 'payment_method':
-					if( strtolower( $subscription_details[self::$mapped_fields[$column]] ) == 'paypal' && ! empty( $subscription_details[self::$mapped_fields['paypal_subscriber_id']] ) ) {
-						// Paypal
-						$paypal_sub_id = $subscription_details[self::$mapped_fields['paypal_subscriber_id']];
-						$title = ( ! empty( $subscription_details[self::$mapped_fields['payment_method_title']] ) ) ? $subscription_details[self::$mapped_fields['payment_method_title']] : 'Paypal Transfer';
-						$order_meta[] = array( 'key' => '_' . $column, 'value' => 'paypal' );
-						$order_meta[] = array( 'key' => '_payment_method_title', 'value' => $title );
-						$order_meta[] = array( 'key' => '_recurring_payment_method', 'value' => 'paypal' );
-						$order_meta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
-						$order_meta[] = array( 'key' => '_paypal_subscriber_id', 'value' => $paypal_sub_id );
-					} else if( strtolower( $subscription_details[self::$mapped_fields[$column]] ) == 'stripe' && ! empty( $subscription_details[self::$mapped_fields['stripe_customer_id']] ) ) {
-						// Stripe
-						$stripe_cust_id = $subscription_details[self::$mapped_fields['stripe_customer_id']];
-						$title = ( ! empty( $subscription_details[self::$mapped_fields['payment_method_title']] ) ) ? $subscription_details[self::$mapped_fields['payment_method_title']] : 'Stripe Transfer';
-						// $stripe_cust_id will be checked before this point to make sure it's not null
-						$order_meta[] = array( 'key' => '_' . $column, 'value' => 'stripe' );
-						$order_meta[] = array( 'key' => '_payment_method_title', 'value' => $title );
-						$order_meta[] = array( 'key' => '_recurring_payment_method', 'value' => 'stripe' );
-						$order_meta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
-						$order_meta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
-					} else { // default to manual payment regardless
+					$payment_method = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? strtolower( $subscription_details[self::$mapped_fields[$column]] ) : '';
+					$title = ( ! empty( $subscription_details[self::$mapped_fields['payment_method_title']] ) ) ? $subscription_details[self::$mapped_fields['payment_method_title']] : $payment_method;
+					$use_manual_recurring = false;
+					$tmp_ordermeta = array();
+
+					if ( ! empty( $payment_method ) && array_key_exists( $payment_method, self::$supported_payment_gateways ) ) {
+						$meta_amount = self::$supported_payment_gateways[$payment_method];
+						$tmp_ordermeta[] = array( 'key' => '_' . $column, 'value' => $payment_method );
+						$tmp_ordermeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
+						$tmp_ordermeta[] = array( 'key' => '_recurring_payment_method', 'value' => $payment_method );
+						$tmp_ordermeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
+						for( $num = 1; $num <= $meta_amount; $num++ ) {
+							if( ! empty ( $subscription_details[self::$mapped_fields[self::$supported_payment_gateways[$payment_method . '_' . $num]]] ) ) {
+								$meta_value = $subscription_details[self::$mapped_fields[self::$supported_payment_gateways[$payment_method . '_' . $num]]];
+								$tmp_ordermeta[] = array( 'key' => '_' . self::$supported_payment_gateways[$payment_method . '_' . $num], 'value' => $meta_value );
+							} else {
+								$use_manual_recurring = true;
+							}
+						}
+					} else {
+						$use_manual_recurring = true;
+					}
+
+					if( $use_manual_recurring ) {
 						$order_meta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
 						$result['warning'][] = __( 'No recognisable payment method has been specified. Defaulting to manual recurring payments. ', 'wcs-importer' );
+					} else {
+						foreach ( $tmp_ordermeta as $tmp_meta ) {
+							$order_meta[] = array( 'key' => $tmp_meta['key'], 'value' => $tmp_meta['value'] );
+						}
+						//$order_meta = array_merge( $order_meta, $tmp_ordermeta );
 					}
 					break;
 				case 'shipping_addresss_1':
