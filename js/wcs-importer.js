@@ -92,9 +92,9 @@ jQuery(document).ready(function($){
 					}
 					check_completed();
 				} else {
-					var success = 0, 
-						failed = 0, 
-						critical = 0 , 
+					var success = 0,
+						failed = 0,
+						critical = 0,
 						minor = 0,
 						tests = 0;
 
