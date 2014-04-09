@@ -251,7 +251,7 @@ class WCS_Admin_Importer {
 							<th><?php _e( 'Email passwords?', 'wcs-importer' ); ?></th>
 							<td>
 								<input type="checkbox" name="email_customer" value="yes" <?php checked( $email_customer, 'yes' ); ?> />
-								<em><?php _e( 'If importing new users, you can email customers their temporary password.', 'wcs-importer' ); ?></em>
+								<em><?php _e( 'If importing new users, you can email customers their account details.', 'wcs-importer' ); ?></em>
 							</td>
 						</tr>
 					</tbody>
