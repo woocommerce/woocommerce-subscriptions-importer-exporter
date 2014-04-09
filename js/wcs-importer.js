@@ -1,11 +1,11 @@
 jQuery(document).ready(function($){
 	var count = 0;
 
-	if ( wcs_import_data.test_mode == 'false' && wcs_import_data.error_message.length > 0 ) {
-		if ( confirm( wcs_import_data.error_message ) ){
+	if ( wcs_script_data.test_mode == 'false' && wcs_script_data.error_message.length > 0 ) {
+		if ( confirm( wcs_script_data.error_message ) ){
 			run_import();
 		} else {
-			window.location.href = wcs_import_data.cancelled_url;
+			window.location.href = wcs_script_data.cancelled_url;
 		}
 	} else {
 		run_import();
@@ -20,7 +20,7 @@ jQuery(document).ready(function($){
 	function ajax_import( start_pos, end_pos, row_start ) {
 		var data = {
 			action:		'wcs_import_request',
-			file:		file_name,
+			file_id:	wcs_script_data.file_id,
 			start:		start_pos,
 			end:		end_pos,
 			row_num:	row_start
