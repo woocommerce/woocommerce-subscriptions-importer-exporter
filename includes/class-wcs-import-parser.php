@@ -443,7 +443,6 @@ class WCS_Import_Parser {
 		$customer_email = ( ! empty ( $subscription_details[self::$mapped_fields['customer_email']] ) ) ? $subscription_details[self::$mapped_fields['customer_email']] : '';
 		$username = ( ! empty ( $subscription_details[self::$mapped_fields['customer_username']] ) ) ? $subscription_details[self::$mapped_fields['customer_username']] : '';
 		$customer_id = ( ! empty( $subscription_details[self::$mapped_fields['customer_id']] ) ) ? $subscription_details[self::$mapped_fields['customer_id']] : '';
-		$password = ( ! empty( $subscription_details[self::$mapped_fields['customer_password']] ) ) ? $subscription_details[self::$mapped_fields['customer_password']] : wp_generate_password( 12, true );
 
 		if ( ! empty( $subscription_details[self::$mapped_fields['customer_password']] ) ) {
 			$password = $subscription_details[self::$mapped_fields['customer_password']];
