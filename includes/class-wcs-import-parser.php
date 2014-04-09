@@ -1,136 +1,138 @@
 <?php 
 
 class WCS_Import_Parser {
-	var $mapped_fields = array();
-	var $results = array();
-	var $file_pointer_start_position;
-	var $file_pointer_end_position;
-	var $starting_row_number;
-	var $test_mode;
-	var $email_customer;
+	static $mapped_fields = array();
+	static $results = array();
+	static $result = array();
+	static $file_pointer_start_position;
+	static $file_pointer_end_position;
+	static $starting_row_number;
+	static $test_mode;
+	static $email_customer;
 
-	function __construct() {
-		// Order meta values
-		$this->order_meta_fields = array(
-			"order_shipping",
-			"order_shipping_tax",
-			"order_tax",
-			"cart_discount",
-			"order_discount",
-			"order_total",
-			"order_recurring_total",
-			"payment_method",
-			"shipping_method",
-			"customer_user",
-			"billing_first_name",
-			"billing_last_name",
-			"billing_company",
-			"billing_address_1",
-			"billing_address_2",
-			"billing_city",
-			"billing_state",
-			"billing_postcode",
-			"billing_country",
-			"billing_email",
-			"billing_phone",
-			"shipping_first_name",
-			"shipping_last_name",
-			"shipping_company",
-			"shipping_address_1",
-			"shipping_address_2",
-			"shipping_city",
-			"shipping_state",
-			"shipping_postcode",
-			"shipping_country",
-		);
+	static $order_meta_fields = array(
+		"order_shipping",
+		"order_shipping_tax",
+		"order_tax",
+		"cart_discount",
+		"order_discount",
+		"order_total",
+		"order_recurring_total",
+		"payment_method",
+		"shipping_method",
+		"customer_user",
+		"billing_first_name",
+		"billing_last_name",
+		"billing_company",
+		"billing_address_1",
+		"billing_address_2",
+		"billing_city",
+		"billing_state",
+		"billing_postcode",
+		"billing_country",
+		"billing_email",
+		"billing_phone",
+		"shipping_first_name",
+		"shipping_last_name",
+		"shipping_company",
+		"shipping_address_1",
+		"shipping_address_2",
+		"shipping_city",
+		"shipping_state",
+		"shipping_postcode",
+		"shipping_country",
+	);
 
-		// User meta data
-		$this->user_data_titles = array (
-			"billing_first_name",
-			"billing_last_name",
-			"billing_company",
-			"billing_address_1",
-			"billing_address_2",
-			"billing_city",
-			"billing_state",
-			"billing_postcode",
-			"billing_country",
-			"billing_email",
-			"billing_phone",
-			"shipping_first_name",
-			"shipping_last_name",
-			"shipping_company",
-			"shipping_address_1",
-			"shipping_address_2",
-			"shipping_city",
-			"shipping_state",
-			"shipping_postcode",
-			"shipping_country",
-		);
+	// User meta data
+	static $user_data_titles = array (
+		"billing_first_name",
+		"billing_last_name",
+		"billing_company",
+		"billing_address_1",
+		"billing_address_2",
+		"billing_city",
+		"billing_state",
+		"billing_postcode",
+		"billing_country",
+		"billing_email",
+		"billing_phone",
+		"shipping_first_name",
+		"shipping_last_name",
+		"shipping_company",
+		"shipping_address_1",
+		"shipping_address_2",
+		"shipping_city",
+		"shipping_state",
+		"shipping_postcode",
+		"shipping_country",
+	);
 
-		$this->order_item_meta_fields = array (
-			"recurring_line_total",
-			"recurring_line_tax",
-			"recurring_line_subtotal",
-			"recurring_line_subtotal_tax",
-			"line_subtotal",
-			"line_total",
-			"line_tax",
-			"line_subtotal_tax",
-		);
-	}
+	static $order_item_meta_fields = array (
+		"recurring_line_total",
+		"recurring_line_tax",
+		"recurring_line_subtotal",
+		"recurring_line_subtotal_tax",
+		"line_subtotal",
+		"line_total",
+		"line_tax",
+		"line_subtotal_tax",
+	);
 
 	/**
 	 *
 	 * @since 1.0
 	 */
-	function import_data( $file, $mapped_fields, $file_pointer_start_position, $file_pointer_end_position, $starting_row_num, $test_mode, $email_customer ) {
-		global $woocommerce;
-		$file_path = addslashes( $file );
-		$this->mapped_fields = $mapped_fields;
-		$this->file_pointer_start_position = $file_pointer_start_position;
-		$this->file_pointer_end_position = $file_pointer_end_position;
-		$this->starting_row_number = $starting_row_num;
-		$this->test_mode = ( $test_mode == 'true' ) ? true : false;
-		$this->email_customer = ( $email_customer == 'true' ) ? true : false;
-		$this->import_start( $file_path );
-		return $this->results;
+	public static function import_data( $file_path, $mapped_fields, $file_pointer_start_position, $file_pointer_end_position, $starting_row_num, $test_mode, $email_customer ) {
+		$file_path = addslashes( $file_path );
+		self::$mapped_fields = $mapped_fields;
+		self::$file_pointer_start_position = $file_pointer_start_position;
+		self::$file_pointer_end_position = $file_pointer_end_position;
+		self::$starting_row_number = $starting_row_num;
+		self::$test_mode = ( $test_mode == 'true' ) ? true : false;
+		self::$email_customer = ( $email_customer == 'true' ) ? true : false;
+
+		self::import_start( $file_path );
+		return self::$results;
 	}
 
 	/**
-	 * Loads the csv file contents into the class variable $this->file
+	 * Loads the csv file contents into the class variable self::$file
 	 *
 	 * @since 1.0
 	 */
-	function import_start( $file ) {
-		$enc = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
-		if ( $enc ) setlocale( LC_ALL, 'en_US.' . $enc );
+	public static function import_start( $file_path ) {
+		$file_encoding = mb_detect_encoding( $file_path, 'UTF-8, ISO-8859-1', true );
+		if ( $file_encoding ) setlocale( LC_ALL, 'en_US.' . $file_encoding );
 		@ini_set( 'auto_detect_line_endings', true );
 
-		if ( $file ) {
-			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
-				$row = array();
-				$header = fgetcsv( $handle, 0 );
+		if ( $file_path ) {
+			if ( ( $file_handle = fopen( $file_path, "r" ) ) !== FALSE ) {
+				$subscription_details = array();
+				$column_headers = fgetcsv( $file_handle, 0 );
 
-				if( $this->file_pointer_start_position != 0 ) {
-					fseek( $handle, $this->file_pointer_start_position );
+				if ( self::$file_pointer_start_position != 0 ) {
+					fseek( $file_handle, self::$file_pointer_start_position );
 				}
 
-				while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== false ) {
-					foreach ( $header as $key => $heading ) {
-						if ( ! $heading ) continue;
-						$s_heading = strtolower( $heading );
-						$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? trim( $this->format_data_from_csv( $postmeta[$key], $enc ) ) : '';
+				while ( ( $csv_row = fgetcsv( $file_handle, 0 ) ) !== false ) {
+
+					foreach ( $column_headers as $key => $header ) {
+						if ( ! $header ) {
+							continue;
+						}
+						$header = strtolower( $header );
+						$subscription_details[ $header ] = ( isset( $csv_row[ $key ] ) ) ? trim( self::format_data_from_csv( $csv_row[ $key ], $file_encoding ) ) : '';
 					}
 
-					// will move to just sending $row instead of listing all these variables
-					$this->starting_row_number++;
-					$this->import( $row );
-					if( ftell( $handle ) >= $this->file_pointer_end_position ) {
+					// will move to just sending $subscription_details instead of listing all these variables
+					self::$starting_row_number++;
+
+					self::import_subscription( $subscription_details );
+					if( ftell( $file_handle ) >= self::$file_pointer_end_position ) {
 						break;
 					}
 				}
-			fclose( $handle );
+				fclose( $file_handle );
 			}
 		}
 	}
@@ -139,8 +141,8 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	public static function format_data_from_csv( $data, $enc ) {
-		return ( $enc == 'UTF-8' ) ? $data : utf8_encode( $data );
+	public static function format_data_from_csv( $data, $file_encoding ) {
+		return ( $file_encoding == 'UTF-8' ) ? $data : utf8_encode( $data );
 	}
 
 	/**
@@ -148,90 +150,88 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	function import( $row ) {
+	private static function import( $subscription_details ) {
 		$download_permissions_granted = false;
-		$postmeta = array();
-		$subscription = array();
-		$subscription['warning'] = $subscription['error'] = array();
-		// Check Product id a woocommerce product
+		$order_meta = array();
+		$result['warning'] = $result['error'] = array();
 
-		if( empty( $this->mapped_fields['product_id'] ) || ! ( $this->check_product( $row[$this->mapped_fields['product_id']] ) ) ) {
-			$subscription['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
+		// Check Product id a woocommerce product
+		if( empty( self::$mapped_fields['product_id'] ) || ! ( self::check_product( $subscription_details[self::$mapped_fields['product_id']] ) ) ) {
+			$result['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
 		}
 
 		// Check customer id is valid or create one
-		$cust_id = $this->check_customer( $row );
-		if ( empty( $cust_id ) ) {
-			// Error with customer information in line of csv
-			$subscription['error'][] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
+		$user_id = self::check_customer( $subscription_details );
+		if ( empty( $user_id ) ) {
+			$result['error'][] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
 		} else {
-			$customer = get_user_by( 'id', $cust_id );
-			$subscription['user_id'] = $customer->ID;
-			$subscription['username'] = $customer->user_login;
+			$customer = get_user_by( 'id', $user_id );
+			$result['user_id'] = $customer->ID;
+			$result['username'] = $customer->user_login;
 		}
 
 		// skip importing rows without the required information
-		if( ! empty( $subscription['error'] ) ) {
-			$subscription['status'] = 'failed';
-			$subscription['row_number'] = $this->starting_row_number;
-			array_push( $this->results, $subscription );
+		if( ! empty( $result['error'] ) ) {
+			$result['status'] = 'failed';
+			$result['row_number'] = self::$starting_row_number;
+			array_push( self::$results, $result );
 			return;
 		}
 
 		// Get product object - checked validity @ L141
-		$_product = get_product( $row[$this->mapped_fields['product_id']] );
-		$subscription['item'] = $_product->get_title();
+		$_product = get_product( $subscription_details[self::$mapped_fields['product_id']] );
+		$result['item'] = $_product->get_title();
 
-		$missing_ship_addr = $missing_bill_addr = array();
+		$missing_shipping_addresses = $missing_billing_addresses = array();
 
 		// populate order meta data
-		foreach( $this->order_meta_fields as $column ) {
+		foreach( self::$order_meta_fields as $column ) {
 			switch( $column ) {
 				case 'shipping_method':
-					$method = ( ! empty( $row[$this->mapped_fields['shipping_method']] ) ) ? $row[$this->mapped_fields['shipping_method']] : '';
-					$title = ( ! empty( $row[$this->mapped_fields['shipping_method_title']] ) ) ? $row[$this->mapped_fields['shipping_method_title']] : '';
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $method );
-					$postmeta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
-					$postmeta[] = array( 'key' => '_recurring_shipping_method', 'value' => $method );
-					$postmeta[] = array( 'key' => '_recurring_shipping_method_title', 'value' => $title );
+					$method = ( ! empty( $subscription_details[self::$mapped_fields['shipping_method']] ) ) ? $subscription_details[self::$mapped_fields['shipping_method']] : '';
+					$title = ( ! empty( $subscription_details[self::$mapped_fields['shipping_method_title']] ) ) ? $subscription_details[self::$mapped_fields['shipping_method_title']] : '';
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $method );
+					$order_meta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
+					$order_meta[] = array( 'key' => '_recurring_shipping_method', 'value' => $method );
+					$order_meta[] = array( 'key' => '_recurring_shipping_method_title', 'value' => $title );
 					if( empty( $method ) || empty( $title ) ) {
 						// set up warning message to show admin -  Do i need be more specific??
-						$subscription['warning'][] = __( 'Shipping method and/or title for the order has been set to empty. ', 'wcs-importer' );
+						$result['warning'][] = __( 'Shipping method and/or title for the order has been set to empty. ', 'wcs-importer' );
 					}
 					break;
 				case 'order_shipping':
-					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
-					$postmeta[] = array( 'key' => '_order_recurring_shipping_total', 'value' => $value );
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : '';
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[] = array( 'key' => '_order_recurring_shipping_total', 'value' => $value );
 					break;
 				case 'order_shipping_tax':
-					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
-					$postmeta[] = array( 'key' => '_order_recurring_shipping_tax_total', 'value' => $value );
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : '';
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[] = array( 'key' => '_order_recurring_shipping_tax_total', 'value' => $value );
 					break;
 				case 'payment_method':
-					if( strtolower( $row[$this->mapped_fields[$column]] ) == 'paypal' && ! empty( $row[$this->mapped_fields['paypal_subscriber_id']] ) ) {
+					if( strtolower( $subscription_details[self::$mapped_fields[$column]] ) == 'paypal' && ! empty( $subscription_details[self::$mapped_fields['paypal_subscriber_id']] ) ) {
 						// Paypal
-						$paypal_sub_id = $row[$this->mapped_fields['paypal_subscriber_id']];
-						$title = ( ! empty( $row[$this->mapped_fields['payment_method_title']] ) ) ? $row[$this->mapped_fields['payment_method_title']] : 'Paypal Transfer';
-						$postmeta[] = array( 'key' => '_' . $column, 'value' => 'paypal' );
-						$postmeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
-						$postmeta[] = array( 'key' => '_recurring_payment_method', 'value' => 'paypal' );
-						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
-						$postmeta[] = array( 'key' => '_paypal_subscriber_id', 'value' => $paypal_sub_id );
-					} else if( strtolower( $row[$this->mapped_fields[$column]] ) == 'stripe' && ! empty( $row[$this->mapped_fields['stripe_customer_id']] ) ) {
+						$paypal_sub_id = $subscription_details[self::$mapped_fields['paypal_subscriber_id']];
+						$title = ( ! empty( $subscription_details[self::$mapped_fields['payment_method_title']] ) ) ? $subscription_details[self::$mapped_fields['payment_method_title']] : 'Paypal Transfer';
+						$order_meta[] = array( 'key' => '_' . $column, 'value' => 'paypal' );
+						$order_meta[] = array( 'key' => '_payment_method_title', 'value' => $title );
+						$order_meta[] = array( 'key' => '_recurring_payment_method', 'value' => 'paypal' );
+						$order_meta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
+						$order_meta[] = array( 'key' => '_paypal_subscriber_id', 'value' => $paypal_sub_id );
+					} else if( strtolower( $subscription_details[self::$mapped_fields[$column]] ) == 'stripe' && ! empty( $subscription_details[self::$mapped_fields['stripe_customer_id']] ) ) {
 						// Stripe
-						$stripe_cust_id = $row[$this->mapped_fields['stripe_customer_id']];
-						$title = ( ! empty( $row[$this->mapped_fields['payment_method_title']] ) ) ? $row[$this->mapped_fields['payment_method_title']] : 'Stripe Transfer';
+						$stripe_cust_id = $subscription_details[self::$mapped_fields['stripe_customer_id']];
+						$title = ( ! empty( $subscription_details[self::$mapped_fields['payment_method_title']] ) ) ? $subscription_details[self::$mapped_fields['payment_method_title']] : 'Stripe Transfer';
 						// $stripe_cust_id will be checked before this point to make sure it's not null
-						$postmeta[] = array( 'key' => '_' . $column, 'value' => 'stripe' );
-						$postmeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
-						$postmeta[] = array( 'key' => '_recurring_payment_method', 'value' => 'stripe' );
-						$postmeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
-						$postmeta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
+						$order_meta[] = array( 'key' => '_' . $column, 'value' => 'stripe' );
+						$order_meta[] = array( 'key' => '_payment_method_title', 'value' => $title );
+						$order_meta[] = array( 'key' => '_recurring_payment_method', 'value' => 'stripe' );
+						$order_meta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
+						$order_meta[] = array( 'key' => '_stripe_customer_id', 'value' => $stripe_cust_id );
 					} else { // default to manual payment regardless
-						$postmeta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
-						$subscription['warning'][] = __( 'No recognisable payment method has been specified. Defaulting to manual recurring payments. ', 'wcs-importer' );
+						$order_meta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
+						$result['warning'][] = __( 'No recognisable payment method has been specified. Defaulting to manual recurring payments. ', 'wcs-importer' );
 					}
 					break;
 				case 'shipping_addresss_1':
@@ -239,82 +239,82 @@ class WCS_Import_Parser {
 				case 'shipping_postcode':
 				case 'shipping_state':
 				case 'shipping_country':
-					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : '';
 					if( empty( $value ) ) {
-						$metadata = get_user_meta( $cust_id, $column );
+						$metadata = get_user_meta( $user_id, $column );
 						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
 					}
 					if( empty( $value ) ) {
-						$missing_ship_addr[] = $column;
+						$missing_shipping_addresses[] = $column;
 					}
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				case 'billing_addresss_1':
 				case 'billing_city':
 				case 'billing_postcode':
 				case 'billing_state':
 				case 'billing_country':
-					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : '';
 					if( empty( $value ) ) {
-						$metadata = get_user_meta( $cust_id, $column );
+						$metadata = get_user_meta( $user_id, $column );
 						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
 					}
 					if( empty( $value ) ) {
-						$missing_bill_addr[] = $column;
+						$missing_billing_addresses[] = $column;
 					}
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				case 'customer_user':
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $cust_id );
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $user_id );
 					break;
 				case 'order_total':
 				case 'order_recurring_total':
-					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : $_product->subscription_price;
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : $_product->subscription_price;
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				case 'order_discount':
-					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
-					$postmeta[] = array( 'key' => '_order_recurring_discount_total', 'value' => $value );
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : '';
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[] = array( 'key' => '_order_recurring_discount_total', 'value' => $value );
 					break;
 				case 'cart_discount':
-					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
-					$postmeta[] = array( 'key' => '_order_recurring_discount_cart', 'value' => $value );
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : '';
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[] = array( 'key' => '_order_recurring_discount_cart', 'value' => $value );
 					break;
 				case 'order_tax':
-					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
-					$postmeta[] = array( 'key' => '_order_recurring_tax_total', 'value' => $value );
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : '';
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[] = array( 'key' => '_order_recurring_tax_total', 'value' => $value );
 					break;
 				default:
-					$value = ( ! empty( $row[$this->mapped_fields[$column]] ) ) ? $row[$this->mapped_fields[$column]] : '';
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : '';
 					if( empty( $value ) ) {
-						$metadata = get_user_meta( $cust_id, $column );
+						$metadata = get_user_meta( $user_id, $column );
 						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
 					}
-					$postmeta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
 			}
 		}
-		if( ! empty( $missing_ship_addr ) ) {
-			$subscription['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim( implode(', ', $missing_ship_addr ), ',' ) . '. ', 'wcs-importer' );
+		if( ! empty( $missing_shipping_addresses ) ) {
+			$result['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-importer' );
 		}
-		if ( ! empty( $missing_bill_addr ) ) {
-			$subscription['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_bill_addr ), ',' ) . '. ', 'wcs-importer' );
+		if ( ! empty( $missing_billing_addresses ) ) {
+			$result['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-importer' );
 		}
 
 		// Check and set download permissions boolean, will run in test-mode
-		$download_permission = ( ! empty ( $row[$this->mapped_fields['download_permission_granted']] ) ) ? strtolower( $row[$this->mapped_fields['download_permission_granted']] ) : '';
+		$download_permission = ( ! empty ( $subscription_details[self::$mapped_fields['download_permission_granted']] ) ) ? strtolower( $subscription_details[self::$mapped_fields['download_permission_granted']] ) : '';
 		if( strcmp( $download_permission, 'true' ) == 0 || strcmp( $download_permission, 'yes' ) == 0 ) {
 			$download_permissions_granted = true;
 			if( get_option( 'woocommerce_downloads_grant_access_after_payment' ) == 'no' ) {
-				$subscription['warning'][] = __( 'Download permissions cannot be granted because your current WooCommerce settings have disabled this feature.', 'wcs-importer' );
+				$result['warning'][] = __( 'Download permissions cannot be granted because your current WooCommerce settings have disabled this feature.', 'wcs-importer' );
 				$download_permissions_granted = false;
 			}
 		}
 
 		// Skip this section when testing the importer for errors and/or warnings
-		if( ! $this->test_mode ) {
+		if( ! self::$test_mode ) {
 			$order_data = array(
 					'post_date'     => date( 'Y-m-d H:i:s', time() ),
 					'post_type'     => 'shop_order',
@@ -350,8 +350,8 @@ class WCS_Import_Parser {
 				wc_add_order_item_meta( $item_id, '_variation_id', ( ! empty ($_product->variation_id ) ) ? $_product->variation_id : '');
 
 				// add the additional subscription meta data to the order
-				foreach( $this->order_item_meta_fields as $metadata ) {
-					$value = ( ! empty( $row[$this->mapped_fields[$metadata]] ) ) ? $row[$this->mapped_fields[$metadata]] : 0;
+				foreach( self::$order_item_meta_fields as $metadata ) {
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$metadata]] ) ) ? $subscription_details[self::$mapped_fields[$metadata]] : 0;
 					wc_add_order_item_meta( $item_id, '_' . $metadata, $value );
 				}
 
@@ -367,22 +367,26 @@ class WCS_Import_Parser {
 
 				// Update the subscription meta data with values in $subscription_meta
 				$subscription_meta = array (
-						'start_date' 	=> ( ! empty( $row[$this->mapped_fields['subscription_start_date']] ) ) ? $row[$this->mapped_fields['subscription_start_date']] : date('m/d/y'),
-						'expiry_date'	=> ( ! empty( $row[$this->mapped_fields['subscription_expiry_date']] ) ) ? $row[$this->mapped_fields['subscription_expiry_date']] : '',
-						'end_date'		=> ( ! empty( $row[$this->mapped_fields['subscription_end_date']] ) ) ? $row[$this->mapped_fields['subscription_end_date']] : '',
+						'start_date' 	=> ( ! empty( $subscription_details[self::$mapped_fields['subscription_start_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_start_date']] : date('m/d/y'),
+						'expiry_date'	=> ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_expiry_date']] : '',
+						'end_date'		=> ( ! empty( $subscription_details[self::$mapped_fields['subscription_end_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_end_date']] : '',
 				);
 
 				$_POST['order_id'] = $order_id;
+
 				WC_Subscriptions_Order::prefill_order_item_meta( Array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
-				// Create pening Subscription
+
+				// Create pending Subscription
 				WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
+
 				// Update the status of the subscription order
-				if( ! empty( $this->mapped_fields['subscription_status'] ) && $row[$this->mapped_fields['subscription_status']] ) {
-					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $row[$this->mapped_fields['subscription_status']] ) );
+				if( ! empty( self::$mapped_fields['subscription_status'] ) && $subscription_details[self::$mapped_fields['subscription_status']] ) {
+					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $subscription_details[self::$mapped_fields['subscription_status']] ) );
 				} else {
 					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
-					$subscription['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
+					$result['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
 				}
+
 				// Add additional subscription meta data
 				$sub_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
 				WC_Subscriptions_Manager::update_subscription( $sub_key, $subscription_meta );
@@ -394,29 +398,29 @@ class WCS_Import_Parser {
 			add_action( 'woocommerce_order_status_pending_to_completed_notification', array( WC()->mailer()->emails['WC_Email_New_Order'], 'trigger' ) );
 			add_action( 'woocommerce_order_status_completed_notification', array( WC()->mailer()->emails['WC_Email_Customer_Completed_Order'], 'trigger' ) );
 
-			$subscription['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
+			$result['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
+
 			// Check if the subscription has been successfully added
 			$key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
-			$subscription_check = WC_Subscriptions_Manager::get_subscription( $key );
+			$subscription = WC_Subscriptions_Manager::get_subscription( $key );
 
-			if( ! empty ( $subscription_check['order_id'] ) && ! empty ( $subscription_check['product_id'] ) ) {
-				// successfully added subscription
-				// Attach information on each order to the results array
-				$subscription['status'] = 'success';
-				$subscription['order'] = $subscription_check['order_id'];
-				$subscription['subscription_status'] = $subscription_check['status'];
-				$subscription['item_id'] = ( ! empty ( $subscription_check['variation_id'] ) ) ? $subscription_check['variation_id'] : $subscription_check['product_id'];
-				array_push( $this->results, $subscription );
+			// Successfully added subscription. Attach information on each order to the results array.
+			if( ! empty ( $subscription['order_id'] ) && ! empty ( $subscription['product_id'] ) ) {
+				$result['status'] = 'success';
+				$result['order'] = $subscription['order_id'];
+				$result['subscription_status'] = $subscription['status'];
+				$result['item_id'] = ( ! empty ( $subscription['variation_id'] ) ) ? $subscription['variation_id'] : $subscription['product_id'];
+				array_push( self::$results, $result );
 			} else {
-				$subscription['status'] = 'failed';
-				array_push( $this->results, $subscription );
+				$result['status'] = 'failed';
+				array_push( self::$results, $result );
 			}
 		} else {
-			if( empty( $this->mapped_fields['subscription_status'] ) && empty( $row[$this->mapped_fields['subscription_status']] ) ) {
-				$subscription['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
+			if( empty( self::$mapped_fields['subscription_status'] ) && empty( $subscription_details[self::$mapped_fields['subscription_status']] ) ) {
+				$result['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
 			}
-			$subscription['row_number'] = $this->starting_row_number;
-			array_push( $this->results, $subscription );
+			$result['row_number'] = self::$starting_row_number;
+			array_push( self::$results, $result );
 		}
 	}
 
@@ -425,9 +429,9 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	function check_product( $product_id ) {
+	public static function check_product( $product_id ) {
 		$is_subscription = WC_Subscriptions_Product::is_subscription( $product_id );
-		return ( empty( $is_subscription) ) ? false : true;
+		return ( empty( $is_subscription ) ) ? false : true;
 	}
 
 	/**
@@ -435,11 +439,19 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	function check_customer( $row ) {
-		$customer_email = ( ! empty ( $row[$this->mapped_fields['customer_email']] ) ) ? $row[$this->mapped_fields['customer_email']] : '';
-		$username = ( ! empty ( $row[$this->mapped_fields['customer_username']] ) ) ? $row[$this->mapped_fields['customer_username']] : '';
-		$customer_id = ( ! empty( $row[$this->mapped_fields['customer_id']] ) ) ? $row[$this->mapped_fields['customer_id']] : '';
-		$password = ( ! empty( $row[$this->mapped_fields['customer_password']] ) ) ? $row[$this->mapped_fields['customer_password']] : wp_generate_password( 12, true );
+	public static function check_customer( $subscription_details ) {
+		$customer_email = ( ! empty ( $subscription_details[self::$mapped_fields['customer_email']] ) ) ? $subscription_details[self::$mapped_fields['customer_email']] : '';
+		$username = ( ! empty ( $subscription_details[self::$mapped_fields['customer_username']] ) ) ? $subscription_details[self::$mapped_fields['customer_username']] : '';
+		$customer_id = ( ! empty( $subscription_details[self::$mapped_fields['customer_id']] ) ) ? $subscription_details[self::$mapped_fields['customer_id']] : '';
+		$password = ( ! empty( $subscription_details[self::$mapped_fields['customer_password']] ) ) ? $subscription_details[self::$mapped_fields['customer_password']] : wp_generate_password( 12, true );
+
+		if ( ! empty( $subscription_details[self::$mapped_fields['customer_password']] ) ) {
+			$password = $subscription_details[self::$mapped_fields['customer_password']];
+			$password_generated = false;
+		} else {
+			$password = wp_generate_password( 12, true );
+			$password_generated = true;
+		}
 
 		$found_customer = false;
 		if( empty( $customer_id ) ) {
@@ -457,15 +469,15 @@ class WCS_Import_Parser {
 			if( ! $found_customer && is_email( $customer_email ) && ! empty( $username ) ) {
 				$found_customer = wp_create_user( $username, $password, $customer_email );
 				// update user meta data
-				foreach( $this->user_data_titles as $key ) {
+				foreach( self::$user_data_titles as $key ) {
 					switch( $key ) {
 						case 'billing_email':
 							// user billing email if set in csv otherwise use the user's account email
-							$meta_value = ( ! empty( $row[$this->mapped_fields[$key]] ) ) ? $row[$this->mapped_fields[$key]] : $customer_email;
+							$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $customer_email;
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
 						case 'billing_first_name':
-							$meta_value = ( ! empty( $row[$this->mapped_fields[$key]] ) ) ? $row[$this->mapped_fields[$key]] : $username;
+							$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $username;
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
 						case 'shipping_addresss_1':
@@ -475,15 +487,15 @@ class WCS_Import_Parser {
 						case 'shipping_state':
 						case 'shipping_country':
 							// Set the shipping address fields to match the billing fields if not specified in CSV
-							$meta_value = ( ! empty( $row[$this->mapped_fields[$key]] ) ) ? $row[$this->mapped_fields[$key]] : '';
+							$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
 							if( empty ( $meta_value ) ) {
 								$n_key = str_replace( "shipping", "billing", $key );
-								$meta_value = ( ! empty( $row[ $this->mapped_fields[$n_key]] ) ) ? $row[$this->mapped_fields[$n_key]] : '';
+								$meta_value = ( ! empty( $subscription_details[ self::$mapped_fields[$n_key]] ) ) ? $subscription_details[self::$mapped_fields[$n_key]] : '';
 							}
 							update_user_meta( $found_customer, $key, $meta_value );
 							break;
 						default:
-							$meta_value = ( ! empty( $row[$this->mapped_fields[$key]] ) ) ? $row[$this->mapped_fields[$key]] : '';
+							$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
 							update_user_meta( $found_customer, $key, $meta_value );
 					}
 				}
@@ -492,8 +504,8 @@ class WCS_Import_Parser {
 				WC_Subscriptions_Manager::make_user_inactive( $found_customer );
 
 				// send user registration email if admin as chosen to do so
-				if( $this->email_customer && function_exists( 'wp_new_user_notification' ) ) {
-					wp_new_user_notification( $found_customer, $password );
+				if( self::$email_customer && function_exists( 'wp_new_user_notification' ) ) {
+					do_action( 'woocommerce_created_customer', $found_customer, $password, $password_generated );
 				}
 			}
 			return $found_customer;
