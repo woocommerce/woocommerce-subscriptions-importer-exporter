@@ -134,8 +134,6 @@ jQuery(document).ready(function($){
 					}
 					$('#wcs-importer_test_warnings td').append( results_text );
 
-					$('input[name="file_id"]').val( wcs_script_data.file_id );
-					$('input[name="file_url"]').val( file_url );
 					check_completed();
 				}
 			}
