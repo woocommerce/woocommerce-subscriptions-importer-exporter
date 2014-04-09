@@ -417,7 +417,7 @@ class WCS_Import_Parser {
 				WC_Subscriptions_Manager::update_subscription( $subscription_key, $subscription_meta );
 
 				if ( ! empty ( $subscription_meta['expiry_date'] ) ) {
-					if ( strtotime( $subscription_meta['expiry_date'] ) > gmdate( 'U' ) ) {
+					if ( strtotime( $subscription_meta['expiry_date'] ) <= gmdate( 'U' ) ) {
 						WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'expired' );
 					} else {
 						// We also need to manually schedule the expiration date due to data duplication issues with Subscriptions
