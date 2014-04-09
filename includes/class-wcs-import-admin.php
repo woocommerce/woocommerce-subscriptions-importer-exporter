@@ -438,7 +438,7 @@ class WCS_Admin_Importer {
 					<tr id="wcs-importer_test_warnings"><th><?php _e( 'Warnings', 'wcs-importer' ); ?>:</th><td></td></tr>
 				</tbody>
 			</table>
-			<div id="wcs-completed-message">
+			<div id="wcs-completed-message" style="display: none;">
 				<p><?php _e( 'Test Finished!', 'wcs-importer' );?></p>
 				<a class="button" href="<?php echo esc_attr( wp_nonce_url( $action, 'import-upload' ) ); ?> "><?php _e( 'Run Import' , 'wcs-importer' ); ?></a>
 			</div>
@@ -462,7 +462,7 @@ class WCS_Admin_Importer {
 				</tfoot>
 				<tbody></tbody>
 			</table>
-			<p id="wcs-completed-message">
+			<p id="wcs-completed-message" style="display: none;">
 				<?php printf( __( 'Import Complete! %sView Subscriptions%s, %sView Orders%s or %sImport another file%s.', 'wcs-importer' ), '<a href="' . admin_url( 'admin.php?page=subscriptions' ) . '">', '</a>', '<a href="' . admin_url( 'edit.php?post_type=shop_order' ) . '">', '</a>', '<a href="' . $this->admin_url . '">', '</a>' ); ?>
 			</p>
 		<?php endif;
