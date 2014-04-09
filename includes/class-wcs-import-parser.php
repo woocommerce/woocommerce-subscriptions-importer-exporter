@@ -170,7 +170,7 @@ class WCS_Import_Parser {
 		$user_id = self::check_customer( $subscription_details );
 		if ( empty( $user_id ) ) {
 			$result['error'][] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
-		} else {
+		} elseif ( ! self::$test_mode ) {
 			$customer = get_user_by( 'id', $user_id );
 			$result['user_id'] = $customer->ID;
 			$result['username'] = $customer->user_login;
@@ -488,59 +488,68 @@ class WCS_Import_Parser {
 				$found_customer = username_exists( $username );
 			}
 
-			// try creating a customer from email, username and address information
 			if( ! $found_customer && is_email( $customer_email ) ) {
 
-				if ( empty( $username ) ) {
-					$maybe_username = explode( '@', $customer_email );
-					$maybe_username = sanitize_user( $maybe_username[0] );
-					$counter = 1;
-					$username = $maybe_username;
-					while ( username_exists( $username ) ) {
-						$username = $maybe_username . $counter;
-						$counter++;
+				// In test mode, we just want to know if a user account can be created - as we have a valid email address, it can be.
+				if ( self::$test_mode ) {
+
+					$found_customer = true;
+
+				} else {
+
+					// Not in test mode, create a user account for this email
+					if ( empty( $username ) ) {
+						$maybe_username = explode( '@', $customer_email );
+						$maybe_username = sanitize_user( $maybe_username[0] );
+						$counter = 1;
+						$username = $maybe_username;
+						while ( username_exists( $username ) ) {
+							$username = $maybe_username . $counter;
+							$counter++;
+						}
 					}
-				}
 
-				$found_customer = wp_create_user( $username, $password, $customer_email );
-				// update user meta data
-				foreach( self::$user_data_titles as $key ) {
-					switch( $key ) {
-						case 'billing_email':
-							// user billing email if set in csv otherwise use the user's account email
-							$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $customer_email;
-							update_user_meta( $found_customer, $key, $meta_value );
-							break;
-						case 'billing_first_name':
-							$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $username;
-							update_user_meta( $found_customer, $key, $meta_value );
-							break;
-						case 'shipping_addresss_1':
-						case 'shipping_address_2':
-						case 'shipping_city':
-						case 'shipping_postcode':
-						case 'shipping_state':
-						case 'shipping_country':
-							// Set the shipping address fields to match the billing fields if not specified in CSV
-							$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
-							if( empty ( $meta_value ) ) {
-								$n_key = str_replace( "shipping", "billing", $key );
-								$meta_value = ( ! empty( $subscription_details[ self::$mapped_fields[$n_key]] ) ) ? $subscription_details[self::$mapped_fields[$n_key]] : '';
-							}
-							update_user_meta( $found_customer, $key, $meta_value );
-							break;
-						default:
-							$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
-							update_user_meta( $found_customer, $key, $meta_value );
+					$found_customer = wp_create_user( $username, $password, $customer_email );
+
+					// update user meta data
+					foreach( self::$user_data_titles as $key ) {
+						switch( $key ) {
+							case 'billing_email':
+								// user billing email if set in csv otherwise use the user's account email
+								$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $customer_email;
+								update_user_meta( $found_customer, $key, $meta_value );
+								break;
+							case 'billing_first_name':
+								$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $username;
+								update_user_meta( $found_customer, $key, $meta_value );
+								break;
+							case 'shipping_addresss_1':
+							case 'shipping_address_2':
+							case 'shipping_city':
+							case 'shipping_postcode':
+							case 'shipping_state':
+							case 'shipping_country':
+								// Set the shipping address fields to match the billing fields if not specified in CSV
+								$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
+								if( empty ( $meta_value ) ) {
+									$n_key = str_replace( "shipping", "billing", $key );
+									$meta_value = ( ! empty( $subscription_details[ self::$mapped_fields[$n_key]] ) ) ? $subscription_details[self::$mapped_fields[$n_key]] : '';
+								}
+								update_user_meta( $found_customer, $key, $meta_value );
+								break;
+							default:
+								$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
+								update_user_meta( $found_customer, $key, $meta_value );
+						}
 					}
-				}
 
-				// sets all new user's roles to the value set as default_inactive_role
-				WC_Subscriptions_Manager::make_user_inactive( $found_customer );
+					// sets all new user's roles to the value set as default_inactive_role
+					WC_Subscriptions_Manager::make_user_inactive( $found_customer );
 
-				// send user registration email if admin as chosen to do so
-				if( self::$email_customer && function_exists( 'wp_new_user_notification' ) ) {
-					do_action( 'woocommerce_created_customer', $found_customer, $password, $password_generated );
+					// send user registration email if admin as chosen to do so
+					if( self::$email_customer && function_exists( 'wp_new_user_notification' ) ) {
+						do_action( 'woocommerce_created_customer', $found_customer, $password, $password_generated );
+					}
 				}
 			}
 			return $found_customer;
