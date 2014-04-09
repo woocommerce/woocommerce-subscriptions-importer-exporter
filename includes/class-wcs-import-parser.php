@@ -452,12 +452,21 @@ class WCS_Import_Parser {
 			$password_generated = true;
 		}
 
+//		error_log( '###### ###### ###### ###### ######' );
+//		error_log( '###### In ' . __FUNCTION__ );
+//		error_log( '###### $customer_email = ' . $customer_email );
+//		error_log( '###### $username = ' . $username );
+//		error_log( '###### $customer_id = ' . $customer_id );
+//		error_log( '###### $password = ' . $password );
+
 		$found_customer = false;
+
 		if( empty( $customer_id ) ) {
+
 			// check for registered email if customer id is not set
 			if( ! $found_customer && is_email( $customer_email ) ) {
-					// check by email
-					$found_customer = email_exists( $customer_email );
+				$found_customer = email_exists( $customer_email );
+
 			// if customer still not found, check by username
 			}
 			if( ! $found_customer && ! empty( $username ) ) {
