@@ -602,6 +602,9 @@ class WCS_Admin_Importer {
 
 		@set_time_limit(0);
 
+		// Requests to admin-ajax.php use the front-end memory limit, we want to use the admin (i.e. max) memory limit
+		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
+
 		if( isset( $_POST['file_id'] ) && isset( $_POST['row_num'] ) ) {
 			$file_path          = get_attached_file( absint( $_POST['file_id'] ) );
 			$mapped_fields      = get_post_meta( absint( $_POST['file_id'] ), '_mapped_rules', true );
