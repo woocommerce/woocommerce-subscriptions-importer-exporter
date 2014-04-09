@@ -23,7 +23,7 @@ jQuery(document).ready(function($){
 			file_id:	wcs_script_data.file_id,
 			start:		start_pos,
 			end:		end_pos,
-			row_num:	row_start
+			row_num:	row_start,
 			test_mode:	wcs_script_data.test_mode,
 			email_customer:	wcs_script_data.email_customer,
 		}
