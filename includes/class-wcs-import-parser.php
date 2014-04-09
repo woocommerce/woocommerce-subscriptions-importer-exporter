@@ -337,7 +337,7 @@ class WCS_Import_Parser {
 					'post_date'     => $start_date,
 					'post_date_gmt' => $start_date_gmt,
 					'post_type'     => 'shop_order',
-					'post_title'    => 'Order &ndash; ' . date( 'F j, Y @ h:i A', current_time( 'timestamp' ) ),
+					'post_title' 	=> sprintf( __( 'Order &ndash; %s', 'wcs-importer' ), strftime( _x( '%b %d, %Y @ %I:%M %p', 'Order date parsed by strftime', 'wcs-importer' ) ) ),
 					'post_status'   => 'publish',
 					'ping_status'   => 'closed',
 					'post_author'   => 1,
