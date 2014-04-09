@@ -395,17 +395,15 @@ class WCS_Import_Parser {
 
 				// Update the subscription meta data with values in $subscription_meta
 				$subscription_meta = array (
-						'start_date'    => $start_date_gmt,
-						'expiry_date'	=> ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_expiry_date']] : '',
-						'end_date'		=> ( ! empty( $subscription_details[self::$mapped_fields['subscription_end_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_end_date']] : '',
+						'start_date'         => $start_date_gmt,
+						'expiry_date'        => ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_expiry_date']] : '',
+						'end_date'           => ( ! empty( $subscription_details[self::$mapped_fields['subscription_end_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_end_date']] : '',
+						'completed_payments' => array( $start_date_gmt ),
 				);
 
 				$_POST['order_id'] = $order_id;
 
-				WC_Subscriptions_Order::prefill_order_item_meta( Array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
-
-				// Create pending Subscription
-				WC_Subscriptions_Manager::create_pending_subscription_for_order( $order_id, $_product->id, $subscription_meta );
+				WC_Subscriptions_Order::prefill_order_item_meta( array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
 
 				// Update the status of the subscription order
 				if( ! empty( self::$mapped_fields['subscription_status'] ) && $subscription_details[self::$mapped_fields['subscription_status']] ) {
@@ -420,8 +418,6 @@ class WCS_Import_Parser {
 			}
 
 			$result['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
-
-
 
 			// Check if the subscription has been successfully added
 			$subscription = WC_Subscriptions_Manager::get_subscription( $subscription_key );
