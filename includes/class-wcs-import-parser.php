@@ -415,6 +415,15 @@ class WCS_Import_Parser {
 
 				// Add additional subscription meta data
 				WC_Subscriptions_Manager::update_subscription( $subscription_key, $subscription_meta );
+
+				if ( ! empty ( $subscription_meta['expiry_date'] ) ) {
+					if ( strtotime( $subscription_meta['expiry_date'] ) > gmdate( 'U' ) ) {
+						WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'expired' );
+					} else {
+						// We also need to manually schedule the expiration date due to data duplication issues with Subscriptions
+						WC_Subscriptions_Manager::set_expiration_date( $subscription_key, '', $subscription_meta['expiry_date'] );
+					}
+				}
 			}
 
 			$result['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
