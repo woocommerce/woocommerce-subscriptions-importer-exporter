@@ -79,13 +79,9 @@ class WCS_Import_Parser {
 	);
 
 	static $supported_payment_gateways = array (
-		'paypal'            => 1,
-		'paypal_1'          => 'paypal_subscriber_id',
-		'stripe'            => 1,
-		'stripe_1'          => 'stripe_customer_id',
-		'authorize.net'     => 2,
-		'authorize.net_1'   => 'authorize_net_cim_profile_id',
-		'authorize.net_2'   => 'authorize_net_cim_payment_profile_id',
+		'paypal'            => array( 'paypal_subscriber_id' ),
+		'stripe'            => array( 'stripe_customer_id' ),
+		'authorize.net'     => array( 'authorize_net_cim_profile_id', 'authorize_net_cim_payment_profile_id' ),
 	);
 
 	/**
@@ -226,15 +222,14 @@ class WCS_Import_Parser {
 					$tmp_ordermeta = array();
 
 					if ( ! empty( $payment_method ) && array_key_exists( $payment_method, self::$supported_payment_gateways ) ) {
-						$meta_amount = self::$supported_payment_gateways[$payment_method];
 						$tmp_ordermeta[] = array( 'key' => '_' . $column, 'value' => $payment_method );
 						$tmp_ordermeta[] = array( 'key' => '_payment_method_title', 'value' => $title );
 						$tmp_ordermeta[] = array( 'key' => '_recurring_payment_method', 'value' => $payment_method );
 						$tmp_ordermeta[] = array( 'key' => '_recurring_payment_method_title', 'value' => $title );
-						for( $num = 1; $num <= $meta_amount; $num++ ) {
-							if( ! empty ( $subscription_details[self::$mapped_fields[self::$supported_payment_gateways[$payment_method . '_' . $num]]] ) ) {
-								$meta_value = $subscription_details[self::$mapped_fields[self::$supported_payment_gateways[$payment_method . '_' . $num]]];
-								$tmp_ordermeta[] = array( 'key' => '_' . self::$supported_payment_gateways[$payment_method . '_' . $num], 'value' => $meta_value );
+						foreach( self::$supported_payment_gateways[$payment_method] as $meta_data ) {
+							if( ! empty ( $subscription_details[self::$mapped_fields[$meta_data]] ) ) {
+								$meta_value = $subscription_details[self::$mapped_fields[$meta_data]];
+								$tmp_ordermeta[] = array( 'key' => '_' . $meta_data, 'value' => $meta_value );
 							} else {
 								$use_manual_recurring = true;
 							}
