@@ -474,7 +474,19 @@ class WCS_Import_Parser {
 			}
 
 			// try creating a customer from email, username and address information
-			if( ! $found_customer && is_email( $customer_email ) && ! empty( $username ) ) {
+			if( ! $found_customer && is_email( $customer_email ) ) {
+
+				if ( empty( $username ) ) {
+					$maybe_username = explode( '@', $customer_email );
+					$maybe_username = sanitize_user( $maybe_username[0] );
+					$counter = 1;
+					$username = $maybe_username;
+					while ( username_exists( $username ) ) {
+						$username = $maybe_username . $counter;
+						$counter++;
+					}
+				}
+
 				$found_customer = wp_create_user( $username, $password, $customer_email );
 				// update user meta data
 				foreach( self::$user_data_titles as $key ) {
