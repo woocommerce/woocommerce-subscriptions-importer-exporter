@@ -129,21 +129,24 @@ A link to edit the order is given at the end of the list of warnings.
   - Occurs when the user_id provided doesn't exist, the email doesn't exist, the username is invalid and there's not enough information to create a new user.
 
 ## Subscription Importer Simplifications
-*	product_id/variation_id – variable subscription ids can also be placed in the product_id column as well as regular subscriptions
-*	Billing/shipping Information - If the shipping/billing information is not provided in the CSV the importer will try gather the information from the users settings before leaving the values empty.
-*	Recurring Order meta Data - The values for recurring_shipping_method/title, order_recurring_shipping_total, order_recurring_shipping_tax_total, recurring
-*	Billing First name - to avoid the billing name being left null, the customers_username has been used if no billing_first_name is set by the user or the CSV.
-*	payment_method/payment_method_title – the values used in these columns are also used for the recurring_payment_method and recurring_payment_method_title
-* order_total/order_recurring_total - If not specified in the CSV these values will be set to the subscription price tied to the product object.
-* If the following values are not specified in the CSV they will be set to $0 on the order: 
-  * recurring_line_total, 
-  * recurring_line_tax, 
-  * recurring_line_subtotal, 
-  * recurring_line_subtotal_tax, 
-  * line_subtotal, 
-  * line_total, 
-  * line_tax, 
-  * line_subtotal_tax.
+* product_id/variation_id – variable subscription ids can also be placed in the product_id column as well as regular subscriptions
+* Billing/shipping Information - If the shipping/billing information is not provided in the CSV the importer will try gather the information from the users settings before leaving the values empty.
+* Recurring Order meta Data - The values for recurring_shipping_method/title, order_recurring_shipping_total, order_recurring_shipping_tax_total, recurring
+* Billing First name - to avoid the billing name being left null, the customers_username has been used if no billing_first_name is set by the user or the CSV.
+* payment_method/payment_method_title – the values used in these columns are also used for the recurring_payment_method and recurring_payment_method_title
+* If the following values are not specified in the CSV they will be set to $0 on the order (i.e. taxes will not be calculated):
+  * recurring_line_subtotal_tax
+  * recurring_line_tax
+  * line_subtotal_tax
+  * line_tax
+* If the following values are not specified in the CSV they will be set to the subscription product's recurring price (regardless of whether a tax value is specified or not):
+  * recurring_line_subtotal
+  * recurring_line_total
+* If the following values are not specified in the CSV they will be set to the subscription product's sign-up fee (if any) plus recurring price, if there is no free trial (regardless of whether a tax value is specified or not):
+  * line_subtotal
+  * line_total
+  * order_total
+  * order_recurring_total
 
 ## How to use the Importer
 
