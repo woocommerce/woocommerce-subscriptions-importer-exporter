@@ -37,14 +37,14 @@ jQuery(document).ready(function($){
 							var warnings = results[i].warning;
 							if( warnings.length > 0 ) {
 								table_data += '<td class="row warning" rowspan="2"><strong>' + wcs_script_data.success +' ( !! )</strong></td>';
-								table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
+								table_data += '<td class="row">' + ( results[i].edit_order_link != null  ? results[i].edit_order_link : '-' ) + '</td>';
 							} else {
 								table_data += '<td class="row success">' + wcs_script_data.success +'</td>';
-								table_data += '<td class="row">' + ( results[i].order != null  ? results[i].order : '-' ) + '</td>';
+								table_data += '<td class="row">' + ( results[i].edit_order_link != null  ? results[i].edit_order_link : '-' ) + '</td>';
 							}
 
-							table_data += '<td class="row">' + results[i].item + ' ( #' + results[i].item_id + ' )</td>';
-							table_data += '<td class="row">' + results[i].username + ' ( #' + results[i].user_id + ' )</td>';
+							table_data += '<td class="row">' + results[i].item + ' ( ' + results[i].edit_post_link + ' )</td>';
+							table_data += '<td class="row">' + results[i].username + ' ( ' + results[i].edit_user_link + ' )</td>';
 							table_data += '<td class="row column-status"><mark class="' + results[i].subscription_status + '">' + results[i].subscription_status + '</mark></td>';
 							table_data += '<td class="row">' + warnings.length + '</td>';
 
@@ -58,7 +58,7 @@ jQuery(document).ready(function($){
 								for( var x = 0; x < warnings.length; x++ ) {
 									warningString += warnings[x];
 								}
-								$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '"><td colspan="5">' + warningString + ' [ <a href="' + results[i].edit_order + '">' + wcs_script_data.edit_order + ' #' + results[i].order +'</a> ]</td></tr>');
+								$('#wcs-import-progress tbody').append( '<tr class="' + row_classes + '"><td colspan="5">' + warningString + ' [ ' + results[i].edit_order_link + ' ]</td></tr>');
 							}
 						} else {
 							table_data += '<td class="row error-import">' + wcs_script_data.failed + '</td>';

@@ -174,6 +174,7 @@ class WCS_Import_Parser {
 			$customer = get_user_by( 'id', $user_id );
 			$result['user_id'] = $customer->ID;
 			$result['username'] = $customer->user_login;
+			$result['edit_user_link'] = sprintf( '<a href="%s">#%s</a>', get_edit_user_link( $user_id ), $user_id );
 		}
 
 		// skip importing rows without the required information
@@ -447,17 +448,17 @@ class WCS_Import_Parser {
 				}
 			}
 
-			$result['edit_order'] = admin_url( 'post.php?post=' . $order_id .'&action=edit' );
-
 			// Check if the subscription has been successfully added
 			$subscription = WC_Subscriptions_Manager::get_subscription( $subscription_key );
 
 			// Successfully added subscription. Attach information on each order to the results array.
 			if( ! empty ( $subscription['order_id'] ) && ! empty ( $subscription['product_id'] ) ) {
 				$result['status'] = 'success';
-				$result['order'] = $subscription['order_id'];
+				$result['order_id'] = $subscription['order_id'];
+				$result['edit_order_link'] = sprintf( '<a href="%s">#%s</a>', get_edit_post_link( $order_id ), $order_id );
 				$result['subscription_status'] = $subscription['status'];
 				$result['item_id'] = ( ! empty ( $subscription['variation_id'] ) ) ? $subscription['variation_id'] : $subscription['product_id'];
+				$result['edit_post_link'] = sprintf( '<a href="%s">#%s</a>', get_edit_post_link( $subscription['product_id'] ), $result['item_id'] );
 				array_push( self::$results, $result );
 			} else {
 				$result['status'] = 'failed';
