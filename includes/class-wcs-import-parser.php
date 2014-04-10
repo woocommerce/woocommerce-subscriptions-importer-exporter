@@ -282,6 +282,17 @@ class WCS_Import_Parser {
 					$order_meta[] = array( 'key' => '_' . $column, 'value' => $user_id );
 					break;
 				case 'order_total':
+					$trial_length = WC_Subscriptions_Product::get_trial_length( $_product );
+					$sign_up_fee  = WC_Subscriptions_Product::get_sign_up_fee( $_product );
+					if ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) {
+						$value = $subscription_details[self::$mapped_fields[$column]];
+					} elseif ( $trial_length > 0 ) {
+						$value = $sign_up_fee;
+					} else {
+						$value = $sign_up_fee + $_product->subscription_price;
+					}
+					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					break;
 				case 'order_recurring_total':
 					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : $_product->subscription_price;
 					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
@@ -379,7 +390,17 @@ class WCS_Import_Parser {
 
 				// add the additional subscription meta data to the order
 				foreach( self::$order_item_meta_fields as $metadata ) {
-					$value = ( ! empty( $subscription_details[self::$mapped_fields[$metadata]] ) ) ? $subscription_details[self::$mapped_fields[$metadata]] : 0;
+					switch ( $metadata ) {
+						case 'recurring_line_subtotal' :
+						case 'recurring_line_total' :
+						case 'line_subtotal' :
+						case 'line_total' :
+							$default = $_product->subscription_price;
+							break;
+						default :
+							$default = 0;
+					}
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$metadata]] ) ) ? $subscription_details[self::$mapped_fields[$metadata]] : $default;
 					wc_add_order_item_meta( $item_id, '_' . $metadata, $value );
 				}
 
