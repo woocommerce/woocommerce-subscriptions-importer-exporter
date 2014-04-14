@@ -343,7 +343,7 @@ class WCS_Import_Parser {
 		if( ! self::$test_mode ) {
 
 			$start_date     = ( ! empty( $subscription_details[self::$mapped_fields['subscription_start_date']] ) ) ? get_date_from_gmt( date( 'Y-m-d H:i:s', strtotime( $subscription_details[self::$mapped_fields['subscription_start_date']] ) ) ) : current_time( 'mysql' );
-			$start_date_gmt = ( ! empty( $subscription_details[self::$mapped_fields['subscription_start_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_start_date']] : current_time( 'mysql', 1 );
+			$start_date_gmt = ( ! empty( $subscription_details[self::$mapped_fields['subscription_start_date']] ) ) ? date( 'Y-m-d H:i:s', strtotime( $subscription_details[self::$mapped_fields['subscription_start_date']] ) ) : current_time( 'mysql', 1 );
 
 			$order_data = array(
 					'post_date'     => $start_date,
@@ -418,9 +418,9 @@ class WCS_Import_Parser {
 				// Update the subscription meta data with values in $subscription_meta
 				$subscription_meta = array (
 						'start_date'         => $start_date_gmt,
-						'trial_expiry_date'  => ( ! empty( $subscription_details[self::$mapped_fields['subscription_trial_expiry_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_trial_expiry_date']] : WC_Subscriptions_Product::get_trial_expiration_date( $_product, $start_date_gmt ),
-						'expiry_date'        => ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_expiry_date']] : WC_Subscriptions_Product::get_expiration_date( $_product, $start_date_gmt ),
-						'end_date'           => ( ! empty( $subscription_details[self::$mapped_fields['subscription_end_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_end_date']] : '',
+						'trial_expiry_date'  => ( ! empty( $subscription_details[self::$mapped_fields['subscription_trial_expiry_date']] ) ) ? date( 'Y-m-d H:i:s', strtotime( $subscription_details[self::$mapped_fields['subscription_trial_expiry_date']] ) ) : WC_Subscriptions_Product::get_trial_expiration_date( $_product, $start_date_gmt ),
+						'expiry_date'        => ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) ? date( 'Y-m-d H:i:s', strtotime( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) : WC_Subscriptions_Product::get_expiration_date( $_product, $start_date_gmt ),
+						'end_date'           => ( ! empty( $subscription_details[self::$mapped_fields['subscription_end_date']] ) ) ? date( 'Y-m-d H:i:s', strtotime( $subscription_details[self::$mapped_fields['subscription_end_date']] ) ) : '',
 						'completed_payments' => array( $start_date_gmt ),
 				);
 
