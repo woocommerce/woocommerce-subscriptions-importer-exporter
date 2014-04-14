@@ -527,6 +527,7 @@ class WCS_Admin_Importer {
 			'shipping_country' 					   => '',
 			'subscription_status'				   => '',
 			'subscription_start_date'			   => '',
+			'subscription_trial_expiry_date'	   => '',
 			'subscription_expiry_date'			   => '',
 			'subscription_end_date'				   => '',
 			'payment_method' 					   => '',
