@@ -438,7 +438,7 @@ class WCS_Import_Parser {
 
 				WC_Subscriptions_Order::prefill_order_item_meta( array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
 
-				// Update the status of the subscription order
+				// Update the status of the subscription
 				if( ! empty( self::$mapped_fields['subscription_status'] ) && $subscription_details[self::$mapped_fields['subscription_status']] ) {
 					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $subscription_details[self::$mapped_fields['subscription_status']] ) );
 				} else {
@@ -488,7 +488,7 @@ class WCS_Import_Parser {
 			}
 		} else {
 			if( empty( self::$mapped_fields['subscription_status'] ) && empty( $subscription_details[self::$mapped_fields['subscription_status']] ) ) {
-				$result['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
+				$result['warning'][] = __( 'No subscription status was specified. Subscription will be created with the status "pending". ', 'wcs-importer' );
 			}
 			$result['row_number'] = self::$starting_row_number;
 			array_push( self::$results, $result );
