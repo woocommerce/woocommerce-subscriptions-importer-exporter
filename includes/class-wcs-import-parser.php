@@ -423,6 +423,11 @@ class WCS_Import_Parser {
 						'completed_payments' => array( $start_date_gmt ),
 				);
 
+				// Make sure that the expiration date is not after a specified end date
+				if ( ! empty( $subscription_meta['end_date'] ) && strtotime( $subscription_meta['expiry_date'] ) >= strtotime( $subscription_meta['end_date'] ) ) {
+					$subscription_meta['expiry_date'] = $subscription_meta['end_date'];
+				}
+
 				$_POST['order_id'] = $order_id;
 
 				WC_Subscriptions_Order::prefill_order_item_meta( array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
