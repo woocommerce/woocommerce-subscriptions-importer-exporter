@@ -102,7 +102,8 @@ The following columns have some requirements for acceptable values or formats.
 ### Accepted Subscription Column Values
 *	product_id - this must contain either the id of a regular or variable subscription product within your store.  
 *	subscription_start_date - If provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the current date will be used.
-*	subscription_expiry_date - If provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the subscription expiration date will be left empty and will not expire.
+*	subscription_trial_expiry_date - If provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the subscription trial expiration date will be calculated based on the free trial set on the product (if any) and the subscription's start date.
+*	subscription_expiry_date - If provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the subscription expiration date will be calculated based on the length set on the product (if any) and the subscription's start date.
 *	subscription_end_date - If provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the subscription end date will be left empty - this date is simply a record of a day in the past the subscription ended, either due to expiraiton or cancellation.
 *	subscription_status - Can be one of: active, expired, pending, on-hold or cancelled.
 

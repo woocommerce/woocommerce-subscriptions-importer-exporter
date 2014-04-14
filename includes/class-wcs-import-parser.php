@@ -418,10 +418,16 @@ class WCS_Import_Parser {
 				// Update the subscription meta data with values in $subscription_meta
 				$subscription_meta = array (
 						'start_date'         => $start_date_gmt,
-						'expiry_date'        => ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_expiry_date']] : '',
+						'trial_expiry_date'  => ( ! empty( $subscription_details[self::$mapped_fields['subscription_trial_expiry_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_trial_expiry_date']] : WC_Subscriptions_Product::get_trial_expiration_date( $_product, $start_date_gmt ),
+						'expiry_date'        => ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_expiry_date']] : WC_Subscriptions_Product::get_expiration_date( $_product, $start_date_gmt ),
 						'end_date'           => ( ! empty( $subscription_details[self::$mapped_fields['subscription_end_date']] ) ) ? $subscription_details[self::$mapped_fields['subscription_end_date']] : '',
 						'completed_payments' => array( $start_date_gmt ),
 				);
+
+				// Record the payment at the end of the trial (if any) to make sure next payment date is calculated correctly
+				if ( ! empty ( $subscription_meta['trial_expiry_date'] ) && strtotime( $subscription_meta['trial_expiry_date'] ) <= gmdate( 'U' ) ) {
+					$subscription_meta['completed_payments'][] = $subscription_meta['trial_expiry_date'];
+				}
 
 				// Make sure that the expiration date is not after a specified end date
 				if ( ! empty( $subscription_meta['end_date'] ) && strtotime( $subscription_meta['expiry_date'] ) >= strtotime( $subscription_meta['end_date'] ) ) {
@@ -443,12 +449,23 @@ class WCS_Import_Parser {
 				// Add additional subscription meta data
 				WC_Subscriptions_Manager::update_subscription( $subscription_key, $subscription_meta );
 
-				if ( ! empty ( $subscription_meta['expiry_date'] ) ) {
-					if ( strtotime( $subscription_meta['expiry_date'] ) <= gmdate( 'U' ) ) {
-						WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'expired' );
-					} else {
-						// We also need to manually schedule the expiration date due to data duplication issues with Subscriptions
-						WC_Subscriptions_Manager::set_expiration_date( $subscription_key, '', $subscription_meta['expiry_date'] );
+				// For active subscriptions, make sure payment and expiration dates are set correctly
+				if ( ! empty( self::$mapped_fields['subscription_status'] ) && 'active' == $subscription_details[self::$mapped_fields['subscription_status']] ) {
+
+					// We also need to manually schedule the trial expiration date due to data duplication issues with Subscriptions
+					if ( ! empty ( $subscription_meta['trial_expiry_date'] ) && strtotime( $subscription_meta['trial_expiry_date'] ) > gmdate( 'U' ) ) {
+						WC_Subscriptions_Manager::set_trial_expiration_date( $subscription_key, '', $subscription_meta['trial_expiry_date'] );
+					}
+
+					WC_Subscriptions_Manager::set_next_payment_date( $subscription_key );
+
+					if ( ! empty ( $subscription_meta['expiry_date'] ) ) {
+						if ( strtotime( $subscription_meta['expiry_date'] ) <= gmdate( 'U' ) && empty( $subscription_meta['end_date'] ) ) {
+							WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'expired' );
+						} else {
+							// We also need to manually schedule the expiration date due to data duplication issues with Subscriptions
+							WC_Subscriptions_Manager::set_expiration_date( $subscription_key, '', $subscription_meta['expiry_date'] );
+						}
 					}
 				}
 			}
