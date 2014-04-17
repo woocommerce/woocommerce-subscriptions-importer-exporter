@@ -185,7 +185,6 @@ class WCS_Import_Parser {
 			return;
 		}
 
-		// Get product object - checked validity @ L141
 		$_product = get_product( $subscription_details[self::$mapped_fields['product_id']] );
 		$result['item'] = $_product->get_title();
 
@@ -246,7 +245,6 @@ class WCS_Import_Parser {
 						foreach ( $tmp_ordermeta as $tmp_meta ) {
 							$order_meta[] = array( 'key' => $tmp_meta['key'], 'value' => $tmp_meta['value'] );
 						}
-						//$order_meta = array_merge( $order_meta, $tmp_ordermeta );
 					}
 					break;
 				case 'shipping_addresss_1':
@@ -387,7 +385,7 @@ class WCS_Import_Parser {
 				wc_add_order_item_meta( $item_id, '_qty', apply_filters( 'woocommerce_stock_amount', 1 ) );
 				wc_add_order_item_meta( $item_id, '_tax_class', $_product->get_tax_class() );
 				wc_add_order_item_meta( $item_id, '_product_id', $_product->id );
-				wc_add_order_item_meta( $item_id, '_variation_id', ( ! empty ($_product->variation_id ) ) ? $_product->variation_id : '');
+				wc_add_order_item_meta( $item_id, '_variation_id', ( ! empty ( $_product->variation_id ) ) ? $_product->variation_id : '');
 
 				// Store variation data in meta so admin can view it
 				if ( isset( $_product->variation_data ) && is_array( $_product->variation_data ) && ! empty( $_product->variation_data ) ) {
