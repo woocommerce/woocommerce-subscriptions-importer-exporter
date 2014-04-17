@@ -389,6 +389,14 @@ class WCS_Import_Parser {
 				wc_add_order_item_meta( $item_id, '_product_id', $_product->id );
 				wc_add_order_item_meta( $item_id, '_variation_id', ( ! empty ($_product->variation_id ) ) ? $_product->variation_id : '');
 
+				// Store variation data in meta so admin can view it
+				if ( isset( $_product->variation_data ) && is_array( $_product->variation_data ) && ! empty( $_product->variation_data ) ) {
+					foreach ( $_product->variation_data as $variation_key => $variation_value ) {
+						$variation_key = str_replace( 'attribute_', '', $variation_key );
+						wc_add_order_item_meta( $item_id, $variation_key, $variation_value );
+					}
+				}
+
 				// Add line item meta for backorder status
 				if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) ) {
 					wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
