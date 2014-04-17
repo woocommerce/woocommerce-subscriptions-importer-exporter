@@ -420,7 +420,24 @@ class WCS_Import_Parser {
 
 				$_POST['order_id'] = $order_id;
 
-				WC_Subscriptions_Order::prefill_order_item_meta( array( 'product_id' => $_product->id, 'variation_id' => $_product->id ), $item_id );
+				WC_Subscriptions_Order::prefill_order_item_meta( array( 'product_id' => $_product->id, 'variation_id' => $_product->variation_id ), $item_id );
+
+				//Update the recurring subscription meta data
+				foreach( self::$order_item_meta_fields as $metadata ) {
+					switch ( $metadata ) {
+						case 'line_subtotal' :
+						case 'line_total' :
+						case 'recurring_line_total' :
+						case 'recurring_line_subtotal' :
+							$prod_id = ( $_product->variation_id ) ? $_product->variation_id : $_product->id;
+							$default = WC_Subscriptions_Product::get_price( $prod_id );
+							break;
+						default :
+							$default = 0;
+					}
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[$metadata]] ) ) ? $subscription_details[self::$mapped_fields[$metadata]] : $default;
+					wc_update_order_item_meta( $item_id, '_' . $metadata, $value );
+				}
 
 				// Update the status of the subscription
 				if( ! empty( self::$mapped_fields['subscription_status'] ) && $subscription_details[self::$mapped_fields['subscription_status']] ) {
