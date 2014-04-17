@@ -389,22 +389,6 @@ class WCS_Import_Parser {
 				wc_add_order_item_meta( $item_id, '_product_id', $_product->id );
 				wc_add_order_item_meta( $item_id, '_variation_id', ( ! empty ($_product->variation_id ) ) ? $_product->variation_id : '');
 
-				// add the additional subscription meta data to the order
-				foreach( self::$order_item_meta_fields as $metadata ) {
-					switch ( $metadata ) {
-						case 'recurring_line_subtotal' :
-						case 'recurring_line_total' :
-						case 'line_subtotal' :
-						case 'line_total' :
-							$default = $_product->subscription_price;
-							break;
-						default :
-							$default = 0;
-					}
-					$value = ( ! empty( $subscription_details[self::$mapped_fields[$metadata]] ) ) ? $subscription_details[self::$mapped_fields[$metadata]] : $default;
-					wc_add_order_item_meta( $item_id, '_' . $metadata, $value );
-				}
-
 				// Add line item meta for backorder status
 				if ( $_product->backorders_require_notification() && $_product->is_on_backorder( 1 ) ) {
 					wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
