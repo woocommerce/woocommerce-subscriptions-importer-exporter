@@ -536,13 +536,6 @@ class WCS_Import_Parser {
 			$password_generated = true;
 		}
 
-//		error_log( '###### ###### ###### ###### ######' );
-//		error_log( '###### In ' . __FUNCTION__ );
-//		error_log( '###### $customer_email = ' . $customer_email );
-//		error_log( '###### $username = ' . $username );
-//		error_log( '###### $customer_id = ' . $customer_id );
-//		error_log( '###### $password = ' . $password );
-
 		$found_customer = false;
 
 		if( empty( $customer_id ) ) {
