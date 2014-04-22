@@ -369,6 +369,8 @@ class WCS_Admin_Importer {
 									<option value="billing_email" <?php selected( $header, 'billing_email' ); ?>>billing_email</option>
 									<option value="billing_phone" <?php selected( $header, 'billing_phone' ); ?>>billing_phone</option>
 									<option value="billing_company" <?php selected( $header, 'billing_company' ); ?>>billing_company</option>
+									<option value="shipping_first_name" <?php selected( $header, 'shipping_first_name' ); ?>>shipping_first_name</option>
+									<option value="shipping_last_name" <?php selected( $header, 'shipping_last_name' ); ?>>shipping_last_name</option>
 									<option value="shipping_address_1" <?php selected( $header, 'shipping_address_1' ); ?>>shipping_address_1</option>
 									<option value="shipping_address_2" <?php selected( $header, 'shipping_address_2' ); ?>>shipping_address_2</option>
 									<option value="shipping_city" <?php selected( $header, 'shipping_city' ); ?>>shipping_city</option>

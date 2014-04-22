@@ -585,6 +585,8 @@ class WCS_Import_Parser {
 								$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $username;
 								update_user_meta( $found_customer, $key, $meta_value );
 								break;
+							case 'shipping_first_name':
+							case 'shipping_last_name':
 							case 'shipping_addresss_1':
 							case 'shipping_address_2':
 							case 'shipping_city':

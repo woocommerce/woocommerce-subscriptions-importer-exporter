@@ -50,6 +50,8 @@ Importing subscriptions involves setting up a CSV file containing various column
 *	billing_email
 *	billing_phone
 *	billing_company
+*	shipping_first_name
+*	shipping_last_name
 *	shipping_address_1
 *	shipping_address_2
 *	shipping_city
