@@ -98,8 +98,8 @@ The following columns have some requirements for acceptable values or formats.
 *	product_id
 *	subscription_status
 *	subscription_start_date
-*	subscriptions_expiry_date
-*	subscriptions_end_date
+*	subscription_expiry_date
+*	subscription_end_date
 
 ### Accepted Subscription Column Values
 *	product_id - this must contain either the id of a regular or variable subscription product within your store.  
