@@ -649,7 +649,6 @@ class WCS_Import_Parser {
 
 		// $days = the number of days between start and expiry dates
 		$days = ceil( ( $expiry_date - $start_date ) / ( 60 * 60 * 24 ) );
-		error_log( "calculated difference = " . $days . ", period = " . $period );
 		switch( $period ) {
 			case 'day' :
 				return $days;
