@@ -445,6 +445,16 @@ class WCS_Import_Parser {
 					wc_update_order_item_meta( $item_id, '_' . $metadata, $value );
 				}
 
+				// set the _subscription_length if expiry_date given in CSV
+				if ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) {
+					$period = WC_Subscriptions_Order::get_subscription_period( $order_id );
+					$new_sub_length = self::calculate_sub_length( strtotime( $subscription_meta['start_date'] ), strtotime( $subscription_meta['expiry_date'] ), $period );
+
+					if( $new_sub_length != -1 ) {
+						wc_update_order_item_meta( $item_id, '_subscription_length', $new_sub_length );
+					}
+				}
+
 				// Update the status of the subscription
 				if( ! empty( self::$mapped_fields['subscription_status'] ) && $subscription_details[self::$mapped_fields['subscription_status']] ) {
 					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $subscription_details[self::$mapped_fields['subscription_status']] ) );
@@ -624,6 +634,31 @@ class WCS_Import_Parser {
 				return absint( $customer_id );
 			}
 			return $found_customer; // should be false
+		}
+	}
+
+	/* Calculates the number of payments between the start_date and expiry_date
+	 * based on the period (i.e. Day, Month etc); return 0 if expiry_date is not in the future.
+	 * @since 1.0
+	 */
+	public static function calculate_sub_length( $start_date, $expiry_date, $period ) {
+		// check expiry date is in the future
+		if( $expiry_date <= $start_date ) {
+			return -1;
+		}
+
+		// $days = the number of days between start and expiry dates
+		$days = ceil( ( $expiry_date - $start_date ) / ( 60 * 60 * 24 ) );
+		error_log( "calculated difference = " . $days . ", period = " . $period );
+		switch( $period ) {
+			case 'day' :
+				return $days;
+			case 'week' :
+				return floor( $days / 7 );
+			case 'month' :
+				return floor( $days / 30 );
+			case 'year' :
+				return floor( $days / 365 );
 		}
 	}
 }
