@@ -411,6 +411,7 @@ class WCS_Import_Parser {
 						'trial_expiry_date'  => ( ! empty( $subscription_details[self::$mapped_fields['subscription_trial_expiry_date']] ) ) ? date( 'Y-m-d H:i:s', strtotime( $subscription_details[self::$mapped_fields['subscription_trial_expiry_date']] ) ) : WC_Subscriptions_Product::get_trial_expiration_date( $_product, $start_date_gmt ),
 						'expiry_date'        => ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) ? date( 'Y-m-d H:i:s', strtotime( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) : WC_Subscriptions_Product::get_expiration_date( $_product, $start_date_gmt ),
 						'end_date'           => ( ! empty( $subscription_details[self::$mapped_fields['subscription_end_date']] ) ) ? date( 'Y-m-d H:i:s', strtotime( $subscription_details[self::$mapped_fields['subscription_end_date']] ) ) : '',
+						'status'             => 'pending',
 						'completed_payments' => array( $start_date_gmt ),
 				);
 
@@ -446,7 +447,6 @@ class WCS_Import_Parser {
 				}
 
 				// set the _subscription_length if expiry_date given in CSV
-				$sub_expired = false;
 				if ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) {
 					$find_length_start = ( ! empty( $subscription_meta['trial_expiry_date'] ) ) ? strtotime( $subscription_meta['trial_expiry_date'] ) : strtotime( $subscription_meta['start_date'] );
 					$period = WC_Subscriptions_Order::get_subscription_period( $order_id );
@@ -455,7 +455,6 @@ class WCS_Import_Parser {
 					if( $new_sub_length != -1 ) {
 						wc_update_order_item_meta( $item_id, '_subscription_length', $new_sub_length );
 					} else { // set subscription as expired and display warning to admin
-						$sub_expired = true;
 						$subscription_meta['status'] = 'expired';
 						$result['warning'][] = __( 'Subscription set as expired due to the expiry date given in the CSV being invalid.', 'wcs-importer' );
 
@@ -463,7 +462,7 @@ class WCS_Import_Parser {
 				}
 
 				// Update the status of the subscription if not already set to expired
-				if( ! $sub_expired ) {
+				if( $subscription_meta['status'] != 'expired' ) {
 					if( ! empty( self::$mapped_fields['subscription_status'] ) && $subscription_details[self::$mapped_fields['subscription_status']] ) {
 						$subscription_meta['status'] = strtolower( $subscription_details[self::$mapped_fields['subscription_status']] );
 					} else {
@@ -476,7 +475,7 @@ class WCS_Import_Parser {
 				WC_Subscriptions_Manager::update_subscription( $subscription_key, $subscription_meta );
 
 				// For active subscriptions, make sure payment and expiration dates are set correctly
-				if ( ! empty( self::$mapped_fields['subscription_status'] ) && 'active' == $subscription_details[self::$mapped_fields['subscription_status']]  && ! $sub_expired ) {
+				if ( ! empty( self::$mapped_fields['subscription_status'] ) && 'active' == $subscription_details[self::$mapped_fields['subscription_status']]  && $subscription_meta['status'] != 'expired' ) {
 
 					// We also need to manually schedule the trial expiration date due to data duplication issues with Subscriptions
 					if ( ! empty ( $subscription_meta['trial_expiry_date'] ) && strtotime( $subscription_meta['trial_expiry_date'] ) > gmdate( 'U' ) ) {
@@ -652,6 +651,7 @@ class WCS_Import_Parser {
 	 */
 	public static function calculate_sub_length( $start_date, $expiry_date, $period ) {
 		// check expiry date is in the future
+		error_log( 'expiry: ' . $expiry_date . ', start: ' . $start_date );
 		if( $expiry_date <= $start_date ) {
 			return -1;
 		}
