@@ -446,28 +446,37 @@ class WCS_Import_Parser {
 				}
 
 				// set the _subscription_length if expiry_date given in CSV
+				$sub_expired = false;
 				if ( ! empty( $subscription_details[self::$mapped_fields['subscription_expiry_date']] ) ) {
+					$find_length_start = ( ! empty( $subscription_meta['trial_expiry_date'] ) ) ? strtotime( $subscription_meta['trial_expiry_date'] ) : strtotime( $subscription_meta['start_date'] );
 					$period = WC_Subscriptions_Order::get_subscription_period( $order_id );
-					$new_sub_length = self::calculate_sub_length( strtotime( $subscription_meta['start_date'] ), strtotime( $subscription_meta['expiry_date'] ), $period );
+					$new_sub_length = self::calculate_sub_length( $find_length_start, strtotime( $subscription_meta['expiry_date'] ), $period );
 
 					if( $new_sub_length != -1 ) {
 						wc_update_order_item_meta( $item_id, '_subscription_length', $new_sub_length );
+					} else { // set subscription as expired and display warning to admin
+						$sub_expired = true;
+						$subscription_meta['status'] = 'expired';
+						$result['warning'][] = __( 'Subscription set as expired due to the expiry date given in the CSV being invalid.', 'wcs-importer' );
+
 					}
 				}
 
-				// Update the status of the subscription
-				if( ! empty( self::$mapped_fields['subscription_status'] ) && $subscription_details[self::$mapped_fields['subscription_status']] ) {
-					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, strtolower( $subscription_details[self::$mapped_fields['subscription_status']] ) );
-				} else {
-					WC_Subscriptions_Manager::update_users_subscriptions_for_order( $order_id, 'pending' );
-					$result['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
+				// Update the status of the subscription if not already set to expired
+				if( ! $sub_expired ) {
+					if( ! empty( self::$mapped_fields['subscription_status'] ) && $subscription_details[self::$mapped_fields['subscription_status']] ) {
+						$subscription_meta['status'] = strtolower( $subscription_details[self::$mapped_fields['subscription_status']] );
+					} else {
+						$subscription_meta['status'] = 'pending';
+						$result['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
+					}
 				}
 
 				// Add additional subscription meta data
 				WC_Subscriptions_Manager::update_subscription( $subscription_key, $subscription_meta );
 
 				// For active subscriptions, make sure payment and expiration dates are set correctly
-				if ( ! empty( self::$mapped_fields['subscription_status'] ) && 'active' == $subscription_details[self::$mapped_fields['subscription_status']] ) {
+				if ( ! empty( self::$mapped_fields['subscription_status'] ) && 'active' == $subscription_details[self::$mapped_fields['subscription_status']]  && ! $sub_expired ) {
 
 					// We also need to manually schedule the trial expiration date due to data duplication issues with Subscriptions
 					if ( ! empty ( $subscription_meta['trial_expiry_date'] ) && strtotime( $subscription_meta['trial_expiry_date'] ) > gmdate( 'U' ) ) {
