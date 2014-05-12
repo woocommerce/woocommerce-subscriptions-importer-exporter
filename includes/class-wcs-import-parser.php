@@ -651,7 +651,6 @@ class WCS_Import_Parser {
 	 */
 	public static function calculate_sub_length( $start_date, $expiry_date, $period ) {
 		// check expiry date is in the future
-		error_log( 'expiry: ' . $expiry_date . ', start: ' . $start_date );
 		if( $expiry_date <= $start_date ) {
 			return -1;
 		}
