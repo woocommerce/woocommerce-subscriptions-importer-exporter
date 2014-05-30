@@ -488,7 +488,9 @@ class WCS_Import_Parser {
 						$from_date = $next_payment_timestamp = WC_Subscriptions_Manager::calculate_next_payment_date( $subscription_key, $user_id, 'timestamp', $from_date );
 					} while ( $next_payment_timestamp < gmdate( 'U' ) && $next_payment_timestamp != 0 );
 
-					WC_Subscriptions_Manager::set_next_payment_date( $subscription_key, '', $next_payment_timestamp );
+					if ( $next_payment_timestamp != 0 ) {
+						WC_Subscriptions_Manager::set_next_payment_date( $subscription_key, '', $next_payment_timestamp );
+					}
 
 					if ( ! empty ( $subscription_meta['expiry_date'] ) ) {
 						if ( strtotime( $subscription_meta['expiry_date'] ) <= gmdate( 'U' ) && empty( $subscription_meta['end_date'] ) ) {
