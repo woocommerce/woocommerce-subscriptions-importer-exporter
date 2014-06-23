@@ -21,13 +21,6 @@ if ( ! function_exists( 'woothemes_queue_update' ) || ! function_exists( 'is_woo
  * Plugin updates
  */
 //swoothemes_queue_update( plugin_basename( __FILE__ ), '6115e6d7e297b623a169fdcf5728b224', '27147' );
-
-// Check for required plugins and versions
-if ( ! class_exists('WC_Subscriptions') || ! class_exists('WC_Subscriptions_Admin') || version_compare( WC_Subscriptions::$version, '1.5', '<' ) ) {
-	add_action( 'admin_notices', 'WC_Subscription_Importer::plugin_dependency_notice' );
-	return;
-}
-
 // Plugin Classes
 require_once( dirname( __FILE__ ) . '/includes/class-wcs-import-admin.php' );
 require_once( dirname( __FILE__ ) . '/includes/class-wcs-import-parser.php' );
@@ -57,7 +50,11 @@ class WC_Subscription_Importer {
 	 */
 	public static function setup_importer() {
 		if ( is_admin() ) {
-			self::$wcs_importer = new WCS_Admin_Importer();
+			if ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '1.5', '>=' ) ) {
+				self::$wcs_importer = new WCS_Admin_Importer();
+			} else {
+				add_action( 'admin_notices', __CLASS__ . '::plugin_dependency_notice' );
+			}
 		}
 	}
 
