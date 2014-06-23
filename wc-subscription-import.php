@@ -17,10 +17,6 @@ if ( ! function_exists( 'woothemes_queue_update' ) || ! function_exists( 'is_woo
 	require_once( 'woo-includes/woo-functions.php' );
 }
 
-/**
- * Plugin updates
- */
-//swoothemes_queue_update( plugin_basename( __FILE__ ), '6115e6d7e297b623a169fdcf5728b224', '27147' );
 // Plugin Classes
 require_once( dirname( __FILE__ ) . '/includes/class-wcs-import-admin.php' );
 require_once( dirname( __FILE__ ) . '/includes/class-wcs-import-parser.php' );
