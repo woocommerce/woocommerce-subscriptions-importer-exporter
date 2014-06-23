@@ -1,12 +1,12 @@
 <?php
 /*
 Plugin Name: WooCommerce Subscriptions Importer
-Plugin URI: -
+Plugin URI:
 Description: CSV Importer to bring your subscriptions to Woocommerce.
 Version: 1.0
-Author: -
-Author URI: -
-License: -
+Author: Prospress Inc
+Author URI: http://prospress.com
+License: GPLv2
 */
 if ( !defined( 'ABSPATH') ) exit; // Exit if accessed directly
 
