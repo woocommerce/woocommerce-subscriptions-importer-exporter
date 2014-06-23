@@ -95,4 +95,3 @@ class WC_Subscription_Importer {
 		<?php endif;
 	}
 }
-?>
