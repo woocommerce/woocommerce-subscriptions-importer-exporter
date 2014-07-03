@@ -89,7 +89,7 @@ The following columns have some requirements for acceptable values or formats.
 
 ### Accepted Order Column Values
 The following columns have some requirements for acceptable values or formats.
-*	payment_method – the currently supported payment methods are PayPal or Stripe. If anything other than paypal or stripe is used, the import will default to manual renewal.
+*	payment_method – the currently supported payment methods are PayPal, Stripe and Authorize.net. If anything other than paypal or stripe is used, the import will default to manual renewal.
 *	shipping_method - This should be the shipping method name as seen in the Order admin, i.e. "free_shipping", but can be any string that identifies the shipping method to you; defaults to an empty shipping method.
 *	download_permission_granted - value can be either yes or true; anything else will not grant download permissions for the subscription product in the order.
 *	All dollar amounts need to be either integer or decimal value for instance, “5.65”, “3”, “127.2” are all valid entries.
@@ -174,3 +174,10 @@ After ticking the box to run the importer in test mode, you should see something
 
 ### Step 3b: Import Completion Table
 ![Completion Table Screenshot](http://i59.tinypic.com/suyil5.png)
+
+##FAQ
+#### 1. Is it possible to make sure the active subscriptions will still work?
+Yes. When importing active subscriptions, it's important you that the subcription id's are provided in the CSV. Depending on the payment gateway being used, the information required varies (see below).
+  - With <strong>PayPal</strong>, make sure you have set the paypal_subscriber_id field in the CSV ( PayPal sometimes call this the recurring payment profile ID).
+  - When using <strong>Stripe</strong>, ensure the stripe_customer_id field is set in the CSV.
+  - For those using <strong>Authorize.net</strong>, you will need to provide both the authorize_net_cim_profile_id and the authorize_net_cim_payment_profile_id fields in the CSV. Both pieces of information are required as the authorize_net_cim_profile_id value refers to the customer and the authorize_net_cim_payment_profile_id is used by Authorize.net to identify their payment information.
