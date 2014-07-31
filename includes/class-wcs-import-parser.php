@@ -170,6 +170,8 @@ class WCS_Import_Parser {
 		$user_id = self::check_customer( $subscription_details );
 		if ( empty( $user_id ) ) {
 			$result['error'][] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
+		} elseif ( is_wp_error( $user_id ) ) {
+			$result['error'][] = $user_id->get_error_message();
 		} elseif ( ! self::$test_mode ) {
 			$customer = get_user_by( 'id', $user_id );
 			$result['user_id'] = $customer->ID;
@@ -593,46 +595,49 @@ class WCS_Import_Parser {
 
 					$found_customer = wp_create_user( $username, $password, $customer_email );
 
-					// update user meta data
-					foreach( self::$user_data_titles as $key ) {
-						switch( $key ) {
-							case 'billing_email':
-								// user billing email if set in csv otherwise use the user's account email
-								$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $customer_email;
-								update_user_meta( $found_customer, $key, $meta_value );
-								break;
-							case 'billing_first_name':
-								$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $username;
-								update_user_meta( $found_customer, $key, $meta_value );
-								break;
-							case 'shipping_first_name':
-							case 'shipping_last_name':
-							case 'shipping_addresss_1':
-							case 'shipping_address_2':
-							case 'shipping_city':
-							case 'shipping_postcode':
-							case 'shipping_state':
-							case 'shipping_country':
-								// Set the shipping address fields to match the billing fields if not specified in CSV
-								$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
-								if( empty ( $meta_value ) ) {
-									$n_key = str_replace( "shipping", "billing", $key );
-									$meta_value = ( ! empty( $subscription_details[ self::$mapped_fields[$n_key]] ) ) ? $subscription_details[self::$mapped_fields[$n_key]] : '';
-								}
-								update_user_meta( $found_customer, $key, $meta_value );
-								break;
-							default:
-								$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
-								update_user_meta( $found_customer, $key, $meta_value );
+					if ( ! is_wp_error( $found_customer ) ) {
+
+						// update user meta data
+						foreach( self::$user_data_titles as $key ) {
+							switch( $key ) {
+								case 'billing_email':
+									// user billing email if set in csv otherwise use the user's account email
+									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $customer_email;
+									update_user_meta( $found_customer, $key, $meta_value );
+									break;
+								case 'billing_first_name':
+									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $username;
+									update_user_meta( $found_customer, $key, $meta_value );
+									break;
+								case 'shipping_first_name':
+								case 'shipping_last_name':
+								case 'shipping_addresss_1':
+								case 'shipping_address_2':
+								case 'shipping_city':
+								case 'shipping_postcode':
+								case 'shipping_state':
+								case 'shipping_country':
+									// Set the shipping address fields to match the billing fields if not specified in CSV
+									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
+									if( empty ( $meta_value ) ) {
+										$n_key = str_replace( "shipping", "billing", $key );
+										$meta_value = ( ! empty( $subscription_details[ self::$mapped_fields[$n_key]] ) ) ? $subscription_details[self::$mapped_fields[$n_key]] : '';
+									}
+									update_user_meta( $found_customer, $key, $meta_value );
+									break;
+								default:
+									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
+									update_user_meta( $found_customer, $key, $meta_value );
+							}
 						}
-					}
 
-					// sets all new user's roles to the value set as default_inactive_role
-					WC_Subscriptions_Manager::make_user_inactive( $found_customer );
+						// sets all new user's roles to the value set as default_inactive_role
+						WC_Subscriptions_Manager::make_user_inactive( $found_customer );
 
-					// send user registration email if admin as chosen to do so
-					if( self::$email_customer && function_exists( 'wp_new_user_notification' ) ) {
-						do_action( 'woocommerce_created_customer', $found_customer, $password, $password_generated );
+						// send user registration email if admin as chosen to do so
+						if( self::$email_customer && function_exists( 'wp_new_user_notification' ) ) {
+							do_action( 'woocommerce_created_customer', $found_customer, $password, $password_generated );
+						}
 					}
 				}
 			}
@@ -640,9 +645,11 @@ class WCS_Import_Parser {
 		} else {
 			// check customer id
 			$found_customer = get_user_by( 'id', $customer_id );
-			if( ! empty( $found_customer ) ) {
+
+			if ( ! empty( $found_customer ) && ! is_wp_error( $found_customer ) ) {
 				return absint( $customer_id );
 			}
+
 			return $found_customer; // should be false
 		}
 	}
