@@ -162,7 +162,7 @@ class WCS_Import_Parser {
 		$result['warning'] = $result['error'] = array();
 
 		// Check Product id a woocommerce product
-		if( empty( self::$mapped_fields['product_id'] ) || ! ( self::check_product( $subscription_details[self::$mapped_fields['product_id']] ) ) ) {
+		if ( empty( self::$mapped_fields['product_id'] ) || ! ( self::check_product( $subscription_details[self::$mapped_fields['product_id']] ) ) ) {
 			$result['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
 		}
 
@@ -177,8 +177,8 @@ class WCS_Import_Parser {
 			$result['edit_user_link'] = sprintf( '<a href="%s">#%s</a>', get_edit_user_link( $user_id ), $user_id );
 		}
 
-		// skip importing rows without the required information
-		if( ! empty( $result['error'] ) ) {
+		// Skip importing rows without the required information
+		if ( ! empty( $result['error'] ) ) {
 			$result['status'] = 'failed';
 			$result['row_number'] = self::$starting_row_number;
 			array_push( self::$results, $result );
@@ -190,7 +190,7 @@ class WCS_Import_Parser {
 
 		$missing_shipping_addresses = $missing_billing_addresses = array();
 
-		// populate order meta data
+		// Populate order meta data
 		foreach( self::$order_meta_fields as $column ) {
 			switch( $column ) {
 				case 'shipping_method':
@@ -544,12 +544,12 @@ class WCS_Import_Parser {
 	 * @since 1.0
 	 */
 	public static function check_customer( $subscription_details ) {
-		$customer_email = ( ! empty ( $subscription_details[self::$mapped_fields['customer_email']] ) ) ? $subscription_details[self::$mapped_fields['customer_email']] : '';
-		$username = ( ! empty ( $subscription_details[self::$mapped_fields['customer_username']] ) ) ? $subscription_details[self::$mapped_fields['customer_username']] : '';
-		$customer_id = ( ! empty( $subscription_details[self::$mapped_fields['customer_id']] ) ) ? $subscription_details[self::$mapped_fields['customer_id']] : '';
+		$customer_email = ( ! empty ( $subscription_details[ self::$mapped_fields['customer_email'] ] ) ) ? $subscription_details[ self::$mapped_fields['customer_email'] ] : '';
+		$username       = ( ! empty ( $subscription_details[ self::$mapped_fields['customer_username'] ] ) ) ? $subscription_details[ self::$mapped_fields['customer_username'] ] : '';
+		$customer_id    = ( ! empty( $subscription_details[ self::$mapped_fields['customer_id'] ] ) ) ? $subscription_details[ self::$mapped_fields['customer_id'] ] : '';
 
-		if ( ! empty( $subscription_details[self::$mapped_fields['customer_password']] ) ) {
-			$password = $subscription_details[self::$mapped_fields['customer_password']];
+		if ( ! empty( $subscription_details[ self::$mapped_fields['customer_password'] ] ) ) {
+			$password = $subscription_details[ self::$mapped_fields['customer_password'] ];
 			$password_generated = false;
 		} else {
 			$password = wp_generate_password( 12, true );
@@ -558,19 +558,19 @@ class WCS_Import_Parser {
 
 		$found_customer = false;
 
-		if( empty( $customer_id ) ) {
+		if ( empty( $customer_id ) ) {
 
 			// check for registered email if customer id is not set
-			if( ! $found_customer && is_email( $customer_email ) ) {
+			if ( is_email( $customer_email ) ) {
 				$found_customer = email_exists( $customer_email );
+			}
 
 			// if customer still not found, check by username
-			}
-			if( ! $found_customer && ! empty( $username ) ) {
+			if ( ! $found_customer && ! empty( $username ) ) {
 				$found_customer = username_exists( $username );
 			}
 
-			if( ! $found_customer && is_email( $customer_email ) ) {
+			if ( ! $found_customer && is_email( $customer_email ) ) {
 
 				// In test mode, we just want to know if a user account can be created - as we have a valid email address, it can be.
 				if ( self::$test_mode ) {
