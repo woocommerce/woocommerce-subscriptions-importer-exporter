@@ -469,6 +469,8 @@ class WCS_Admin_Importer {
 			</div>
 		<?php else : ?>
 			<h3><?php _e( 'Importing Results', 'wcs-importer' ); ?></h3>
+			<p id="wcs-import-timeout" style="display: none;"><?php echo sprintf( __( 'ERROR: The importing process has timed out. Please check the CSV is correct and do a test run before importing by enabling the checkbox on the Importer Home screen. %s Start Over. %s', 'wcs-importer' ), '<a href="' . $this->admin_url . '">', '</a>' ); ?></p>
+			<p id="wcs-import-time-completion"><?php echo sprintf( __( 'Total Estimated Import Time Between:  %s 0%s minutes. ( %s0%s Completed! )', 'wcs-importer'), '<span id="wcs-estimated-time">', '</span>', '<span id="wcs-completed-percent">', '%</span>' ); ?></p>
 			<table id="wcs-import-progress" class="widefat_importer widefat">
 				<thead>
 					<tr>
