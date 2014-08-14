@@ -152,10 +152,12 @@ jQuery(document).ready(function($){
 			error: function(xmlhttprequest, textstatus, message) {
 				// Something has caused an error whilst importing
 				$('.importer-loading').addClass('finished').removeClass('importer-loading');
-				$('#wcs-import-timeout').show();
-				$('#wcs-completed-message').html( $('#wcs-import-timeout').html() );
-				$('#wcs-completed-message').show();
-				$('#wcs-import-time-completion').hide();
+				if( textstatus === "timeout" ) {
+					$('#wcs-import-timeout').show();
+					$('#wcs-completed-message').html( $('#wcs-import-timeout').html() );
+					$('#wcs-completed-message').show();
+					$('#wcs-import-time-completion').hide();
+				}
 			}
 
 		});
