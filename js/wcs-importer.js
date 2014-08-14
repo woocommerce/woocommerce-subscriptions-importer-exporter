@@ -2,7 +2,11 @@ jQuery(document).ready(function($){
 	var counter = 0;
 
 	if ( wcs_script_data.test_mode == 'false' && wcs_script_data.error_message.length > 0 ) {
-		if ( confirm( wcs_script_data.error_message ) ){
+		if ( confirm( wcs_script_data.error_message ) ) {
+			// calculate an estimate to give the admins a rough idea of a completion time ( 0.33 is based on averages from own tests + 50% )
+			var estimate = ( ( 0.33 * parseInt( wcs_script_data.rows_per_request ) * parseInt( wcs_script_data.total ) ) / 60 ).toFixed(0);
+			$('#wcs-estimated-time').html( estimate + ' to ' + ( ( estimate == 0 ) ? 1 : ( estimate * 1.5).toFixed(0) ) );
+
 			ajax_import( wcs_script_data.file_positions[counter], wcs_script_data.file_positions[counter+1], wcs_script_data.start_row_num[counter/2] );
 		} else {
 			window.location.href = wcs_script_data.cancelled_url;
@@ -21,10 +25,12 @@ jQuery(document).ready(function($){
 			test_mode:	wcs_script_data.test_mode,
 			email_customer:	wcs_script_data.email_customer,
 		}
+
 		$.ajax({
 			url:	wcs_script_data.ajax_url,
 			type:	'POST',
 			data:	data,
+			timeout: 360000, //6 minute timeout should be enough
 			success: function( results ) {
 				// Update confirmation table
 				// Get the valid JSON only from the returned string
@@ -81,7 +87,7 @@ jQuery(document).ready(function($){
 						minor = 0,
 						tests = 0;
 
-					var errors = [], 
+					var errors = [],
 						warnings = [];
 
 					for( var i = 0; i < results.length; i++ ) {
@@ -136,12 +142,22 @@ jQuery(document).ready(function($){
 						$('.finished').html('<td colspan="6" class="row">' + wcs_script_data.finished_importing + '</td>');
 					}
 					$('#wcs-completed-message').show();
+					$('#wcs-completed-percent').html( '100%' );
 				} else {
+					// calculate percentage completed
+					$('#wcs-completed-percent').html( ( ( ( ( counter/2 ) * wcs_script_data.rows_per_request ) / ( wcs_script_data.total * wcs_script_data.rows_per_request ) ) * 100).toFixed(0) + '%' );
 					ajax_import( wcs_script_data.file_positions[counter], wcs_script_data.file_positions[counter+1], wcs_script_data.start_row_num[counter/2] );
 				}
-
+			},
+			error: function(xmlhttprequest, textstatus, message) {
+				// Something has caused an error whilst importing
+				$('.importer-loading').addClass('finished').removeClass('importer-loading');
+				$('#wcs-import-timeout').show();
+				$('#wcs-completed-message').html( $('#wcs-import-timeout').html() );
+				$('#wcs-completed-message').show();
+				$('#wcs-import-time-completion').hide();
 			}
+
 		});
 	}
-
 });
