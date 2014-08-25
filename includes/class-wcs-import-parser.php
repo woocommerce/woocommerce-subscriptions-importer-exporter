@@ -247,6 +247,12 @@ class WCS_Import_Parser {
 						foreach ( $tmp_ordermeta as $tmp_meta ) {
 							$order_meta[] = array( 'key' => $tmp_meta['key'], 'value' => $tmp_meta['value'] );
 						}
+
+						// After all the information has been checked, if the payment method is authorize.net, add the extra user_meta information
+						if( $payment_method == 'authorize.net' ) {
+							$profile_id = ( ! empty ( $subscription_details[self::$mapped_fields['wc_authorize_net_cim_customer_profile_id']] ) ) ? $subscription_details[self::$mapped_fields['wc_authorize_net_cim_customer_profile_id']] : '';
+							update_user_meta( $user_id, '_wc_authorize_net_cim_profile_id', $profile_id );
+						}
 					}
 					break;
 				case 'shipping_addresss_1':
@@ -608,6 +614,12 @@ class WCS_Import_Parser {
 								case 'billing_first_name':
 									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $username;
 									update_user_meta( $found_customer, $key, $meta_value );
+									update_user_meta( $found_customer, 'first_name', $meta_value );
+									break;
+								case 'billing_last_name':
+									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
+									update_user_meta( $found_customer, $key, $meta_value );
+									update_user_meta( $found_customer, 'last_name', $meta_value );
 									break;
 								case 'shipping_first_name':
 								case 'shipping_last_name':
