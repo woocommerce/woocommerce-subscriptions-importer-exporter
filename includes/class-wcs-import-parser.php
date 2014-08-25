@@ -81,7 +81,7 @@ class WCS_Import_Parser {
 	static $supported_payment_gateways = array (
 		'paypal'            => array( 'paypal_subscriber_id' ),
 		'stripe'            => array( 'stripe_customer_id' ),
-		'authorize.net'     => array( 'authorize_net_cim_profile_id', 'authorize_net_cim_payment_profile_id' ),
+		'authorize.net'     => array( 'wc_authorize_net_cim_customer_profile_id', 'wc_authorize_net_cim_payment_profile_id' ),
 	);
 
 	/**
