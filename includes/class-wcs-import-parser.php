@@ -96,7 +96,6 @@ class WCS_Import_Parser {
 		self::$starting_row_number = $starting_row_num;
 		self::$test_mode = ( $test_mode == 'true' ) ? true : false;
 		self::$email_customer = ( $email_customer == 'true' ) ? true : false;
-
 		self::import_start( $file_path );
 		return self::$results;
 	}
@@ -250,7 +249,7 @@ class WCS_Import_Parser {
 
 						// After all the information has been checked, if the payment method is authorize.net, add the extra user_meta information
 						if( $payment_method == 'authorize.net' ) {
-							$profile_id = ( ! empty ( $subscription_details[self::$mapped_fields['wc_authorize_net_cim_customer_profile_id']] ) ) ? $subscription_details[self::$mapped_fields['wc_authorize_net_cim_customer_profile_id']] : '';
+							$profile_id = ( ! empty ( $subscription_details[self::$mapped_fields['authorize_net_cim_profile_id']] ) ) ? $subscription_details[self::$mapped_fields['authorize_net_cim_profile_id']] : '';
 							update_user_meta( $user_id, '_wc_authorize_net_cim_profile_id', $profile_id );
 						}
 					}
@@ -364,12 +363,21 @@ class WCS_Import_Parser {
 
 			$order_id = wp_insert_post( $order_data );
 			$subscription_key = WC_Subscriptions_Manager::get_subscription_key( $order_id, $_product->id );
-
 			foreach ( $order_meta as $meta ) {
 				update_post_meta( $order_id, $meta['key'], $meta['value'] );
 				if ( '_customer_user' == $meta['key'] && $meta['value'] ) {
 					update_user_meta( $meta['value'], 'paying_customer', 1 );
 				}
+			}
+
+			// Add in the custom post meta to order with $order_id
+			foreach( self::$mapped_fields['custom_post_meta'] as $post_meta ) {
+				update_post_meta( $order_id, $post_meta, $subscription_details[$post_meta] );
+			}
+
+			// Add custom user meta to the current user attached to the user
+			foreach( self::$mapped_fields['custom_user_meta'] as $post_meta ) {
+				update_post_meta( $order_id, $post_meta, $subscription_details[$post_meta] );
 			}
 
 			$order = new WC_Order( $order_id );

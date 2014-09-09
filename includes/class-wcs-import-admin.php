@@ -353,6 +353,8 @@ class WCS_Admin_Importer {
 						<td> <!-- Available mapping options -->
 							<select name="mapto[<?php echo $header; ?>]">
 								<option value="0"><?php _e( 'Do not import', 'wcs-importer' ); ?></option>
+								<option value="custom_user_meta">custom_user_meta</option>
+								<option value="custom_post_meta">custom_post_meta</option>
 								<optgroup label="<?php _e( 'Customer Fields', 'wcs-importer'); ?>">
 									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>>customer_id</option>
 									<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
@@ -400,7 +402,7 @@ class WCS_Admin_Importer {
 									<option value="stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
 									<option value="paypal_subscriber_id" <?php selected( $header, 'paypal_subscriber_id' ); ?>>paypal_subscriber_id</option>
 									<option value="wc_authorize_net_cim_payment_profile_id" <?php selected( $header, 'wc_authorize_net_cim_payment_profile_id' ); ?>>wc_authorize_net_cim_payment_profile_id</option>
-									<option value="wc_authorize_net_cim_customer_profile_id" <?php selected( $header, 'wc_authorize_net_cim_customer_profile_id' ); ?>>wc_authorize_net_cim_customer_profile_id</option>
+									<option value="wc_authorize_net_cim_profile_id" <?php selected( $header, 'wc_authorize_net_cim_profile_id' ); ?>>wc_authorize_net_cim_profile_id</option>
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
 								</optgroup>
 								<optgroup label="<?php _e( 'Subscription Status', 'wcs-importer' ); ?>">
@@ -504,6 +506,8 @@ class WCS_Admin_Importer {
 
 		// Possible mapping options
 		$mapped_fields = array(
+			'custom_user_meta'							=> array(),
+			'custom_post_meta'							=> array(),
 			'product_id'						   		=> '',
 			'customer_id' 						   		=> '',
 			'customer_email' 					   		=> '',
@@ -564,12 +568,21 @@ class WCS_Admin_Importer {
 
 		// Doesnt yet handle multiple fields mapped to the same field
 		foreach( $mapped_fields as $key => $value) {
-			$m_key = array_search( $key, $mapping_rules );
-			if ( $m_key ) {
-				$mapped_fields[$key] = $m_key;
+			if ( $key != 'custom_user_meta' && $key != 'custom_post_meta' ) {
+				$m_key = array_search( $key, $mapping_rules );
+				if ( $m_key ) {
+					$mapped_fields[$key] = $m_key;
+				}
 			}
 		}
 
+		// Add the custom post type to their associated arrays in $mapped_fields
+		// TODO: look into a more efficient approach
+		foreach( $mapping_rules as $key => $value ) {
+			if( $value == 'custom_user_meta' || $value == 'custom_post_meta' ) {
+				array_push( $mapped_fields[$value], $key );
+			}
+		}
 		update_post_meta( $_GET['file_id'], '_mapped_rules', $mapped_fields );
 	}
 
