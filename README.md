@@ -62,7 +62,7 @@ Importing subscriptions involves setting up a CSV file containing various column
 *	shipping_postcode
 *	shipping_country
 
-### Accepted Customer Column Fields
+##### Accepted Customer Column Fields
 The following columns have some requirements for acceptable values or formats. 
 * Billing/Shipping information – If this information is not provided in the CSV, the importer will attempt to get the information from the users account information
 * customer_id - this needs to be the integer value which represents the WP User. Can be left blank when creating a new user or if username and/or email of an existing user is present.
@@ -90,22 +90,12 @@ The following columns have some requirements for acceptable values or formats.
 *	shipping_method_title
 *	download_permission_granted
 
-### Accepted Order Column Values
+##### Accepted Order Column Values
 The following columns have some requirements for acceptable values or formats.
 *	payment_method – the currently supported payment methods are PayPal, Stripe and Authorize.net. If anything other than paypal, stripe or authorize.net is used, the import will default to manual renewal.
 *	shipping_method - This should be the shipping method name as seen in the Order admin, i.e. "free_shipping", but can be any string that identifies the shipping method to you; defaults to an empty shipping method.
 *	download_permission_granted - value can be either yes or true; anything else will not grant download permissions for the subscription product in the order.
 *	All dollar amounts need to be either integer or decimal value for instance, “5.65”, “3”, “127.2” are all valid entries.
-
-### Supported Payment Gateways
-The importer currently supports three payment gateways, each requiring different pieces of information in order to successfully transfer active subscriptions.
-  - __Paypal__: paypal_subscriber_id 
-  - __Stripe__: stripe_customer_id
-  - __Authorize.net__: authorize_net_cim_profile_id and authorize_net_cim_payment_profile_id
-
-The importer will detect missing information and provide a pop up before you import. For instance, if you have 'paypal' listed as the payment_method and have not specifed a paypal_subscriber_id field or that field is empty, you will receive a pop up message detailing what information is missing with an option to cancel or continue. If you wish to continue, those subscriptions will default to using manual recurring payments.
-
-If your store uses two payment gateways (ie. PayPal and Stripe) both the paypal_subscriber_id and stripe_customer_id fields will need to mapped and for those rows where the payment_method is set to 'paypal' the paypal_subscriber_id needs to be set while stripe_customer_id can be left empty and vica versa.
 
 ### Subscription Fields
 *	product_id
@@ -114,7 +104,7 @@ If your store uses two payment gateways (ie. PayPal and Stripe) both the paypal_
 *	subscription_expiry_date
 *	subscription_end_date
 
-### Accepted Subscription Column Values
+##### Accepted Subscription Column Values
 *	product_id - this must contain either the id of a regular or variable subscription product within your store.  
 *	subscription_start_date - If provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the current date will be used.
 *	subscription_trial_expiry_date - If provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the subscription trial expiration date will be calculated based on the free trial set on the product (if any) and the subscription's start date.
@@ -122,13 +112,32 @@ If your store uses two payment gateways (ie. PayPal and Stripe) both the paypal_
 *	subscription_end_date - If provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the subscription end date will be left empty - this date is simply a record of a day in the past the subscription ended, either due to expiraiton or cancellation.
 *	subscription_status - Can be one of: active, expired, pending, on-hold or cancelled.
 
+### Importing Custom Fields
+- custom_user_meta
+- custom_post_meta
+Use these columns to add custom information on order meta or user meta. The value of the column header in the csv used as the meta key. For example, you want to add `_terms => true` as order meta for a row in the CSV. Map the column in the CSV with the header `_terms` to `custom_post_meta`.
+
+
+### Supported Payment Gateways
+
+The importer currently supports three payment gateways, each requiring different pieces of information in order to successfully transfer active subscriptions.
+  - __Paypal__: paypal_subscriber_id 
+  - __Stripe__: stripe_customer_id
+  - __Authorize.net__: wc_authorize_net_cim_customer_profile_id and wc_authorize_net_cim_payment_profile_id
+
+The importer will detect missing information and provide a pop up before you import. For instance, if you have 'paypal' listed as the payment_method and have not specifed a paypal_subscriber_id field or that field is empty, you will receive a pop up message detailing what information is missing with an option to cancel or continue. If you wish to continue, those subscriptions will default to using manual recurring payments.
+
+If your store uses two payment gateways (ie. PayPal and Stripe) both the paypal_subscriber_id and stripe_customer_id fields will need to mapped and for those rows where the payment_method is set to 'paypal' the paypal_subscriber_id needs to be set while stripe_customer_id can be left empty and vica versa.
+
 ### Subscription Import Options
+
 * Delimiter - this allows you to specific any other character as the delimiter of the imported CSV; defaulted to the comma character.
 * Test Mode - Enabling this option places the import process in a 'Dry Run" mode where no orders are created, but if sufficient information is given, a new will be created. This is very useful for running test imports prior to the live import.
 * Send off registration email - Having this option ticked means that when the importer creates a new customer, the customer will receive a registration email containing their login details along with their temporary password.
 * AJAX Request Limit - the amount of CSV rows handled at once per AJAX call can be modified by defining the WCS_REQ_LIMIT constant in wp_config.php; defaults to 15.
 
 ### List of Warnings
+
 - Shipping method and/or title for the order has been set to empty.
 - No recognisable payment method has been specified. Default payment method being used.
 - The following shipping address fields have been left empty: [ LIST_OF_FIELDS ].
@@ -139,18 +148,19 @@ If your store uses two payment gateways (ie. PayPal and Stripe) both the paypal_
 A link to edit the order is given at the end of the list of warnings.
 
 ### List of Fatal Errors
+
 - The product_id is not a subscription product in your store.
-  - Occurs when no product_id is given or the product_id is not a subscription product within your store.
 - An error occurred with the customer information provided.
   - Occurs when the user_id provided doesn't exist, the email doesn't exist, the username is invalid and there's not enough information to create a new user.
 
 ### New Customers and Passwords
-When the importer doesn't recognises the given customer by the username or email (in the CSV), it will create a new one with those values. This customer's account is created with the password being securely generated by WordPress. This password can be emailed to the customer by selecting the 'Email Password' option at the first step of importing which is already selected by default. If you choose to untick this option, all your new customers will need to go through the forgot-your-password process which will let them reset it via email.
+
+When the importer doesn't recognise the given customer by the username or email (in the CSV), it will create a new user with those values. This customer's account is created with the password being securely generated by WordPress. This password can be emailed to the customer by selecting the 'Email Password' option at the first step of importing which is already selected by default. If you choose to untick this option, all your new customers will need to go through the forgot-your-password process which will let them reset it via email.
 
 
 ### Subscription Importer Simplifications
 * product_id/variation_id – variable subscription ids can also be placed in the product_id column as well as regular subscriptions
-* Billing/shipping Information - If the shipping/billing information is not provided in the CSV the importer will try gather the information from the users settings before leaving the values empty.
+* Billing/shipping Information - If the shipping/billing information is not provided in the CSV the importer will try gather the information from the user's settings before leaving the values empty.
 * Recurring Order meta Data - The values for recurring_shipping_method/title, order_recurring_shipping_total, order_recurring_shipping_tax_total, recurring
 * Billing First name - to avoid the billing name being left null, the customers_username has been used if no billing_first_name is set by the user or the CSV.
 * payment_method/payment_method_title – the values used in these columns are also used for the recurring_payment_method and recurring_payment_method_title
@@ -162,7 +172,7 @@ When the importer doesn't recognises the given customer by the username or email
 * If the following values are not specified in the CSV they will be set to the subscription product's recurring price (regardless of whether a tax value is specified or not):
   * recurring_line_subtotal
   * recurring_line_total
-* If the following values are not specified in the CSV they will be set to the subscription product's sign-up fee (if any) plus recurring price, if there is no free trial (regardless of whether a tax value is specified or not):
+* If the following values are not specified in the CSV, they will be set to the subscription product's sign-up fee (if any) plus recurring price, if there is no free trial (regardless of whether a tax value is specified or not):
   * line_subtotal
   * line_total
   * order_total
@@ -178,7 +188,7 @@ When the importer doesn't recognises the given customer by the username or email
   - Specify the delimiting character that separates each column; defaults to comma character `,`
 
 ### Step 2: Map the File's Fields
-- Each column header found in the file will listed as a row in the table on this page, along with a dropdown menu. Use the dropdown menu to find and match the information to a value known by the importer. <strong>Must not have the same fields mapped more than once!</strong>
+- Each column header found in the file will listed as a row in the table on this page, along with a dropdown menu. Use the dropdown menu to find and match the information to a value known by the importer. <strong>Must not have the same fields mapped more than once unless it's either `custom_user_meta` or `custom_post_meta`.</strong>
 - List of possible fields to map to are <a href="https://github.com/thenbrent/woocommerce-subscriptions-importer/edit/master/README.md#import-subscriptions">above</a>
 
 ### Step 3a: Run in Test Mode
@@ -190,7 +200,7 @@ After ticking the box to run the importer in test mode, you should see something
 
 ##FAQ
 #### 1. Is it possible to make sure the active subscriptions will still work?
-Yes. When importing active subscriptions, it's important you that the subcription id's are provided in the CSV. Depending on the payment gateway being used, the information required varies (see below).
+Yes. When importing active subscriptions, it's important that the subscription id's are provided in the CSV. Depending on the payment gateway being used, the information required varies (see below).
   - With <strong>PayPal</strong>, make sure you have set the paypal_subscriber_id field in the CSV ( PayPal sometimes call this the recurring payment profile ID).
   - When using <strong>Stripe</strong>, ensure the stripe_customer_id field is set in the CSV.
-  - For those using <strong>Authorize.net</strong>, you will need to provide both the authorize_net_cim_profile_id and the authorize_net_cim_payment_profile_id fields in the CSV. Both pieces of information are required as the authorize_net_cim_profile_id value refers to the customer and the authorize_net_cim_payment_profile_id is used by Authorize.net to identify their payment information.
+  - For those using <strong>Authorize.net</strong>, you will need to provide both the wc_authorize_net_cim_customer_profile_id and the wc_authorize_net_cim_payment_profile_id fields in the CSV. Both pieces of information are required as the wc_authorize_net_cim_customer_profile_id value refers to the customer and the wc_authorize_net_cim_payment_profile_id is used by Authorize.net to identify their payment information.
