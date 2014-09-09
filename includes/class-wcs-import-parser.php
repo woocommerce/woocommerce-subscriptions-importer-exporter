@@ -377,7 +377,7 @@ class WCS_Import_Parser {
 
 			// Add custom user meta to the current user attached to the user
 			foreach( self::$mapped_fields['custom_user_meta'] as $post_meta ) {
-				update_user_meta( $order_id, $post_meta, $subscription_details[$post_meta] );
+				update_user_meta( $user_id, $post_meta, $subscription_details[$post_meta] );
 			}
 
 			$order = new WC_Order( $order_id );
