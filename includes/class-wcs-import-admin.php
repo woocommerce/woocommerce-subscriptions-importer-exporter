@@ -354,7 +354,8 @@ class WCS_Admin_Importer {
 							<select name="mapto[<?php echo $header; ?>]">
 								<option value="0"><?php _e( 'Do not import', 'wcs-importer' ); ?></option>
 								<option value="custom_user_meta">custom_user_meta</option>
-								<option value="custom_post_meta">custom_post_meta</option>
+								<option value="custom_order_meta">custom_order_meta</option>
+								<option value='custom_user_order_meta'>custom_user_order_meta</option>
 								<optgroup label="<?php _e( 'Customer Fields', 'wcs-importer'); ?>">
 									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>>customer_id</option>
 									<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
@@ -507,7 +508,8 @@ class WCS_Admin_Importer {
 		// Possible mapping options
 		$mapped_fields = array(
 			'custom_user_meta'							=> array(),
-			'custom_post_meta'							=> array(),
+			'custom_order_meta'							=> array(),
+			'custom_user_order_meta'					=> array(),
 			'product_id'						   		=> '',
 			'customer_id' 						   		=> '',
 			'customer_email' 					   		=> '',
@@ -568,7 +570,7 @@ class WCS_Admin_Importer {
 
 		// Doesnt yet handle multiple fields mapped to the same field
 		foreach( $mapped_fields as $key => $value) {
-			if ( $key != 'custom_user_meta' && $key != 'custom_post_meta' ) {
+			if ( $key != 'custom_user_meta' && $key != 'custom_order_meta' && $key != 'custom_user_order_meta') {
 				$m_key = array_search( $key, $mapping_rules );
 				if ( $m_key ) {
 					$mapped_fields[$key] = $m_key;
@@ -577,9 +579,8 @@ class WCS_Admin_Importer {
 		}
 
 		// Add the custom post type to their associated arrays in $mapped_fields
-		// TODO: look into a more efficient approach
 		foreach( $mapping_rules as $key => $value ) {
-			if( $value == 'custom_user_meta' || $value == 'custom_post_meta' ) {
+			if( $value == 'custom_user_meta' || $value == 'custom_order_meta' || $value == 'custom_user_order_meta' ) {
 				array_push( $mapped_fields[$value], $key );
 			}
 		}

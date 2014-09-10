@@ -371,13 +371,19 @@ class WCS_Import_Parser {
 			}
 
 			// Add in the custom post meta to order with $order_id
-			foreach( self::$mapped_fields['custom_post_meta'] as $post_meta ) {
+			foreach( self::$mapped_fields['custom_order_meta'] as $post_meta ) {
 				update_post_meta( $order_id, $post_meta, $subscription_details[$post_meta] );
 			}
 
 			// Add custom user meta to the current user attached to the user
-			foreach( self::$mapped_fields['custom_user_meta'] as $post_meta ) {
-				update_user_meta( $user_id, $post_meta, $subscription_details[$post_meta] );
+			foreach( self::$mapped_fields['custom_user_meta'] as $user_meta ) {
+				update_user_meta( $user_id, $user_meta, $subscription_details[$user_meta] );
+			}
+
+			// Add the data listed as custom_post and custom
+			foreach( self::$mapped_fields['custom_user_order_meta'] as $user_order_meta ) {
+				update_user_meta( $user_id, $user_order_meta, $subscription_details[$user_order_meta] );
+				update_post_meta( $order_id, $user_order_meta, $subscription_details[$user_order_meta] );
 			}
 
 			$order = new WC_Order( $order_id );
