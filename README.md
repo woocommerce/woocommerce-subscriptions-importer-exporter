@@ -1,3 +1,7 @@
+### Not yet compatible with WC 2.2 - currently in progress! 
+
+---
+
 # WooCommerce Subscriptions Importer
 
 ##Overview
