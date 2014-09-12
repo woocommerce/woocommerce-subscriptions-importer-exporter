@@ -662,13 +662,13 @@ class WCS_Import_Parser {
 
 						// send user registration email if admin as chosen to do so
 						if( self::$email_customer && function_exists( 'wp_new_user_notification' ) ) {
-							$customer_data = array( 
-								'user_login' => $username,
-								'user_pass'  => $password,
-								'user_email' => $customer_email,
-								'role'       => 'customer'
-							);
-							do_action( 'woocommerce_created_customer', $found_customer, $customer_data, false );
+							// keep the previous value of the option so the original value can be restored
+							$previous_option  = get_option( 'woocommerce_registration_generate_password' );
+							// force the option value so that the password will appear in the email
+							update_option( 'woocommerce_registration_generate_password', 'yes' );
+							do_action( 'woocommerce_created_customer', $found_customer, array( 'user_pass' => $password ), true );
+							// restore the previous value stored in the option
+							update_option( 'woocommerce_registration_generate_password', $previous_option );
 						}
 					}
 				}
