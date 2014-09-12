@@ -96,7 +96,6 @@ class WCS_Import_Parser {
 		self::$starting_row_number = $starting_row_num;
 		self::$test_mode = ( $test_mode == 'true' ) ? true : false;
 		self::$email_customer = ( $email_customer == 'true' ) ? true : false;
-		error_log( ( self::$email_customer == true) ? "customer password should be emailed." : "customer password wont be emailed");
 		self::import_start( $file_path );
 		return self::$results;
 	}
@@ -669,7 +668,6 @@ class WCS_Import_Parser {
 								'user_email' => $customer_email,
 								'role'       => 'customer'
 							);
-							error_log( 'new customer data' . print_r( $customer_data, true) );
 							do_action( 'woocommerce_created_customer', $found_customer, $customer_data, false );
 						}
 					}
