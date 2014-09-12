@@ -96,6 +96,7 @@ class WCS_Import_Parser {
 		self::$starting_row_number = $starting_row_num;
 		self::$test_mode = ( $test_mode == 'true' ) ? true : false;
 		self::$email_customer = ( $email_customer == 'true' ) ? true : false;
+		error_log( ( self::$email_customer == true) ? "customer password should be emailed." : "customer password wont be emailed");
 		self::import_start( $file_path );
 		return self::$results;
 	}
@@ -249,7 +250,7 @@ class WCS_Import_Parser {
 
 						// After all the information has been checked, if the payment method is authorize.net, add the extra user_meta information
 						if( $payment_method == 'authorize.net' ) {
-							$profile_id = ( ! empty ( $subscription_details[self::$mapped_fields['authorize_net_cim_profile_id']] ) ) ? $subscription_details[self::$mapped_fields['authorize_net_cim_profile_id']] : '';
+							$profile_id = ( ! empty ( $subscription_details[self::$mapped_fields['wc_authorize_net_cim_customer_profile_id']] ) ) ? $subscription_details[self::$mapped_fields['wc_authorize_net_cim_customer_profile_id']] : '';
 							update_user_meta( $user_id, '_wc_authorize_net_cim_profile_id', $profile_id );
 						}
 					}
@@ -662,7 +663,14 @@ class WCS_Import_Parser {
 
 						// send user registration email if admin as chosen to do so
 						if( self::$email_customer && function_exists( 'wp_new_user_notification' ) ) {
-							do_action( 'woocommerce_created_customer', $found_customer, $password, $password_generated );
+							$customer_data = array( 
+								'user_login' => $username,
+								'user_pass'  => $password,
+								'user_email' => $customer_email,
+								'role'       => 'customer'
+							);
+							error_log( 'new customer data' . print_r( $customer_data, true) );
+							do_action( 'woocommerce_created_customer', $found_customer, $customer_data, false );
 						}
 					}
 				}

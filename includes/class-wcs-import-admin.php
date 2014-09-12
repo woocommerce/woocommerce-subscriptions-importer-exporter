@@ -403,7 +403,7 @@ class WCS_Admin_Importer {
 									<option value="stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
 									<option value="paypal_subscriber_id" <?php selected( $header, 'paypal_subscriber_id' ); ?>>paypal_subscriber_id</option>
 									<option value="wc_authorize_net_cim_payment_profile_id" <?php selected( $header, 'wc_authorize_net_cim_payment_profile_id' ); ?>>wc_authorize_net_cim_payment_profile_id</option>
-									<option value="wc_authorize_net_cim_profile_id" <?php selected( $header, 'wc_authorize_net_cim_profile_id' ); ?>>wc_authorize_net_cim_profile_id</option>
+									<option value="wc_authorize_net_cim_customer_profile_id" <?php selected( $header, 'wc_authorize_net_cim_customer_profile_id' ); ?>>wc_authorize_net_cim_customer_profile_id</option>
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
 								</optgroup>
 								<optgroup label="<?php _e( 'Subscription Status', 'wcs-importer' ); ?>">
