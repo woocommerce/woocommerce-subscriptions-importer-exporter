@@ -12,6 +12,7 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 	}
 
 	public function importer_simple_test() {
+		echo "test if this function is being called in Travis-ci";
 		// Create a new subscription product to test on
 		$product_id = wp_insert_post( array( 
 			'post_type' 				=> 'product',
