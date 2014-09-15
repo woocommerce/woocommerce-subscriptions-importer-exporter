@@ -1,0 +1,5 @@
+.gitattributes export-ignore
+.gitmodules export-ignore
+.gitignore export-ignore
+deploy.sh export-ignore
+deploy-beta.sh export-ignore
