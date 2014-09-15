@@ -67,7 +67,6 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 	}
 
 	public function test_results() {
-		error_log( self::$import_results );
 		$this->assertTrue( true );
 	}
 
