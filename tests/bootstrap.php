@@ -2,9 +2,9 @@
 
 $GLOBALS['wp_tests_options'] = array(
 	'active_plugins' => array(
-		basename( dirname( dirname( __FILE__ ) ) ) . '/wc-subscription-import.php',
 		basename( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce/woocommerce.php',
-		basename( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce-subscriptions/woocommerce-subscriptions.php'
+		basename( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce-subscriptions/woocommerce-subscriptions.php',
+		basename( dirname( dirname( __FILE__ ) ) ) . '/wc-subscription-import.php',
 	),
 	'template'       => 'twentythirteen',
 	'stylesheet'     => 'twentythirteen',
