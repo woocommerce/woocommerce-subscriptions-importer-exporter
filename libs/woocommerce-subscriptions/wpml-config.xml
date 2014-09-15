@@ -1,0 +1,6 @@
+<wpml-config>
+    <admin-texts>
+        <key name="woocommerce_subscriptions_add_to_cart_button_text">Sign Up Now</key>
+        <key name="woocommerce_subscriptions_order_button_text">Sign Up Now</key>
+    </admin-texts>
+</wpml-config>
