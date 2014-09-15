@@ -2,7 +2,7 @@
 
 $GLOBALS['wp_tests_options'] = array(
 	'active_plugins' => array(
-		basename( dirname( dirname( __FILE__ ) ) ) . '/woocommerce-subscriptions-importer.php',
+		basename( dirname( dirname( __FILE__ ) ) ) . '/wc-subscription-importer.php',
 		basename( dirname( dirname( __FILE__ ) ) ) . '/lib/woocommerce/woocommerce.php',
 		basename( dirname( dirname( __FILE__ ) ) ) . '/lib/woocommerce-subscriptions/woocommerce-subscriptions.php'
 	),
