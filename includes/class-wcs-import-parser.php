@@ -254,7 +254,7 @@ class WCS_Import_Parser {
 						}
 					}
 					break;
-				case 'shipping_addresss_1':
+				case 'shipping_address_1':
 				case 'shipping_city':
 				case 'shipping_postcode':
 				case 'shipping_state':
