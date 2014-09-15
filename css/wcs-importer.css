@@ -1,0 +1,106 @@
+
+#wcs-import-progress {
+	width: 100%;
+}
+
+#wcs-import-progress td, #wcs-import-progress th {
+	padding: .5em 1em;
+}
+#wcs-import-progress td.status, #wcs-import-progress th.status {
+	width: 32px;
+}
+
+#wcs-import-progress td.row,
+#wcs-import-progress th.row {
+	width: 3em;
+	text-align: center;
+	vertical-align: middle;
+	padding: 1em;
+}
+
+#wcs-import-progress tr.warning-top td.row {
+	padding-bottom: 0;
+}
+
+#wcs-import-progress tr.importer-loading td {
+	background: url('../images/ajax-loader.gif') no-repeat center center;
+	height: 32px;
+}
+
+.widefat_importer td {
+	vertical-align: middle;
+	padding: 6px 0px 4px 10px;
+}
+
+#wcs-import-progress ul {
+	list-style: inherit;
+	padding-left: 1.4em;
+}
+
+#wcs-import-progress .warning {
+	border-left: 4px solid #FFD700;
+	padding-left: 1em;
+}
+
+#wcs-import-progress .success {
+	border-left: 4px solid #339933;
+	padding-left: 1em;
+}
+
+#wcs-import-progress .error-import {
+	border-left: 4px solid #CC0000;
+	padding-left: 1em;
+}
+
+.wcs-importer-download {
+	display: inline-block;
+	margin-right: 16px;
+}
+
+/* Imported Status Styles */
+#wcs-import-progress td.column-status {
+	padding: 6px 7px;
+}
+#wcs-import-progress .column-status mark {
+	display: inline-block;
+	text-align: center;
+	white-space: nowrap;
+	padding: 4px 12px;
+	background: #999;
+	border: 1px solid #999;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	-o-border-radius: 4px;
+	border-radius: 4px;
+	margin: 0;
+	font-size: 9px;
+	text-transform: uppercase;
+	color: #fff;
+	font-weight: bold;
+	text-shadow:0 1px 0 rgba(0,0,0,0.3);
+	width: 66px;
+}
+#wcs-import-progress .column-status mark.active {
+	background-color: #339933;
+	border-color: #339933;
+}
+#wcs-import-progress .column-status mark.expired {
+	background-color: #A0658B;
+	border-color: #A0658B;
+}
+#wcs-import-progress .column-status mark.pending {
+	background-color: #999;
+	border-color: #999;
+}
+#wcs-import-progress .column-status mark.on-hold {
+	background-color: #E66F00;
+	border-color: #E66F00;
+}
+#wcs-import-progress .column-status mark.cancelled {
+	background-color: #ccc;
+	border-color: #ccc;
+}
+
+#wcs-completed-message {
+	display:none;
+}
