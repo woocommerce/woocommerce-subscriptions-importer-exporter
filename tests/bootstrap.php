@@ -31,6 +31,7 @@ if( false !== getenv( 'WP_TESTS_DIR' ) ) {
 }
 
 // try activating the woocommerce plugin
-activate_plugin( WP_CONTENT_DIR . '/plugins/woocommerce-subscriptions-importer/libs/woocommerce/woocommerce.php', '', FALSE, TRUE );
+activate_plugin( WP_CONTENT_DIR . '/plugins/woocommerce-subscriptions-importer/libs/woocommerce/woocommerce.php', '', TRUE, TRUE );
+activate_plugin( WP_CONTENT_DIR . '/plugins/woocommerce-subscriptions-importer/libs/woocommerce-subscriptions/woocommerce-subscriptions.php', '', FALSE, TRUE );
 
 include_once('WCS_Importer_UnitTestCase.php');
