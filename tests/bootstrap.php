@@ -30,4 +30,7 @@ if( false !== getenv( 'WP_TESTS_DIR' ) ) {
 	require dirname( dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) ) ) . '/tests/phpunit/includes/bootstrap.php';
 }
 
+// try activating the woocommerce plugin
+activate_plugin( WP_CONTENT_DIR . '/plugins/woocommerce-subscriptions-importer/libs/woocommerce/woocommerce.php', '', FALSE, TRUE );
+
 include_once('WCS_Importer_UnitTestCase.php');

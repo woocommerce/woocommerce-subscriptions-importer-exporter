@@ -8,11 +8,6 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 	static $import_results = array();
 
 	public function setUp() {
-		// include necessary files
-		if( ! class_exists( 'WC_Subscriptions_Product' ) ) {
-			require_once( dirname( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce-subscriptions/classes/class-wc-product-subscription.php' );
-		}
-
 		// Create a new subscription product to test on
 		$product_id = wp_insert_post( array( 
 			'post_type' 				=> 'product',
