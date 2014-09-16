@@ -10,9 +10,9 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 	public function setUp() {
 		require_once ABSPATH . '/wp-admin/includes/plugin.php';
 		// try activating the woo plugins
-		activate_plugin( dirname ( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce/woocommerce.php' );
-		activate_plugin( dirname( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce-subscriptions/woocommerce-subscriptions.php' );
-
+		activate_plugin( dirname ( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce/woocommerce.php', '', ( is_multisite() ) ? TRUE : FALSE, TRUE );
+		activate_plugin( dirname( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce-subscriptions/woocommerce-subscriptions.php', '', ( is_multisite() ) ? TRUE : FALSE, TRUE );
+		echo "Can't use error_log to debug in travis-ci so i'm having to use echoes :( File path: " . dirname( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce-subscriptions/woocommerce-subscriptions.php';
 		// Create a new subscription product to test on
 		$product_id = wp_insert_post( array( 
 			'post_type' 				=> 'product',
@@ -62,7 +62,7 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 			'wc_authorize_net_cim_payment_profile_id' 	=> 'wc_authorize_net_cim_payment_profile_id',
 			'wc_authorize_net_cim_customer_profile_id' 	=> 'wc_authorize_net_cim_customer_profile_id',
 		);
-
+		echo "phpunit output console checker if class exists: " . class_exists( 'WC_Subscriptions_Product' );
 		//$import_results = WCS_Import_Parser::import_data( $test_csv, $mapped_fields, 0, 10000, 1, 'true', 'false' );
 	}
 
