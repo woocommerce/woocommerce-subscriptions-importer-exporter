@@ -8,11 +8,11 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 	static $import_results = array();
 
 	public function setUp() {
-		add_action( 'plugins_loaded', array( $this, 'importer_simple_test' ) );
-	}
+		// include necessary files
+		if( ! class_exists( 'WC_Subscriptions_Product' ) ) {
+			require_once( dirname( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce-subscriptions/classes/class-wc-product-subscription.php' );
+		}
 
-	public function importer_simple_test() {
-		echo "test if this function is being called in Travis-ci";
 		// Create a new subscription product to test on
 		$product_id = wp_insert_post( array( 
 			'post_type' 				=> 'product',
@@ -62,11 +62,6 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 			'wc_authorize_net_cim_payment_profile_id' 	=> 'wc_authorize_net_cim_payment_profile_id',
 			'wc_authorize_net_cim_customer_profile_id' 	=> 'wc_authorize_net_cim_customer_profile_id',
 		);
-
-		// Whether the importer is running in Test Mode
-		$test_mode = true;
-		// Whether to email the new customer their new username and password.
-		$email_customer = true;
 
 		$import_results = WCS_Import_Parser::import_data( $test_csv, $mapped_fields, 0, 10000, 1, 'true', 'false' );
 	}
