@@ -20,7 +20,7 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 			'post_name' 				=> 'simple-subscription-example',
 			'filter'					=> 'raw',
 		));
-
+		echo "product_id = " . $product_id;
 		update_post_meta( $product_id, '_subscription_price', 10 );
 		update_post_meta( $product_id, '_subscription_period', 'month' );
 		update_post_meta( $product_id, '_subscription_period_interval', 1 );
