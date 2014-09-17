@@ -91,6 +91,7 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 		);
 
 		$import_results = WCS_Import_Parser::import_data( $test_csv, $mapped_fields, 0, 10000, 1, 'true', 'false' );
+		error_log( 'result = ' . print_r( $import_results, true ) );
 	}
 
 	public function test_results() {
