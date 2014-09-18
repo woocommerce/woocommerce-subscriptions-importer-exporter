@@ -79,9 +79,9 @@ class WCS_Import_Parser {
 	);
 
 	static $supported_payment_gateways = array (
-		'paypal'            => array( 'paypal_subscriber_id' ),
-		'stripe'            => array( 'stripe_customer_id' ),
-		'authorize.net'     => array( 'wc_authorize_net_cim_customer_profile_id', 'wc_authorize_net_cim_payment_profile_id' ),
+		'paypal'            => array( 'PayPal Subscriber ID' ),
+		'stripe'            => array( '_stripe_customer_id' ),
+		'authorize.net'     => array( '_wc_authorize_net_cim_customer_profile_id', '_wc_authorize_net_cim_payment_profile_id' ),
 	);
 
 	/**
@@ -125,7 +125,6 @@ class WCS_Import_Parser {
 						if ( ! $header ) {
 							continue;
 						}
-						$header = strtolower( $header );
 						$subscription_details[ $header ] = ( isset( $csv_row[ $key ] ) ) ? trim( self::format_data_from_csv( $csv_row[ $key ], $file_encoding ) ) : '';
 					}
 
@@ -230,7 +229,7 @@ class WCS_Import_Parser {
 						foreach( self::$supported_payment_gateways[$payment_method] as $meta_data ) {
 							if( ! empty ( $subscription_details[self::$mapped_fields[$meta_data]] ) ) {
 								$meta_value = $subscription_details[self::$mapped_fields[$meta_data]];
-								$tmp_ordermeta[] = array( 'key' => '_' . $meta_data, 'value' => $meta_value );
+								$tmp_ordermeta[] = array( 'key' => $meta_data, 'value' => $meta_value );
 							} else {
 								$use_manual_recurring = true;
 							}
@@ -247,9 +246,9 @@ class WCS_Import_Parser {
 							$order_meta[] = array( 'key' => $tmp_meta['key'], 'value' => $tmp_meta['value'] );
 						}
 
-						// After all the information has been checked, if the payment method is authorize.net, add the extra user_meta information
+						// After all the information has been checked, add the extra user_meta information requirements for certain payment methods
 						if( $payment_method == 'authorize.net' ) {
-							$profile_id = ( ! empty ( $subscription_details[self::$mapped_fields['wc_authorize_net_cim_customer_profile_id']] ) ) ? $subscription_details[self::$mapped_fields['wc_authorize_net_cim_customer_profile_id']] : '';
+							$profile_id = ( ! empty ( $subscription_details[self::$mapped_fields['_wc_authorize_net_cim_customer_profile_id']] ) ) ? $subscription_details[self::$mapped_fields['_wc_authorize_net_cim_customer_profile_id']] : '';
 							update_user_meta( $user_id, '_wc_authorize_net_cim_profile_id', $profile_id );
 						}
 					}

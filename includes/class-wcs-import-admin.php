@@ -314,7 +314,6 @@ class WCS_Admin_Importer {
 				while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== false ) {
 					foreach ( $column_headers as $key => $column_header ) {
 						if ( ! $column_header ) continue;
-						$column_header = strtolower( $column_header );
 						$row[ $column_header ] = ( isset( $postmeta[ $key ] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[ $key ], $enc ) : '';
 					}
 					break;
@@ -400,10 +399,10 @@ class WCS_Admin_Importer {
 									<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
 									<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
 									<option value="shipping_method_title" <?php selected( $header, 'shipping_method_title' ); ?>>shipping_method_title</option>
-									<option value="stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
-									<option value="paypal_subscriber_id" <?php selected( $header, 'paypal_subscriber_id' ); ?>>paypal_subscriber_id</option>
-									<option value="wc_authorize_net_cim_payment_profile_id" <?php selected( $header, 'wc_authorize_net_cim_payment_profile_id' ); ?>>wc_authorize_net_cim_payment_profile_id</option>
-									<option value="wc_authorize_net_cim_customer_profile_id" <?php selected( $header, 'wc_authorize_net_cim_customer_profile_id' ); ?>>wc_authorize_net_cim_customer_profile_id</option>
+									<option value="_stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
+									<option value="PayPal Subscriber ID" <?php selected( $header, 'PayPal Subscriber ID' ); ?>>PayPal Subscriber id</option>
+									<option value="_wc_authorize_net_cim_payment_profile_id" <?php selected( $header, 'wc_authorize_net_cim_payment_profile_id' ); ?>>wc_authorize_net_cim_payment_profile_id</option>
+									<option value="_wc_authorize_net_cim_customer_profile_id" <?php selected( $header, 'wc_authorize_net_cim_customer_profile_id' ); ?>>wc_authorize_net_cim_customer_profile_id</option>
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
 								</optgroup>
 								<optgroup label="<?php _e( 'Subscription Status', 'wcs-importer' ); ?>">
@@ -558,11 +557,11 @@ class WCS_Admin_Importer {
 			'order_tax'							   		=> '',
 			'order_total' 						 		=> '',
 			'order_recurring_total'				 		=> '',
-			'stripe_customer_id'				  		=> '',
-			'paypal_subscriber_id'				  		=> '',
+			'_stripe_customer_id'				  		=> '',
+			'PayPal Subscriber ID'				  		=> '',
 			'payment_method_title'						=> '',
-			'wc_authorize_net_cim_payment_profile_id' 	=> '',
-			'wc_authorize_net_cim_customer_profile_id' 	=> '',
+			'_wc_authorize_net_cim_payment_profile_id' 	=> '',
+			'_wc_authorize_net_cim_customer_profile_id' => '',
 			'download_permission_granted'		   		=> '',
 		);
 
