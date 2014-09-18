@@ -250,6 +250,9 @@ class WCS_Import_Parser {
 						if( $payment_method == 'authorize.net' ) {
 							$profile_id = ( ! empty ( $subscription_details[self::$mapped_fields['_wc_authorize_net_cim_customer_profile_id']] ) ) ? $subscription_details[self::$mapped_fields['_wc_authorize_net_cim_customer_profile_id']] : '';
 							update_user_meta( $user_id, '_wc_authorize_net_cim_profile_id', $profile_id );
+						} else if ( $payment_method == 'stripe' ) {
+							$stripe_cust_id = ( ! empty ( $subscription_details[self::$mapped_fields['_stripe_customer_id']] ) ) ? $subscription_details[self::$mapped_fields['_stripe_customer_id']] : '';
+							update_user_meta( $user_id, '_stripe_customer_id', $stripe_cust_id );
 						}
 					}
 					break;
