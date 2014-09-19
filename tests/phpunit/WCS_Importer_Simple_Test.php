@@ -106,7 +106,7 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 	public function test_new_customer_default_username() {
 
 		$expected_username = 'johndoe';
-		$this->assertEquals( $expected_username, wp_get_user( self::$user_id, 'user_login', true ) );
+		$this->assertEquals( $expected_username, get_user_meta( self::$user_id, 'user_login', true ) );
 	}
 
 	/**
@@ -117,7 +117,7 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 	public function test_new_customer_meta_from_csv() {
 
 		$expected_email = 'johndoe@example.com';
-		$this->assertEquals( $expected_email, wp_get_user( self::$user_id, 'user_email', true ) );
+		$this->assertEquals( $expected_email, get_user_meta( self::$user_id, 'user_email', true ) );
 		// Will consider separating these into individual functions to easily understanding exactly which case is causing the assertion
 		$expected_billing_first_name = 'John';
 		$expected_billing_last_name  = 'Doe';
