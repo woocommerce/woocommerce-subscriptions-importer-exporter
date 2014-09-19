@@ -81,7 +81,7 @@ class WCS_Import_Parser {
 	static $supported_payment_gateways = array (
 		'paypal'            => array( 'PayPal Subscriber ID' ),
 		'stripe'            => array( '_stripe_customer_id' ),
-		'authorize.net'     => array( '_wc_authorize_net_cim_customer_profile_id', '_wc_authorize_net_cim_payment_profile_id' ),
+		'authorize_net_cim'     => array( '_wc_authorize_net_cim_customer_profile_id', '_wc_authorize_net_cim_payment_profile_id' ),
 	);
 
 	/**
@@ -247,7 +247,7 @@ class WCS_Import_Parser {
 						}
 
 						// After all the information has been checked, add the extra user_meta information requirements for certain payment methods
-						if( $payment_method == 'authorize.net' ) {
+						if( $payment_method == 'authorize_net_cim' ) {
 							$profile_id = ( ! empty ( $subscription_details[self::$mapped_fields['_wc_authorize_net_cim_customer_profile_id']] ) ) ? $subscription_details[self::$mapped_fields['_wc_authorize_net_cim_customer_profile_id']] : '';
 							update_user_meta( $user_id, '_wc_authorize_net_cim_profile_id', $profile_id );
 						} else if ( $payment_method == 'stripe' ) {
@@ -271,7 +271,7 @@ class WCS_Import_Parser {
 					}
 					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
-				case 'billing_addresss_1':
+				case 'billing_address_1':
 				case 'billing_city':
 				case 'billing_postcode':
 				case 'billing_state':
