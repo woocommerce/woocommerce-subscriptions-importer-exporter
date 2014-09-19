@@ -43,7 +43,7 @@ class WCS_Importer_Fail_Product_Test extends WCS_Importer_UnitTestCase {
 			'stripe_customer_id'				  		=> '',
 			'paypal_subscriber_id'				  		=> '',
 			'download_permission_granted'		   		=> '',
-			'product_id'								=> 'product_id',
+			'product_id'								=> '',
 			'customer_email' 							=> 'customer_email',
 			'billing_first_name' 						=> 'billing_first_name',
 			'billing_last_name' 						=> 'billing_last_name',
@@ -76,7 +76,7 @@ class WCS_Importer_Fail_Product_Test extends WCS_Importer_UnitTestCase {
 	 */
 	public function test_product_not_exists() {
 		// test file
-		$test_csv = dirname( __FILE__ ) . '/test-files/product-exists-test.csv';
+		$test_csv = dirname( __FILE__ ) . '/test-files/no-product-exists-test.csv';
 
 		// running the case where the product in the csv doesn't exist.
 		$import_results = WCS_Import_Parser::import_data( $test_csv, self::$mapped_fields, 0, 10000, 1, 'false', 'false' );

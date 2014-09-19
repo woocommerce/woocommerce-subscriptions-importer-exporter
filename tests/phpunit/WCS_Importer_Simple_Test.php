@@ -95,8 +95,8 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 
 		// running the importer in test mode and email customer set to false.
 		self::$import_results = WCS_Import_Parser::import_data( $test_csv, $mapped_fields, 0, 10000, 1, 'false', 'false' )[0];
-		self::$user_id = $import_results['user_id'];
-		error_log( 'Results: ' . print_r( self::$import_results ) );
+		self::$user_id = self::$import_results['user_id'];
+		error_log( 'Results: ' . print_r( self::$import_results, true ) );
 	}
 
 	/**
@@ -131,16 +131,16 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 		$expected_billing_phone      = '';
 
 		// Run a bunch of assertions
-		$this->assertEquals( $expected_billing_first_name, get_user_meta( sefl::$user_id, 'billing_first_name', true ) );
-		$this->assertEquals( $expected_billing_last_name, get_user_meta( sefl::$user_id, 'billing_last_name', true ) );
-		$this->assertEquals( $expected_billing_address_1, get_user_meta( sefl::$user_id, 'billing_address_1', true ) );
-		$this->assertEquals( $expected_billing_address_2, get_user_meta( sefl::$user_id, 'billing_address_2', true ) );
-		$this->assertEquals( $expected_billing_company, get_user_meta( sefl::$user_id, 'billing_company', true ) );
-		$this->assertEquals( $expected_billing_city, get_user_meta( sefl::$user_id, 'billing_city', true ) );
-		$this->assertEquals( $expected_billing_state, get_user_meta( sefl::$user_id, 'billing_state', true ) );
-		$this->assertEquals( $expected_billing_postcode, get_user_meta( sefl::$user_id, 'billing_postcode', true ) );
-		$this->assertEquals( $expected_billing_country, get_user_meta( sefl::$user_id, 'billing_country', true ) );
-		$this->assertEquals( $expected_billing_phone, get_user_meta( sefl::$user_id, 'billing_phone', true ) );
+		$this->assertEquals( $expected_billing_first_name, get_user_meta( self::$user_id, 'billing_first_name', true ) );
+		$this->assertEquals( $expected_billing_last_name, get_user_meta( self::$user_id, 'billing_last_name', true ) );
+		$this->assertEquals( $expected_billing_address_1, get_user_meta( self::$user_id, 'billing_address_1', true ) );
+		$this->assertEquals( $expected_billing_address_2, get_user_meta( self::$user_id, 'billing_address_2', true ) );
+		$this->assertEquals( $expected_billing_company, get_user_meta( self::$user_id, 'billing_company', true ) );
+		$this->assertEquals( $expected_billing_city, get_user_meta( self::$user_id, 'billing_city', true ) );
+		$this->assertEquals( $expected_billing_state, get_user_meta( self::$user_id, 'billing_state', true ) );
+		$this->assertEquals( $expected_billing_postcode, get_user_meta( self::$user_id, 'billing_postcode', true ) );
+		$this->assertEquals( $expected_billing_country, get_user_meta( self::$user_id, 'billing_country', true ) );
+		$this->assertEquals( $expected_billing_phone, get_user_meta( self::$user_id, 'billing_phone', true ) );
 
 	}
 
@@ -158,14 +158,14 @@ class WCS_Importer_Simple_Test extends WCS_Importer_UnitTestCase {
 		$expected_shipping_country    = 'Australia';
 
 		// Run a bunch of assertions to check shipping details on user meta
-		$this->assertEquals( $expected_shipping_first_name, get_user_meta( sefl::$user_id, 'shipping_first_name', true ) );
-		$this->assertEquals( $expected_shipping_last_name, get_user_meta( sefl::$user_id, 'shipping_last_name', true ) );
-		$this->assertEquals( $expected_shipping_address_1, get_user_meta( sefl::$user_id, 'shipping_address_1', true ) );
-		$this->assertEquals( $expected_shipping_address_2, get_user_meta( sefl::$user_id, 'shipping_address_2', true ) );
-		$this->assertEquals( $expected_shipping_country, get_user_meta( sefl::$user_id, 'shipping_country', true ) );
-		$this->assertEquals( $expected_shipping_city, get_user_meta( sefl::$user_id, 'shipping_city', true ) );
-		$this->assertEquals( $expected_shipping_state, get_user_meta( sefl::$user_id, 'shipping_state', true ) );
-		$this->assertEquals( $expected_shipping_postcode, get_user_meta( sefl::$user_id, 'shipping_postcode', true ) );
+		$this->assertEquals( $expected_shipping_first_name, get_user_meta( self::$user_id, 'shipping_first_name', true ) );
+		$this->assertEquals( $expected_shipping_last_name, get_user_meta( self::$user_id, 'shipping_last_name', true ) );
+		$this->assertEquals( $expected_shipping_address_1, get_user_meta( self::$user_id, 'shipping_address_1', true ) );
+		$this->assertEquals( $expected_shipping_address_2, get_user_meta( self::$user_id, 'shipping_address_2', true ) );
+		$this->assertEquals( $expected_shipping_country, get_user_meta( self::$user_id, 'shipping_country', true ) );
+		$this->assertEquals( $expected_shipping_city, get_user_meta( self::$user_id, 'shipping_city', true ) );
+		$this->assertEquals( $expected_shipping_state, get_user_meta( self::$user_id, 'shipping_state', true ) );
+		$this->assertEquals( $expected_shipping_postcode, get_user_meta( self::$user_id, 'shipping_postcode', true ) );
 	}
 
 }
