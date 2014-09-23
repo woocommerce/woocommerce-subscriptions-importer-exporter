@@ -19,4 +19,4 @@ env:
 before_script:
     - source tests/travis/setup.sh
 
-script: phpunit --configuration tests/phpunit.xml.dist
+script: phpunit --configuration phpunit.xml.dist
