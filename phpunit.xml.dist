@@ -9,11 +9,11 @@
 				 processIsolation="false"
 				 stopOnFailure="false"
 				 syntaxCheck="false"
-				 bootstrap="bootstrap.php"
+				 bootstrap="tests/bootstrap.php"
 		>
 	<testsuites>
 		<testsuite name="Subscriptions Importer Server">
-			<directory>./phpunit</directory>
+			<directory>./tests/phpunit</directory>
 		</testsuite>
 	</testsuites>
 	<groups>

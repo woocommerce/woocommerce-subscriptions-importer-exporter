@@ -1,17 +1,12 @@
 
 <?php
 
-require_once dirname( dirname( dirname( __FILE__ ) ) ) . '/libs/woocommerce-subscriptions/classes/class-wc-subscriptions-product.php';
 /**
  * Class WCS_Importer_Fail_Product_Test - A test class testing all variations of importing a csv with important product information missing.
  */
 class WCS_Importer_Fail_Product_Test extends WCS_Importer_UnitTestCase {
 
-	static $mapped_fields = array();
-
-	public function setUp() {
-		// Manually set the mapped fields for the test case
-		self::$mapped_fields = array(
+	protected $mapped_fields = array(
 			'custom_user_meta'							=> array(),
 			'custom_order_meta'							=> array(),
 			'custom_user_order_meta'					=> array(),
@@ -55,6 +50,7 @@ class WCS_Importer_Fail_Product_Test extends WCS_Importer_UnitTestCase {
 			'billing_country' 							=> 'billing_country',
 			'shipping_address_1' 						=> 'shipping_address_1',
 			'shipping_city' 							=> 'shipping_city',
+			'shipping_company'							=> '',
 			'shipping_state' 							=> 'shipping_state',
 			'shipping_postcode' 						=> 'shipping_postcode',
 			'shipping_country' 							=> 'shipping_country',
@@ -66,39 +62,91 @@ class WCS_Importer_Fail_Product_Test extends WCS_Importer_UnitTestCase {
 			'payment_method_title'						=> 'payment_method_title',
 			'shipping_method' 							=> 'shipping_method',
 			'shipping_method_title'						=> 'shipping_method_title',
-			'wc_authorize_net_cim_payment_profile_id' 	=> 'wc_authorize_net_cim_payment_profile_id',
-			'wc_authorize_net_cim_customer_profile_id' 	=> 'wc_authorize_net_cim_customer_profile_id',
+			'_wc_authorize_net_cim_payment_profile_id' 	=> 'wc_authorize_net_cim_payment_profile_id',
+			'_wc_authorize_net_cim_customer_profile_id' => 'wc_authorize_net_cim_customer_profile_id',
 		);
-	}
 
 	/**
-	 * 
+	 * Test that the errors received consist of a product_id that doesn't exist
+	 * @since 1.0.0
 	 */
 	public function test_product_not_exists() {
 		// test file
 		$test_csv = dirname( __FILE__ ) . '/test-files/no-product-exists-test.csv';
+		$this->mapped_fields['product_id'] = 'product_id';
 
-		// running the case where the product in the csv doesn't exist.
-		$import_results = WCS_Import_Parser::import_data( $test_csv, self::$mapped_fields, 0, 10000, 1, 'false', 'false' );
+		// the case where the subscription product in the csv doesn't exist in the store.
+		$import_results = WCS_Import_Parser::import_data( $test_csv, $this->mapped_fields, 0, 3000, 1, 'false', 'false' );
+		$import_results = $import_results[0];
+
+		// check resulting status
+		$expected_status = 'failed';
+		$this->assertEquals( $expected_status, $import_results['status'] );
+
+		// check that result values weren't set
+		$this->assertFalse( isset( $import_results['order_id'] ) );
+		$this->assertFalse( isset( $import_results['edit_order_linkder_id'] ) );
+		$this->assertFalse( isset( $import_results['subscription_status'] ) );
+		$this->assertFalse( isset( $import_results['item_id'] ) );
+		$this->assertFalse( isset( $import_results['edit_post_link'] ) );
+
+		// check the error array returned for a missing subscription product message
+		$error_message_found = false;
+		$expected_message = 'The product_id is not a subscription product in your store.';
+		foreach( $import_results['error'] as $error ) {
+			if ( $error == $expected_message ) {
+				$error_message_found = true;
+			}
+		}
+		$this->assertTrue( $error_message_found );
 	}
 
 	/**
-	 *
+	 * Test that the errors received consist of a product_id that doesn't exist when the column
+	 * is not given in the CSV.
+	 * @since 1.0.0
 	 */
-	public function test_product_id_missing_from_csv() {
+	public function test_missing_product_column() {
+		// test file
 		$test_csv = dirname( __FILE__ ) . '/test-files/missing-product-column.csv';
 
-		// running the case where the product in the csv doesn't exist.
-		$import_results = WCS_Import_Parser::import_data( $test_csv, self::$mapped_fields, 0, 10000, 1, 'false', 'false' );
+		// running the case where the product column in the csv doesn't exist.
+		$import_results = WCS_Import_Parser::import_data( $test_csv, $this->mapped_fields, 0, 3000, 1, 'false', 'false' );
+		$import_results = $import_results[0];
 
+		// check resulting status
+		$expected_status = 'failed';
+		$this->assertEquals( $expected_status, $import_results['status'] );
+
+		// check that result values weren't set
+		$this->assertFalse( isset( $import_results['order_id'] ) );
+		$this->assertFalse( isset( $import_results['edit_order_linkder_id'] ) );
+		$this->assertFalse( isset( $import_results['subscription_status'] ) );
+		$this->assertFalse( isset( $import_results['item_id'] ) );
+		$this->assertFalse( isset( $import_results['edit_post_link'] ) );
+
+		// check the error array returned for a missing subscription product message
+		$error_message_found = false;
+		$expected_message = 'The product_id is not a subscription product in your store.';
+		foreach( $import_results['error'] as $error ) {
+			if ( $error == $expected_message ) {
+				$error_message_found = true;
+			}
+		}
+		$this->assertTrue( $error_message_found );
 	}
 
 	/**
-	 *
+	 * Create a variable subscription without any variations and try to use the variable_subscription id's to import.
+	 * The import should fail.
+	 * @since 1.0.0
 	 */
-	public function test_incorrect_variation_id() {
-		// Create a new variable subscription product to test on
-		/*$product_id = wp_insert_post( array( 
+	public function test_variable_subscription_incorrect_id() {
+		// test file
+		$test_csv = dirname( __FILE__ ) . '/test-files/incorrect-variation_id.csv';
+		$this->mapped_fields['product_id'] = 'product_id';
+		//create the product as a variable subscription with out any variations
+		$variable_id = wp_insert_post( array( 
 			'post_type' 				=> 'product',
 			'post_author' 				=> 1,
 			'post_title' 				=> 'Simple Test Subscription',
@@ -109,18 +157,50 @@ class WCS_Importer_Fail_Product_Test extends WCS_Importer_UnitTestCase {
 			'filter'					=> 'raw',
 		));
 
-		update_post_meta( $product_id, '_subscription_price', 10 );
-		update_post_meta( $product_id, '_subscription_period', 'month' );
-		update_post_meta( $product_id, '_subscription_period_interval', 1 );
-		update_post_meta( $product_id, '_subscription_length', 0 );
+		update_post_meta( $variable_id, '_subscription_price', 10 );
+		update_post_meta( $variable_id, '_subscription_period', 'month' );
+		update_post_meta( $variable_id, '_subscription_period_interval', 1 );
+		update_post_meta( $variable_id, '_subscription_length', 0 );
 
-		wp_set_object_terms( $product_id, 'subscription', 'product_type' );*/
+		wp_set_object_terms( $variable_id, 'variable-subscription', 'product_type' );
 
-		// set the test csv file
-		$test_csv = dirname( __FILE__ ) . '/test-files/incorrect-variation_id.csv';
+		$import_results = WCS_Import_Parser::import_data( $test_csv, $this->mapped_fields, 0, 3000, 1, 'false', 'false' );
+		$import_results = $import_results[0];
 
-		// running the case where the product in the csv doesn't exist.
-		$import_results = WCS_Import_Parser::import_data( $test_csv, self::$mapped_fields, 0, 10000, 1, 'false', 'false' );
+		// check resulting status
+		$expected_status = 'failed';
+		$this->assertEquals( $expected_status, $import_results['status'] );
+
+		// check that result values weren't set
+		$this->assertFalse( isset( $import_results['order_id'] ) );
+		$this->assertFalse( isset( $import_results['edit_order_linkder_id'] ) );
+		$this->assertFalse( isset( $import_results['subscription_status'] ) );
+		$this->assertFalse( isset( $import_results['item_id'] ) );
+		$this->assertFalse( isset( $import_results['edit_post_link'] ) );
+
+		// check the error array returned for a missing subscription product message
+		$error_message_found = false;
+		$expected_message = 'The product_id is not a subscription product in your store.';
+		foreach( $import_results['error'] as $error ) {
+			if ( $error == $expected_message ) {
+				$error_message_found = true;
+			}
+		}
+		$this->assertTrue( $error_message_found );
+	}
+
+	/**
+	 * Clean slate before each test is ran.
+	 * @since 1.0.0
+	 */
+	 function tearDown() {
+	 	// as some test cases need to set this array value and some need it to be left empty we should clear it if it's set
+	 	if( ! empty( $this->mapped_fields['product_id'] ) ) {
+	 		$this->mapped_fields['product_id'] = '';
+	 	}
+	 	// clear the usual WCS_Import_Parser static variables
+		WCS_Import_Parser::$results = array();
+		WCS_Import_Parser::$result = array();
 	}
 
 }
