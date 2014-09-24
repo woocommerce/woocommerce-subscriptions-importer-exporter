@@ -96,7 +96,7 @@ The following columns have some requirements for acceptable values or formats.
 
 ##### Accepted Order Column Values
 The following columns have some requirements for acceptable values or formats.
-*	payment_method – the currently supported payment methods are PayPal, Stripe and Authorize.net. If anything other than paypal, stripe or authorize.net is used, the import will default to manual renewal.
+*	payment_method – the currently supported payment methods are PayPal, Stripe and Authorize.net. If anything other than paypal, stripe or authorize_net_cim is used, the import will default to manual renewal.
 *	shipping_method - This should be the shipping method name as seen in the Order admin, i.e. "free_shipping", but can be any string that identifies the shipping method to you; defaults to an empty shipping method.
 *	download_permission_granted - value can be either yes or true; anything else will not grant download permissions for the subscription product in the order.
 *	All dollar amounts need to be either integer or decimal value for instance, “5.65”, “3”, “127.2” are all valid entries.
