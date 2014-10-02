@@ -1,11 +1,7 @@
-### Not yet compatible with WC 2.2 - currently in progress! 
-
----
-
 # WooCommerce Subscriptions Importer
 
 ##Overview
-The WooCommerce Subscriptions CSV Import Suite allows you to easily import your subscriptions from a CSV file into your WooCommerce Store. This is particularly useful when migrating stores and importing from a different eCommerce platform - which may or may not use exactly the same fields as WooCommerce. Subscriptions are ordered and mapped to existing or new users. The order item is mapped to existing subscription or variable subscription id’s. A total of [BLANK] fields can set in the CSV giving you the utmost control over the import process.
+The WooCommerce Subscriptions CSV Import Suite allows you to easily import your subscriptions from a CSV file into your WooCommerce Store. This is particularly useful when migrating stores and importing from a different eCommerce platform - which may or may not use exactly the same fields as WooCommerce. Subscriptions are ordered and mapped to existing or new users. The order item is mapped to existing subscription or variable subscription id’s. A total of 58 fields can set in the CSV giving you the utmost control over the import process.
 
 ## Before Installing
 Please note that it is not possible to move subscriptions created with PayPal to a store using a different URL to the store where the customer initially signed up for the subscription. This is not a limitation in WooCommerce Subscriptions, it is a limitation with PayPal and it’s IPN system. If you're interested in getting your customers to use a different payment method (we recommend stripe), then try using the Failed Payment approach explained here: http://docs.woothemes.com/document/subscriptions/customers-view/#section-3
