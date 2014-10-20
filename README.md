@@ -205,3 +205,16 @@ It sure is! When importing active subscriptions, it's important that the subscri
   - With __PayPal__, make sure you have set the paypal_subscriber_id field in the CSV ( PayPal sometimes call this the recurring payment profile ID).
   - When using __Stripe__, ensure the stripe_customer_id field is set in the CSV.
   - For those using __Authorize.net__, you will need to provide both the wc_authorize_net_cim_customer_profile_id and the wc_authorize_net_cim_payment_profile_id fields in the CSV. Both pieces of information are required!
+
+#### 2. Can subscriptions still be imported with an unsupported payment gateway?
+Yes but first, it should be understood that they are two possible solutions to consider:
+
+  - defaulting to manual renewals;
+  - allow the customer to change their payment option after the first payment fails.
+
+Firstly, if you are using a payment gateway that is not supported by the CSV Importer, the subscriptions will still successfully import however they will be set to require manual renewal payments and will have the following warning on the import completion table, as shown in the image below.
+![Unsupported Payment Method](https://i.cloudup.com/Ktkeu1FoVS-2000x2000.png)
+
+If Subscriptions are set to manual renewals, it is very difficult (often impossible) to change them to an automatic renewal payment method, however it is relatively simple to change a payment method from automatic to manual renewals. Beforehand, you can [submit a request](http://support.woothemes.com/) for the payment method that you wish to use to be supported, or the other alternative is to import the subscription with another and use random text as the `stripe_customer_id` (a different payment method can be used as long as it is supported by the CSV Importer and supports the changing payment methods feature, see more info on this [here](http://docs.woothemes.com/document/subscriptions/payment-gateways/#section-1)). The stripe payment gateway with random text method is used to force the first payment to fail, allowing your customers to login and setup their preferred payment method by clicking the 'Change Payment Method' button on their My Account page and going through the checkout.
+
+If the later approach is taken, we strongly recommend that you notify all affected customers about the change to avoid any confusion in the future.
