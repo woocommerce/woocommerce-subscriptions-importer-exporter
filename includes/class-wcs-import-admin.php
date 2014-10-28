@@ -400,7 +400,7 @@ class WCS_Admin_Importer {
 									<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
 									<option value="shipping_method_title" <?php selected( $header, 'shipping_method_title' ); ?>>shipping_method_title</option>
 									<option value="_stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
-									<option value="PayPal Subscriber ID" <?php selected( $header, 'PayPal Subscriber ID' ); ?>>PayPal Subscriber id</option>
+									<option value="_paypal_subscriber_id" <?php selected( $header, 'paypal_subscriber_id' ); ?>>paypal_subscriber_id</option>
 									<option value="_wc_authorize_net_cim_payment_profile_id" <?php selected( $header, 'wc_authorize_net_cim_payment_profile_id' ); ?>>wc_authorize_net_cim_payment_profile_id</option>
 									<option value="_wc_authorize_net_cim_customer_profile_id" <?php selected( $header, 'wc_authorize_net_cim_customer_profile_id' ); ?>>wc_authorize_net_cim_customer_profile_id</option>
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
@@ -558,7 +558,7 @@ class WCS_Admin_Importer {
 			'order_total' 						 		=> '',
 			'order_recurring_total'				 		=> '',
 			'_stripe_customer_id'				  		=> '',
-			'PayPal Subscriber ID'				  		=> '',
+			'_paypal_subscriber_id'				  		=> '',
 			'payment_method_title'						=> '',
 			'_wc_authorize_net_cim_payment_profile_id' 	=> '',
 			'_wc_authorize_net_cim_customer_profile_id' => '',
