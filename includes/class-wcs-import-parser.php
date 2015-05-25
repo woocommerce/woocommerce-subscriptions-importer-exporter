@@ -525,6 +525,11 @@ class WCS_Import_Parser {
 						}
 					}
 				}
+
+				// make sure users with active subscriptions are set as the default subsciber role
+				if ( 'active' == $subscription_meta['status'] ) {
+					WC_Subscriptions_Manager::update_users_role( $user_id, 'default_subscriber_role' );
+				}
 			}
 
 			// Check if the subscription has been successfully added
