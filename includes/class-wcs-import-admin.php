@@ -395,6 +395,7 @@ class WCS_Admin_Importer {
 									<option value="order_shipping" <?php selected( $header, 'order_shipping' ); ?>>order_shipping</option>
 									<option value="order_tax" <?php selected( $header, 'order_tax' ); ?>>order_tax</option>
 									<option value="order_total" <?php selected( $header, 'order_total' ); ?>>order_total</option>
+									<option value="order_recurring_total" <?php selected( $header, 'order_recurring_total' ); ?>>order_recurring_total</option>
 									<option value="payment_method" <?php selected( $header, 'payment_method' ); ?>>payment_method</option>
 									<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
 									<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
