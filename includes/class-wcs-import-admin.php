@@ -405,6 +405,7 @@ class WCS_Admin_Importer {
 									<option value="_wc_authorize_net_cim_payment_profile_id" <?php selected( $header, 'wc_authorize_net_cim_payment_profile_id' ); ?>>wc_authorize_net_cim_payment_profile_id</option>
 									<option value="_wc_authorize_net_cim_customer_profile_id" <?php selected( $header, 'wc_authorize_net_cim_customer_profile_id' ); ?>>wc_authorize_net_cim_customer_profile_id</option>
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
+									<option value="quantity" <?php selected( $header, 'quantity' ); ?>>quantity</option>
 								</optgroup>
 								<optgroup label="<?php _e( 'Subscription Status', 'wcs-importer' ); ?>">
 									<option value="subscription_status" <?php selected( $header, 'subscription_status' ); ?>>subscription_status</option>
@@ -564,6 +565,7 @@ class WCS_Admin_Importer {
 			'_wc_authorize_net_cim_payment_profile_id' 	=> '',
 			'_wc_authorize_net_cim_customer_profile_id' => '',
 			'download_permission_granted'		   		=> '',
+			'quantity'									=> '',
 		);
 
 		$mapping_rules = $_POST['mapto'];
