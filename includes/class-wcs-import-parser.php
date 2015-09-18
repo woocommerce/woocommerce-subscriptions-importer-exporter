@@ -187,6 +187,7 @@ class WCS_Import_Parser {
 
 		$_product = get_product( $subscription_details[self::$mapped_fields['product_id']] );
 		$result['item'] = $_product->get_title();
+		$qty = ( ! empty( $subscription_details[ self::$mapped_fields['quantity'] ] ) ) ? $subscription_details[ self::$mapped_fields[ 'quantity' ] ] : 1;
 
 		$missing_shipping_addresses = $missing_billing_addresses = array();
 
@@ -292,17 +293,18 @@ class WCS_Import_Parser {
 				case 'order_total':
 					$trial_length = WC_Subscriptions_Product::get_trial_length( $_product );
 					$sign_up_fee  = WC_Subscriptions_Product::get_sign_up_fee( $_product );
+
 					if ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) {
 						$value = $subscription_details[self::$mapped_fields[$column]];
 					} elseif ( $trial_length > 0 ) {
-						$value = $sign_up_fee;
+						$value = $qty * $sign_up_fee;
 					} else {
-						$value = $sign_up_fee + $_product->subscription_price;
+						$value = $qty * ( $sign_up_fee + $_product->subscription_price );
 					}
 					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				case 'order_recurring_total':
-					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : $_product->subscription_price;
+					$value = ( ! empty( $subscription_details[self::$mapped_fields[ $column ] ] ) ) ? $subscription_details[self::$mapped_fields[$column]] : $_product->subscription_price;
 					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 				case 'order_discount':
@@ -406,7 +408,7 @@ class WCS_Import_Parser {
 
 			// Add line item meta
 			if ( $item_id ) {
-				wc_add_order_item_meta( $item_id, '_qty', apply_filters( 'woocommerce_stock_amount', 1 ) );
+				wc_add_order_item_meta( $item_id, '_qty', apply_filters( 'woocommerce_stock_amount', $qty ) );
 				wc_add_order_item_meta( $item_id, '_tax_class', $_product->get_tax_class() );
 				wc_add_order_item_meta( $item_id, '_product_id', $_product->id );
 				wc_add_order_item_meta( $item_id, '_variation_id', ( ! empty ( $_product->variation_id ) ) ? $_product->variation_id : '');
