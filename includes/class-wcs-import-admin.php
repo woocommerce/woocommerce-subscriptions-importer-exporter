@@ -402,8 +402,8 @@ class WCS_Admin_Importer {
 									<option value="shipping_method_title" <?php selected( $header, 'shipping_method_title' ); ?>>shipping_method_title</option>
 									<option value="_stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
 									<option value="PayPal Subscriber ID" <?php selected( $header, 'PayPal Subscriber ID' ); ?>>PayPal Subscriber id</option>
-									<option value="_wc_authorize_net_cim_payment_profile_id" <?php selected( $header, 'wc_authorize_net_cim_payment_profile_id' ); ?>>wc_authorize_net_cim_payment_profile_id</option>
-									<option value="_wc_authorize_net_cim_customer_profile_id" <?php selected( $header, 'wc_authorize_net_cim_customer_profile_id' ); ?>>wc_authorize_net_cim_customer_profile_id</option>
+									<option value="_wc_authorize_net_cim_credit_card_payment_token" <?php selected( $header, 'wc_authorize_net_cim_payment_profile_id' ); ?>>wc_authorize_net_cim_payment_profile_id</option>
+									<option value="_wc_authorize_net_cim_credit_card_customer_id" <?php selected( $header, 'wc_authorize_net_cim_customer_profile_id' ); ?>>wc_authorize_net_cim_customer_profile_id</option>
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
 									<option value="quantity" <?php selected( $header, 'quantity' ); ?>>quantity</option>
 								</optgroup>
@@ -562,8 +562,8 @@ class WCS_Admin_Importer {
 			'_stripe_customer_id'				  		=> '',
 			'PayPal Subscriber ID'				  		=> '',
 			'payment_method_title'						=> '',
-			'_wc_authorize_net_cim_payment_profile_id' 	=> '',
-			'_wc_authorize_net_cim_customer_profile_id' => '',
+			'_wc_authorize_net_cim_credit_card_payment_token' => '',
+			'_wc_authorize_net_cim_credit_card_customer_id'   => '',
 			'download_permission_granted'		   		=> '',
 			'quantity'									=> '',
 		);
