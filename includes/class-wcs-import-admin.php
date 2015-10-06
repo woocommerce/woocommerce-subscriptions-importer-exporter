@@ -95,6 +95,7 @@ class WCS_Admin_Importer {
 							reset( $row_start );
 							$count = 0;
 							$total++;
+
 							// Import rows between $previous_position $position
 							$file_positions[] = $previous_pos;
 							$file_positions[] = $position;
@@ -111,7 +112,7 @@ class WCS_Admin_Importer {
 				}
 
 				if ( count( $payment_method_error ) > 0 ) {
-					$error_message = sprintf( __( "You're importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', json_encode( array_unique( $payment_method_error ) ) ), str_replace( '"', ' ', json_encode( array_unique( $payment_meta_error ) ) ) );
+					$error_message = sprintf( __( 'You\'re importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?', 'wcs-importer' ), str_replace( '"', ' ', json_encode( array_unique( $payment_method_error ) ) ), str_replace( '"', ' ', json_encode( array_unique( $payment_meta_error ) ) ) );
 				} else {
 					$error_message = '';
 				}
@@ -133,8 +134,8 @@ class WCS_Admin_Importer {
 					'start_row_num'    => $row_start,
 					'ajax_url'         => admin_url( 'admin-ajax.php' ),
 					'rows_per_request' => $this->rows_per_request,
-					'test_mode'        =>( 'yes' == $_GET['test_mode'] ) ? "true" : "false",
-					'email_customer'   =>( 'yes' == $_GET['email_customer'] ) ? "true" : "false",
+					'test_mode'        => ( 'yes' == $_GET['test_mode'] ) ? "true" : "false",
+					'email_customer'   => ( 'yes' == $_GET['email_customer'] ) ? "true" : "false",
 					'cancelled_url'    => add_query_arg( 'cancelled', 'true', $this->admin_url ),
 					'total'            => $total,
 				);
@@ -144,29 +145,30 @@ class WCS_Admin_Importer {
 		}
 	}
 
-	/* From the list of supported payment gateways, check if there's a row in the csv
+	/**
+	 * From the list of supported payment gateways, check if there's a row in the csv
 	 * that is missing crucial data needed for importing. Add missing information to
 	 * both &method_error and &meta_error arrays.
-	 * 
+	 *
 	 * @since 1.0
 	 */
-	function check_row_payment_meta( $row, $mapped_fields, &$method_error, &$meta_error ) {
-		$has_missing_meta = false;
+	public function check_row_payment_meta( $row, $mapped_fields, &$method_error, &$meta_error ) {
+		$has_missing_meta   = false;
 		$supported_gateways = WCS_Import_Parser::$supported_payment_gateways;
-		$payment_method = ( ! empty ( $row[$mapped_fields['payment_method']] ) ) ? strtolower( $row[$mapped_fields['payment_method']] ) : '';
+		$payment_method     = ( ! empty ( $row[ $mapped_fields['payment_method'] ] ) ) ? strtolower( $row[ $mapped_fields['payment_method'] ] ) : '';
 
-		if( ! empty( $payment_method ) && array_key_exists( $payment_method, $supported_gateways ) ) {
-			foreach( $supported_gateways[$payment_method] as $meta_data ) {
-				if ( empty ( $row[$mapped_fields[$meta_data]] ) ) {
+		if ( ! empty( $payment_method ) && array_key_exists( $payment_method, $supported_gateways ) ) {
+
+			foreach ( $supported_gateways[ $payment_method ] as $meta_data ) {
+				if ( empty ( $row[ $mapped_fields[ $meta_data ] ] ) ) {
 					$has_missing_meta = true;
 					$meta_error[] = $meta_data;
 				}
 			}
-			if( $has_missing_meta ) {
-				$method_error[] = $row[$mapped_fields['payment_method']];
+
+			if ( $has_missing_meta ) {
+				$method_error[] = $row[ $mapped_fields['payment_method'] ];
 			}
-		} else {
-			// unsupported value for payment gateway
 		}
 	}
 
@@ -179,30 +181,30 @@ class WCS_Admin_Importer {
 
 		echo '<div class="wrap">';
 		echo '<h2>' . __( 'Subscription CSV Importer', 'wcs-importer' ) . '</h2>';
-		if ( ! isset( $_GET['step'] ) || isset( $_GET['cancelled'] ) ) :
-		?>
-		<div id="message" class="updated woocommerce-message wc-connect">
+
+		if ( ! isset( $_GET['step'] ) || isset( $_GET['cancelled'] ) ) : ?>
+
+			<div id="message" class="updated woocommerce-message wc-connect">
 			<?php if ( isset( $_GET['cancelled'] ) ) : ?>
-			<div id="message" class="updated error">
-				<p><?php _e( 'Import cancelled.', 'wcs-importer' ); ?></p>
-			</div>
+				<div id="message" class="updated error">
+					<p><?php _e( 'Import cancelled.', 'wcs-importer' ); ?></p>
+				</div>
 			<?php endif; ?>
 			<?php if ( ! isset( $_GET['step'] ) ) : ?>
-			<div class="squeezer">
-				<h4><?php _e( '<strong>Before you begin</strong>, please prepare your CSV file.', 'wcs-importer' ); ?></h4>
-				<p class="submit">
-					<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a>
-					<a href="<?php echo plugins_url( 'wcs-import-sample.csv', WC_Subscription_Importer::$plugin_file ); ?>" class="button wcs-importer-download"><?php _e( 'Download Example CSV', 'wcs-importer' ); ?></a>
-				</p>
-			</div>
+				<div class="squeezer">
+					<h4><?php printf( esc_html__( '%sBefore you begin%s, please prepare your CSV file.', 'wcs-importer' ), '<strong>', '</strong>' ); ?></h4>
+					<p class="submit">
+						<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a>
+						<a href="<?php echo plugins_url( 'wcs-import-sample.csv', WC_Subscription_Importer::$plugin_file ); ?>" class="button wcs-importer-download"><?php _e( 'Download Example CSV', 'wcs-importer' ); ?></a>
+					</p>
+				</div>
 			<?php endif; ?>
 		</div>
-		<?php
-		endif;
+		<?php endif;
 
 		$page = ( isset( $_GET['step'] ) ) ? $_GET['step'] : 1;
 
-		switch( $page ) {
+		switch ( $page ) {
 			case 1 : //Step: Upload File
 				$this->upload_page();
 				break;
@@ -234,55 +236,54 @@ class WCS_Admin_Importer {
 		$email_customer = ( isset( $_POST['email_customer'] ) ) ? $_POST['email_customer'] : 'no';
 
 		if ( ! empty( $this->upload_error ) ) : ?>
-	<div id="message" class="error">
-		<p><?php printf( __( 'Error uploading file: %s', 'wcs-importer' ), $this->upload_error ); ?></p>
-	</div>
-		<?php endif;
+			<div id="message" class="error">
+				<p><?php printf( esc_html__( 'Error uploading file: %s', 'wcs-importer' ), $this->upload_error ); ?></p>
+			</div>
+		<?php endif; ?>
 
-		echo '<h3>' . __( 'Step 1: Upload CSV File', 'wcs-importer' ) . '</h3>';
-		if ( ! empty( $upload_dir['error'] ) ) : ?>
+		<h3><?php esc_html_e( 'Step 1: Upload CSV File', 'wcs-importer' ); ?></h3>
+		<?php if ( ! empty( $upload_dir['error'] ) ) : ?>
 			<div class="error"><p><?php _e( 'Before you can upload your import file, you will need to fix the following error:' ); ?></p>
-			<p><strong><?php echo $upload_dir['error']; ?></strong></p></div><?php
-		else :
-			?>
-			<p><?php _e( 'Upload a CSV file containing details about your subscriptions to bring across to your store with WooCommerce.', 'wcs-importer' ); ?></p>
-			<p><?php _e( 'Choose a CSV (.csv) file to upload, then click Upload file and import.', 'wcs-importer' ); ?></p>
+			<p><strong><?php echo $upload_dir['error']; ?></strong></p></div>
+		<?php else : ?>
+			<p><?php esc_html_e( 'Upload a CSV file containing details about your subscriptions to bring across to your store with WooCommerce.', 'wcs-importer' ); ?></p>
+			<p><?php esc_html_e( 'Choose a CSV (.csv) file to upload, then click Upload file and import.', 'wcs-importer' ); ?></p>
+
 			<form enctype="multipart/form-data" id="import-upload-form" method="post" action="<?php echo esc_attr( $this->admin_url ); ?>">
 				<?php wp_nonce_field( 'import-upload' ); ?>
 				<table class="form-table">
 					<tbody>
 						<tr>
 							<th>
-								<label for="upload"><?php _e( 'Choose a file:' ); ?></label>
+								<label for="upload"><?php esc_html_e( 'Choose a file:' ); ?></label>
 							</th>
 							<td>
 								<input type="file" id="upload" name="import" size="25" />
 								<input type="hidden" name="action" value="upload_file" />
-								<small><?php printf( __( 'Maximum size: %s' ), size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) ) ); ?></small>
+								<small><?php printf( esc_html__( 'Maximum size: %s' ), size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) ) ); ?></small>
 							</td>
 						</tr>
 						<tr>
-							<th><?php _e( 'Run in Test Mode', 'wcs-importer' ); ?>:</th>
+							<th><?php esc_html_e( 'Run in Test Mode', 'wcs-importer' ); ?>:</th>
 							<td>
 								<input type="checkbox" name="test_mode" value="yes" <?php checked( $test_mode, 'yes' ); ?> />
-								<em><?php _e( 'Check your CSV file for errors and warnings without creating subscriptions, users or orders.', 'wcs-importer' ); ?></em>
+								<em><?php esc_html_e( 'Check your CSV file for errors and warnings without creating subscriptions, users or orders.', 'wcs-importer' ); ?></em>
 							</td>
 						</tr>
 						<tr>
-							<th><?php _e( 'Email passwords?', 'wcs-importer' ); ?></th>
+							<th><?php esc_html_e( 'Email passwords?', 'wcs-importer' ); ?></th>
 							<td>
 								<input type="checkbox" name="email_customer" value="yes" <?php checked( $email_customer, 'yes' ); ?> />
-								<em><?php _e( 'If importing new users, you can email customers their account details.', 'wcs-importer' ); ?></em>
+								<em><?php esc_html_e( 'If importing new users, you can email customers their account details.', 'wcs-importer' ); ?></em>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 				<p class="submit">
-					<input type="submit" class="button" value="<?php esc_attr_e( 'Upload file and import' ); ?>" />
+					<input type="submit" class="button" value="<?php esc_attr_e( 'Upload file and import', 'wcs-importer' ); ?>" />
 				</p>
 			</form>
-			<?php
-		endif;
+		<?php endif;
 	}
 
 	/**
@@ -308,14 +309,17 @@ class WCS_Admin_Importer {
 
 			// Get headers
 			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
-				$row = array();
-
+				$row            = array();
 				$column_headers = fgetcsv( $handle, 0 );
+
 				while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== false ) {
+
 					foreach ( $column_headers as $key => $column_header ) {
+
 						if ( ! $column_header ) continue;
 						$row[ $column_header ] = ( isset( $postmeta[ $key ] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[ $key ], $enc ) : '';
 					}
+
 					break;
 				}
 				fclose( $handle );
@@ -328,22 +332,23 @@ class WCS_Admin_Importer {
 			'test_mode'      => $_GET['test_mode'],
 			'email_customer' => $_GET['email_customer'],
 		);
+
 		$action = add_query_arg( $url_params, $this->admin_url );
 
 		$button_text = ( 'yes' == $_GET['test_mode'] ) ? __( 'Test CSV', 'wcs-importer' ) : __( 'Run Import', 'wcs-importer' );
 
 		$row_number = 1;
 		?>
-		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs-importer' ); ?></h3>
+		<h3><?php esc_html_e( 'Step 2: Map Fields to Column Names', 'wcs-importer' ); ?></h3>
 		<form method="post" action="<?php echo esc_attr( $action ); ?>">
 			<?php wp_nonce_field( 'import-upload' ); ?>
 			<input type="hidden" name="action" value="field_mapping" />
 			<table class="widefat widefat_importer">
 				<thead>
 					<tr>
-						<th><?php _e( 'Map to', 'wcs-importer' ); ?></th>
-						<th><?php _e( 'Column Header', 'wcs-importer' ); ?></th>
-						<th><?php _e( 'Example Column Value', 'wcs-importer' ); ?></th>
+						<th><?php esc_html_e( 'Map to', 'wcs-importer' ); ?></th>
+						<th><?php esc_html_e( 'Column Header', 'wcs-importer' ); ?></th>
+						<th><?php esc_html_e( 'Example Column Value', 'wcs-importer' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -504,7 +509,7 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	function save_mapping() {
+	public function save_mapping() {
 
 		// Possible mapping options
 		$mapped_fields = array(
@@ -641,8 +646,8 @@ class WCS_Admin_Importer {
 	 *
 	 * @since 1.0
 	 */
-	function ajax_request_handler() {
-		if ( ! current_user_can( 'manage_woocommerce' ) ){
+	public function ajax_request_handler() {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( "Cheatin' huh?");
 		}
 
@@ -651,7 +656,7 @@ class WCS_Admin_Importer {
 		// Requests to admin-ajax.php use the front-end memory limit, we want to use the admin (i.e. max) memory limit
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 
-		if( isset( $_POST['file_id'] ) && isset( $_POST['row_num'] ) ) {
+		if ( isset( $_POST['file_id'] ) && isset( $_POST['row_num'] ) ) {
 			$file_path          = get_attached_file( absint( $_POST['file_id'] ) );
 			$mapped_fields      = get_post_meta( absint( $_POST['file_id'] ), '_mapped_rules', true );
 			$file_pointer_start = ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0;
@@ -664,7 +669,8 @@ class WCS_Admin_Importer {
 			header( 'Content-Type: application/json; charset=utf-8' );
 			echo json_encode( $results );
 		}
-		exit; // End
+
+		exit;
 	}
 }
 ?>
