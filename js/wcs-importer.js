@@ -92,6 +92,7 @@ jQuery(document).ready(function($){
 
 					for( var i = 0; i < results.length; i++ ) {
 						tests++;
+
 						if( results[i].error.length > 0 ) {
 							failed++;
 							for( var c = 0; c < results[i].error.length; c++ ) {
@@ -104,6 +105,7 @@ jQuery(document).ready(function($){
 						} else {
 							success++;
 						}
+
 						if( results[i].warning.length > 0 ) {
 							for( var c = 0; c < results[i].warning.length; c++ ) {
 								minor++;
@@ -150,7 +152,7 @@ jQuery(document).ready(function($){
 				}
 			},
 			error: function(xmlhttprequest, textstatus, message) {
-				// Something has caused an error whilst importing
+
 				$('.importer-loading').addClass('finished').removeClass('importer-loading');
 				if( textstatus === "timeout" ) {
 					$('#wcs-import-timeout').show();
