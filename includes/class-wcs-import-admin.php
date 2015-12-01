@@ -52,11 +52,11 @@ class WCS_Import_Admin {
 
 		if ( isset( $_GET['page'] ) && 'import_subscription' == $_GET['page'] ) {
 
-			wp_enqueue_style( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/wcs-importer.css' );
+			wp_enqueue_style( 'wcs-importer-admin', plugin_dir_url( WCS_Importer::$plugin_file ) . '/assets/css/wcs-importer.css' );
 
 			if ( isset( $_GET['step'] ) && 3 == absint( $_GET['step'] )  ) {
 
-				wp_enqueue_script( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
+				wp_enqueue_script( 'wcs-importer-admin', plugin_dir_url( WCS_Importer::$plugin_file ) . '/assets/js/wcs-importer.js' );
 
 				$file_id = absint( $_GET['file_id'] );
 				$file    = get_attached_file( $_GET['file_id'] );
@@ -146,34 +146,7 @@ class WCS_Import_Admin {
 					'total'            => $total,
 				);
 
-				wp_localize_script( 'wcs-importer-admin', 'wcs_script_data', $script_data );
-			}
-		}
-	}
-
-	/**
-	 * From the list of supported payment gateways, check if there's a row in the csv
-	 * that is missing crucial data needed for importing. Add missing information to
-	 * both &method_error and &meta_error arrays.
-	 *
-	 * @since 1.0
-	 */
-	public function check_row_payment_meta( $row, $mapped_fields, &$method_error, &$meta_error ) {
-		$has_missing_meta   = false;
-		$supported_gateways = WCS_Import_Parser::$supported_payment_gateways;
-		$payment_method     = ( ! empty ( $row[ $mapped_fields['payment_method'] ] ) ) ? strtolower( $row[ $mapped_fields['payment_method'] ] ) : '';
-
-		if ( ! empty( $payment_method ) && array_key_exists( $payment_method, $supported_gateways ) ) {
-
-			foreach ( $supported_gateways[ $payment_method ] as $meta_data ) {
-				if ( empty ( $row[ $mapped_fields[ $meta_data ] ] ) ) {
-					$has_missing_meta = true;
-					$meta_error[] = $meta_data;
-				}
-			}
-
-			if ( $has_missing_meta ) {
-				$method_error[] = $row[ $mapped_fields['payment_method'] ];
+				wp_localize_script( 'wcs-importer-admin', 'wcsi_data', $script_data );
 			}
 		}
 	}
