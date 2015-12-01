@@ -1,9 +1,14 @@
 <?php
+/**
+ * WooCommerce Subscriptions Import Admin class
+ *
+ * @since 1.0
+ */
+class WCS_Import_Admin {
 
-class WCS_Admin_Importer {
-	var $import_results = array();
+	public $import_results = array();
 
-	var $upload_error = '';
+	public $upload_error   = '';
 
 	public function __construct() {
 
@@ -11,7 +16,6 @@ class WCS_Admin_Importer {
 		$this->rows_per_request = ( defined( 'WCS_IMPORT_ROWS_PER_REQUEST' ) ) ? WCS_IMPORT_ROWS_PER_REQUEST : 20;
 
 		add_action( 'admin_init', array( &$this, 'post_request_handler' ) );
-
 		add_action( 'admin_init', array( &$this, 'add_import_tool' ) );
 
 		add_action( 'admin_menu', array( &$this, 'add_sub_menu' ), 10 );
@@ -22,6 +26,7 @@ class WCS_Admin_Importer {
 	}
 
 	/**
+	 * Adds the Subscriptions CSV Importer into the Tools
 	 *
 	 * @since 1.0
 	 */
@@ -39,6 +44,7 @@ class WCS_Admin_Importer {
 	}
 
 	/**
+	 * Load scripts
 	 *
 	 * @since 1.0
 	 */
@@ -93,21 +99,21 @@ class WCS_Admin_Importer {
 							$position = ftell( $handle );
 							$row_start[] = end( $row_start ) + $count;
 							reset( $row_start );
+
 							$count = 0;
 							$total++;
 
-							// Import rows between $previous_position $position
 							$file_positions[] = $previous_pos;
 							$file_positions[] = $position;
 						}
 					}
 
-					// Account for the remainder
 					if ( $count > 0 ) {
 						$total++;
 						$file_positions[] = $position;
 						$file_positions[] = ftell( $handle );
 					}
+
 					fclose( $handle );
 				}
 
@@ -118,15 +124,15 @@ class WCS_Admin_Importer {
 				}
 
 				$script_data = array(
-					'success' 				=> __( 'success', 'wcs-importer' ),
-					'failed' 				=> __( 'failed', 'wcs-importer' ),
-					'error_string'			=> sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
-					'finished_importing' 	=> __( 'Finished Importing', 'wcs-importer' ),
-					'edit_order' 			=> __( 'Edit Order', 'wcs-importer' ),
-					'warning'				=> __( 'Warning', 'wcs-importer' ),
-					'warnings'				=> __( 'Warnings', 'wcs-importer' ),
-					'located_at'			=> __( 'Located at rows', 'wcs-importer' ),
-					'error_message'         => $error_message,
+					'success' 				=> esc_html__( 'success', 'wcs-importer' ),
+					'failed' 				=> esc_html__( 'failed', 'wcs-importer' ),
+					'error_string'			=> sprintf( esc_html__( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
+					'finished_importing' 	=> esc_html__( 'Finished Importing', 'wcs-importer' ),
+					'edit_order' 			=> esc_html__( 'Edit Order', 'wcs-importer' ),
+					'warning'				=> esc_html__( 'Warning', 'wcs-importer' ),
+					'warnings'				=> esc_html__( 'Warnings', 'wcs-importer' ),
+					'located_at'			=> esc_html__( 'Located at rows', 'wcs-importer' ),
+					'error_message'         => esc_html__( $error_message ),
 
 					// Data for procesing the file
 					'file_id'          => absint( $_GET['file_id'] ),
@@ -187,7 +193,7 @@ class WCS_Admin_Importer {
 			<div id="message" class="updated woocommerce-message wc-connect">
 			<?php if ( isset( $_GET['cancelled'] ) ) : ?>
 				<div id="message" class="updated error">
-					<p><?php _e( 'Import cancelled.', 'wcs-importer' ); ?></p>
+					<p><?php esc_html_e( 'Import cancelled.', 'wcs-importer' ); ?></p>
 				</div>
 			<?php endif; ?>
 			<?php if ( ! isset( $_GET['step'] ) ) : ?>
@@ -195,7 +201,7 @@ class WCS_Admin_Importer {
 					<h4><?php printf( esc_html__( '%sBefore you begin%s, please prepare your CSV file.', 'wcs-importer' ), '<strong>', '</strong>' ); ?></h4>
 					<p class="submit">
 						<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a>
-						<a href="<?php echo plugins_url( 'wcs-import-sample.csv', WC_Subscription_Importer::$plugin_file ); ?>" class="button wcs-importer-download"><?php _e( 'Download Example CSV', 'wcs-importer' ); ?></a>
+						<a href="<?php echo esc_url( plugins_url( 'wcs-import-sample.csv', WCS_Importer::$plugin_file ) ); ?>" class="button wcs-importer-download"><?php esc_html_e( 'Download Example CSV', 'wcs-importer' ); ?></a>
 					</p>
 				</div>
 			<?php endif; ?>
@@ -264,7 +270,7 @@ class WCS_Admin_Importer {
 							</td>
 						</tr>
 						<tr>
-							<th><?php esc_html_e( 'Run in Test Mode', 'wcs-importer' ); ?>:</th>
+							<th><?php esc_html_e( 'Run in test mode', 'wcs-importer' ); ?>:</th>
 							<td>
 								<input type="checkbox" name="test_mode" value="yes" <?php checked( $test_mode, 'yes' ); ?> />
 								<em><?php esc_html_e( 'Check your CSV file for errors and warnings without creating subscriptions, users or orders.', 'wcs-importer' ); ?></em>
@@ -294,11 +300,9 @@ class WCS_Admin_Importer {
 	private function mapping_page() {
 
 		$file_id = absint( $_GET['file_id'] );
-
-		$file = get_attached_file( $file_id );
+		$file    = get_attached_file( $file_id );
 
 		if ( $file ) {
-
 			$enc = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
 
 			if ( $enc ) {
@@ -307,8 +311,8 @@ class WCS_Admin_Importer {
 
 			@ini_set( 'auto_detect_line_endings', true );
 
-			// Get headers
 			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
+
 				$row            = array();
 				$column_headers = fgetcsv( $handle, 0 );
 
@@ -437,6 +441,7 @@ class WCS_Admin_Importer {
 	/**
 	 * Shows information dependant on whether $_POST['test-mode'] is set or not.
 	 * If set, the admin is provided with a list of critical errors and non-critical warnings
+	 *
 	 * @since 1.0
 	 */
 	private function import_page() {
@@ -618,31 +623,28 @@ class WCS_Admin_Importer {
 				if ( isset( $file['error'] ) ) {
 
 					$this->upload_error = $file['error'];
+				} else {
 
-				} else { // Successful upload, let's move onto the next step
-
-					$next_step_url_params['step'] = '2';
+					$next_step_url_params['step']    = 2;
 					$next_step_url_params['file_id'] = $file['id'];
-					wp_redirect( add_query_arg( $next_step_url_params, $this->admin_url ) );
-					exit;
 
+					wp_safe_redirect( add_query_arg( $next_step_url_params, $this->admin_url ) );
+					exit;
 				}
 
 			} elseif ( 'field_mapping' == $_POST['action'] ) {
 
 				$this->save_mapping();
-
 				$next_step_url_params['step'] = 3;
 
-				wp_redirect( add_query_arg( $next_step_url_params, $this->admin_url ) );
-
-				exit();
+				wp_safe_redirect( add_query_arg( $next_step_url_params, $this->admin_url ) );
+				exit;
 			}
 		}
 	}
 
 	/**
-	 * AJAX request holding the file and mapping information is sent to this function.
+	 * Process the AJAX request and import the subscription with the information gathered.
 	 *
 	 * @since 1.0
 	 */
@@ -673,4 +675,3 @@ class WCS_Admin_Importer {
 		exit;
 	}
 }
-?>

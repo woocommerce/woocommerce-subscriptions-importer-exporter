@@ -13,15 +13,15 @@ if ( ! defined( 'ABSPATH') ) exit; // Exit if accessed directly
 /**
  * Required functions
  */
+if ( ! defined( 'ABSPATH') ) exit; // Exit if accessed directly
+
 if ( ! function_exists( 'woothemes_queue_update' ) || ! function_exists( 'is_woocommerce_active' ) ) {
 	require_once( 'woo-includes/woo-functions.php' );
 }
 
-// Plugin Classes
-require_once( dirname( __FILE__ ) . '/includes/class-wcs-import-admin.php' );
-require_once( dirname( __FILE__ ) . '/includes/class-wcs-import-parser.php' );
-
-WC_Subscription_Importer::init();
+require_once( 'includes/class-wcs-import-admin.php' );
+require_once( 'includes/class-wcs-import-parser.php' );
+require_once( 'includes/wcs-import-functions.php' );
 
 class WC_Subscription_Importer {
 
@@ -29,7 +29,6 @@ class WC_Subscription_Importer {
 	static $plugin_file = __FILE__;
 
 	public static function init() {
-
 		// Create the importer on admin side only
 		add_filter( 'plugins_loaded', __CLASS__ . '::setup_importer', 1 );
 
@@ -38,14 +37,16 @@ class WC_Subscription_Importer {
 	}
 
 	/**
-	 * Create an instance of the importer on admin pages.
+	 * Create an instance of the importer on admin pages and check for WooCommerce Subscriptions dependency.
 	 *
 	 * @since 1.0
 	 */
 	public static function setup_importer() {
+
 		if ( is_admin() ) {
 			if ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '1.5', '>=' ) ) {
 				self::$wcs_importer = new WCS_Admin_Importer();
+
 			} else {
 				add_action( 'admin_notices', __CLASS__ . '::plugin_dependency_notice' );
 			}
@@ -55,8 +56,8 @@ class WC_Subscription_Importer {
 	/**
 	 * Include Docs & Settings links on the Plugins administration screen
 	 *
-	 * @param mixed $links
 	 * @since 1.0
+	 * @param mixed $links
 	 */
 	public static function action_links( $links ) {
 
@@ -75,6 +76,7 @@ class WC_Subscription_Importer {
 	 * @since 1.0
 	 */
 	public static function plugin_dependency_notice() {
+
 		if ( ! class_exists( 'WC_Subscriptions' ) || ! class_exists( 'WC_Subscriptions_Admin' ) ) :
 			/* Only show error for missing WooCommerce if WC Subscriptions is missing aswell, this is to avoid duplicating messages */
 			if ( is_woocommerce_active() ) : ?>
@@ -88,8 +90,10 @@ class WC_Subscription_Importer {
 			<?php endif;?>
 		<?php elseif ( version_compare( WC_Subscriptions::$version, '1.5', '<' ) ) : ?>
 			<div id="message" class="error">
-				<p><?php printf( esc_html__( '%sWooCommerce Subscriptions Importer is inactive.%s The %sWooCommerce Subscriptions%s version 1.5 (or greater) is required to safely run WooCommerce Subscriptions Importer. Please %supdate & activate%s WooCommerce Subscriptions.', 'wcs-importer' ), '<strong>', '</strong>', '<a href="http://www.woothemes.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . admin_url( 'plugins.php' ) . '">', '&nbsp;&raquo;</a>' ); ?></p>
+				<p><?php printf( esc_html__( '%sWooCommerce Subscriptions Importer is inactive.%s The %sWooCommerce Subscriptions%s version 2.0 (or greater) is required to safely run WooCommerce Subscriptions Importer. Please %supdate & activate%s WooCommerce Subscriptions.', 'wcs-importer' ), '<strong>', '</strong>', '<a href="http://www.woothemes.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . admin_url( 'plugins.php' ) . '">', '&nbsp;&raquo;</a>' ); ?></p>
 			</div>
 		<?php endif;
 	}
 }
+
+WC_Subscription_Importer::init();

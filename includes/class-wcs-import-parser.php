@@ -117,8 +117,8 @@ class WCS_Import_Parser {
 		@ini_set( 'auto_detect_line_endings', true );
 
 		if ( $file_path ) {
-			if ( ( $file_handle = fopen( $file_path, "r" ) ) !== FALSE ) {
-				$subscription_details = array();
+			if ( ( $file_handle = fopen( $file_path, 'r' ) ) !== FALSE ) {
+				$data = array();
 				$column_headers = fgetcsv( $file_handle, 0 );
 
 				if ( self::$file_pointer_start_position != 0 ) {
