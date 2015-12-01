@@ -439,74 +439,26 @@ class WCS_Import_Admin {
 	}
 
 	/**
-	 * Shows information dependant on whether $_POST['test-mode'] is set or not.
-	 * If set, the admin is provided with a list of critical errors and non-critical warnings
+	 * Show test page if $_POST['test-mode'] is set and display a list of critical errors and warnings
 	 *
 	 * @since 1.0
 	 */
 	private function import_page() {
 
-		if ( 'yes' == $_GET['test_mode'] ):
+		if ( 'yes' == $_GET['test_mode'] ) {
 
-			$url_params = array(
-				'step'           => '3',
-				'file_id'        => $_GET['file_id'],
-				'test_mode'      => 'no',
-				'email_customer' => $_GET['email_customer'],
-			);
+			$action = add_query_arg( array(
+				'step'            => '3',
+				'file_id'         => $_GET['file_id'],
+				'test_mode'       => 'no',
+				'email_customer'  => $_GET['email_customer'],
+				'add_memberships' => $_GET['add_memberships'],
+			),$this->admin_url );
 
-			$action = add_query_arg( $url_params, $this->admin_url );
-			?>
-			<h3><?php _e( 'Test Run Results', 'wcs-importer' ); ?></h3>
-			<table id="wcs-import-progress" class="widefat_importer widefat">
-				<thead>
-					<tr>
-						<th class="row" colspan="2"><?php _e( 'Importer Test Results', 'wcs-importer' ); ?></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="alternate">
-						<th><strong><?php _e( 'Results', 'wcs-importer' ); ?></strong></th>
-						<td id="wcs-importer_test_results"><strong><?php echo sprintf( __( '%s0%s tests passed, %s0%s tests failed ( %s0%s of the CSV will be imported ).', 'wcs-importer' ), '<span id="wcs-test-passed">', '</span>', '<span id="wcs-test-failed">', '</span>', '<span id="wcs-test-ratio">', '</span>%' ); ?></strong></td>
-					</tr>
-					<tr>
-						<th><strong><?php _e( 'Details', 'wcs-importer' ); ?></strong></th>
-						<td id="wcs-importer_test_details"><strong><?php echo sprintf( __( '%s0%s fatal errors and %s0%s warnings found.', 'wcs-importer' ), '<span id="wcs-fatal-details">', '</span>', '<span id="wcs-warning-details">', '</span>' ); ?></strong></td>
-					</tr>
-					<tr class="alternate" id="wcs-importer_test_errors"><th><?php _e( 'Error Messages', 'wcs-importer' ); ?>:</th><td></td></tr>
-					<tr id="wcs-importer_test_warnings"><th><?php _e( 'Warnings', 'wcs-importer' ); ?>:</th><td></td></tr>
-				</tbody>
-			</table>
-			<div id="wcs-completed-message" style="display: none;">
-				<p><?php _e( 'Test Finished!', 'wcs-importer' );?></p>
-				<a class="button" href="<?php echo esc_attr( wp_nonce_url( $action, 'import-upload' ) ); ?> "><?php _e( 'Run Import' , 'wcs-importer' ); ?></a>
-			</div>
-		<?php else : ?>
-			<h3><?php _e( 'Importing Results', 'wcs-importer' ); ?></h3>
-			<p id="wcs-import-timeout" style="display: none;"><?php echo sprintf( __( 'ERROR: The importing process has timed out. Please check the CSV is correct and do a test run before importing by enabling the checkbox on the Importer Home screen. %s Start Over. %s', 'wcs-importer' ), '<a href="' . $this->admin_url . '">', '</a>' ); ?></p>
-			<p id="wcs-import-time-completion"><?php echo sprintf( __( 'Total Estimated Import Time Between:  %s 0%s minutes. ( %s0%s Completed! )', 'wcs-importer'), '<span id="wcs-estimated-time">', '</span>', '<span id="wcs-completed-percent">', '%</span>' ); ?></p>
-			<table id="wcs-import-progress" class="widefat_importer widefat">
-				<thead>
-					<tr>
-						<th class="row"><?php _e( 'Import Status', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Order #', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Subscription', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'User Name', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Subscription Status', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Number of Warnings', 'wcs-importer' ); ?></th>
-					</tr>
-				</thead>
-				<tfoot>
-					<tr class="importer-loading">
-						<td colspan="6"></td>
-					</tr>
-				</tfoot>
-				<tbody></tbody>
-			</table>
-			<p id="wcs-completed-message" style="display: none;">
-				<?php printf( __( 'Import Complete! %sView Subscriptions%s, %sView Orders%s or %sImport another file%s.', 'wcs-importer' ), '<a href="' . admin_url( 'admin.php?page=subscriptions' ) . '">', '</a>', '<a href="' . admin_url( 'edit.php?post_type=shop_order' ) . '">', '</a>', '<a href="' . $this->admin_url . '">', '</a>' ); ?>
-			</p>
-		<?php endif;
+			include( plugin_dir_path( WCS_Importer::$plugin_file ) . 'templates/test-mode.php' );
+		} else {
+			include( plugin_dir_path( WCS_Importer::$plugin_file ) . 'templates/import-results.php' );
+		}
 	}
 
 	/**
