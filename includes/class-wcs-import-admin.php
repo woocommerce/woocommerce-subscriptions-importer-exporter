@@ -88,11 +88,11 @@ class WCS_Import_Admin {
 						foreach ( $header as $key => $heading ) {
 							if ( ! $heading ) continue;
 							$s_heading = strtolower( $heading );
-							$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[$key], $enc ) : '';
 						}
 
 						// Checks the row for missing required payment meta
 						$this->check_row_payment_meta( $row, $mapped_fields, $payment_method_error, $payment_meta_error );
+							$row[ $s_heading ] = ( isset( $postmeta[ $key ] ) ) ? wcsi_format_data( $postmeta[$key], $enc ) : '';
 
 						if ( $count >= $this->rows_per_request ) {
 							$previous_pos = $position;
@@ -294,7 +294,7 @@ class WCS_Import_Admin {
 					foreach ( $column_headers as $key => $column_header ) {
 
 						if ( ! $column_header ) continue;
-						$row[ $column_header ] = ( isset( $postmeta[ $key ] ) ) ? WCS_Import_Parser::format_data_from_csv( $postmeta[ $key ], $enc ) : '';
+						$row[ $column_header ] = ( isset( $postmeta[ $key ] ) ) ? wcsi_format_data( $postmeta[ $key ], $enc ) : '';
 					}
 
 					break;
