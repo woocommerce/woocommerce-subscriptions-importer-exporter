@@ -69,7 +69,6 @@ class WCS_Import_Admin {
 				@ini_set( 'auto_detect_line_endings', true );
 
 				$file_positions = $row_start = array();
-				$payment_method_error = $payment_meta_error = array();
 
 				$count = 0;
 				$total = 0;
@@ -90,8 +89,6 @@ class WCS_Import_Admin {
 							$s_heading = strtolower( $heading );
 						}
 
-						// Checks the row for missing required payment meta
-						$this->check_row_payment_meta( $row, $mapped_fields, $payment_method_error, $payment_meta_error );
 							$row[ $s_heading ] = ( isset( $postmeta[ $key ] ) ) ? wcsi_format_data( $postmeta[$key], $enc ) : '';
 
 						if ( $count >= $this->rows_per_request ) {
@@ -117,12 +114,6 @@ class WCS_Import_Admin {
 					fclose( $handle );
 				}
 
-				if ( count( $payment_method_error ) > 0 ) {
-					$error_message = sprintf( __( 'You\'re importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?', 'wcs-importer' ), str_replace( '"', ' ', json_encode( array_unique( $payment_method_error ) ) ), str_replace( '"', ' ', json_encode( array_unique( $payment_meta_error ) ) ) );
-				} else {
-					$error_message = '';
-				}
-
 				$script_data = array(
 					'success' 				=> esc_html__( 'success', 'wcs-importer' ),
 					'failed' 				=> esc_html__( 'failed', 'wcs-importer' ),
@@ -132,7 +123,6 @@ class WCS_Import_Admin {
 					'warning'				=> esc_html__( 'Warning', 'wcs-importer' ),
 					'warnings'				=> esc_html__( 'Warnings', 'wcs-importer' ),
 					'located_at'			=> esc_html__( 'Located at rows', 'wcs-importer' ),
-					'error_message'         => esc_html__( $error_message ),
 
 					// Data for procesing the file
 					'file_id'          => absint( $_GET['file_id'] ),
@@ -142,7 +132,6 @@ class WCS_Import_Admin {
 					'rows_per_request' => $this->rows_per_request,
 					'test_mode'        => ( 'yes' == $_GET['test_mode'] ) ? "true" : "false",
 					'email_customer'   => ( 'yes' == $_GET['email_customer'] ) ? "true" : "false",
-					'cancelled_url'    => add_query_arg( 'cancelled', 'true', $this->admin_url ),
 					'total'            => $total,
 				);
 
