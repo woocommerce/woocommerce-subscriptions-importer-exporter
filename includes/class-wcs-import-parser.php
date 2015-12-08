@@ -1,16 +1,19 @@
 <?php 
 
 class WCS_Import_Parser {
-	static $mapped_fields = array();
-	static $results = array();
-	static $result = array();
-	static $file_pointer_start_position;
-	static $file_pointer_end_position;
-	static $starting_row_number;
-	static $test_mode;
-	static $email_customer;
 
+	private static $results = array();
 
+	/* The current row number of CSV */
+	private static $row_number;
+
+	/* Front-end import settings chosen */
+	public static $test_mode;
+	public static $email_customer;
+
+	/* Specifically for the shutdown handler */
+	public static $fields = array();
+	public static $row    = array();
 
 	/** Subscription post meta */
 	public static $order_meta_fields = array(
@@ -56,29 +59,36 @@ class WCS_Import_Parser {
 	);
 
 	/**
+	 * Setup function for the import parse class
 	 *
 	 * @since 1.0
+	 * @param array $data
 	 */
-	public static function import_data( $file_path, $mapped_fields, $file_pointer_start_position, $file_pointer_end_position, $starting_row_num, $test_mode, $email_customer ) {
-		$file_path = addslashes( $file_path );
+	public static function import_data( $data ) {
+		$file_path = addslashes( $data['file_path'] );
 
-		self::$mapped_fields = $mapped_fields;
-		self::$file_pointer_start_position = $file_pointer_start_position;
-		self::$file_pointer_end_position = $file_pointer_end_position;
-		self::$starting_row_number = $starting_row_num;
-		self::$test_mode = ( $test_mode == 'true' ) ? true : false;
-		self::$email_customer = ( $email_customer == 'true' ) ? true : false;
-		self::import_start( $file_path );
+		self::$row_number      = $data['starting_row'];
+		self::$test_mode       = ( $data['test_mode'] == 'true' ) ? true : false;
+		self::$email_customer  = ( $data['email_customer'] == 'true' ) ? true : false;
+		self::$fields          = $data['mapped_fields'];
+
+
+		self::import_start( $file_path, $data['file_start'], $data['file_end'] );
+
 
 		return self::$results;
 	}
 
 	/**
-	 * Loads the csv file contents into the class variable self::$file
+	 * Loads the csv file contents and starts the import
 	 *
 	 * @since 1.0
+	 * @param string $file_path
+	 * @param int $start_position
+	 * @param int $end_position
 	 */
-	public static function import_start( $file_path ) {
+	public static function import_start( $file_path, $start_position, $end_position ) {
+
 		$file_encoding = mb_detect_encoding( $file_path, 'UTF-8, ISO-8859-1', true );
 
 		if ( $file_encoding ) {
@@ -92,8 +102,8 @@ class WCS_Import_Parser {
 				$data = array();
 				$column_headers = fgetcsv( $file_handle, 0 );
 
-				if ( self::$file_pointer_start_position != 0 ) {
-					fseek( $file_handle, self::$file_pointer_start_position );
+				if ( $start_position != 0 ) {
+					fseek( $file_handle, $start_position );
 				}
 
 				while ( ( $csv_row = fgetcsv( $file_handle, 0 ) ) !== false ) {
@@ -102,13 +112,13 @@ class WCS_Import_Parser {
 						if ( ! $header ) {
 							continue;
 						}
-						$subscription_details[ $header ] = ( isset( $csv_row[ $key ] ) ) ? trim( self::format_data_from_csv( $csv_row[ $key ], $file_encoding ) ) : '';
+						$data[ $header ] = ( isset( $csv_row[ $key ] ) ) ? trim( wcsi_format_data( $csv_row[ $key ], $file_encoding ) ) : '';
 					}
 
-					self::$starting_row_number++;
-					self::import_subscription( $subscription_details );
+					self::$row_number++;
+					self::import_subscription( $data );
 
-					if( ftell( $file_handle ) >= self::$file_pointer_end_position ) {
+					if( ftell( $file_handle ) >= $end_position ) {
 						break;
 					}
 				}
@@ -118,65 +128,60 @@ class WCS_Import_Parser {
 	}
 
 	/**
+	 * Create a new subscription and attach all relevant meta given the data in the CSV.
+	 * This function will also create a user if enough valid information is given and there's no
 	 *
 	 * @since 1.0
+	 * @param array $data
 	 */
+	private static function import_subscription( $data ) {
 
-	/**
-	 * Import Subscription
-	 *
-	 * @since 1.0
-	 */
-	private static function import_subscription( $subscription_details ) {
-		$download_permissions_granted = false;
-		$use_manual_recurring         = true;
+		$set_manual      = false;
+		$product_id      = absint( $data[ self::$fields['product_id'] ] );
+		$result          = array();
 
-		$order_meta = array();
-		$result['warning'] = $result['error'] = array();
+		$post_meta = $result['warning'] = $result['error'] = array();
+		$result['row_number']           = self::$row_number;
 
-		if ( empty( self::$mapped_fields['product_id'] ) || ! ( self::check_product( $subscription_details[ self::$mapped_fields['product_id'] ] ) ) ) {
-			$result['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
+		if ( empty( self::$fields['product_id'] ) || ! ( wcsi_check_product( $product_id ) ) ) {
+			$result['error'][] = esc_html__( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
 		}
 
 		$user_id = wcsi_check_customer( $data, self::$fields, self::$test_mode );
 
-		} elseif ( is_wp_error( $user_id ) ) {
+		if ( is_wp_error( $user_id ) ) {
 			$result['error'][] = $user_id->get_error_message();
 
-		} elseif ( ! self::$test_mode ) {
+		} elseif ( empty( $user_id ) ) {
+			$result['error'][] = esc_html__( 'An error occurred with the customer information provided.', 'wcs-importer' );
 
-			$customer = get_user_by( 'id', $user_id );
-			$result['user_id'] = $customer->ID;
-			$result['username'] = $customer->user_login;
-			$result['edit_user_link'] = sprintf( '<a href="%s">#%s</a>', get_edit_user_link( $user_id ), $user_id );
+		} elseif ( ! self::$test_mode ) {
+			$result['username'] = sprintf( '<a href="%s">%s</a>', get_edit_user_link( $user_id ), self::get_user_display_name( $user_id ) );
 		}
 
-		// Skip importing rows without the required information
 		if ( ! empty( $result['error'] ) ) {
-			$result['status']     = 'failed';
-			$result['row_number'] = self::$starting_row_number;
+			$result['status'] = 'failed';
 
 			array_push( self::$results, $result );
 			return;
 		}
 
-		$_product       = get_product( $subscription_details[ self::$mapped_fields['product_id'] ] );
-		$result['item'] = $_product->get_title();
-		$quantity       = ( ! empty( $subscription_details[ self::$mapped_fields['quantity'] ] ) ) ? $subscription_details[ self::$mapped_fields[ 'quantity' ] ] : 1;
+		$_product       = wc_get_product( $product_id );
+		$quantity       = ( ! empty( $data[ self::$fields['quantity'] ] ) ) ? $data[ self::$fields['quantity'] ] : 1;
+		$result['item'] = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product->id ), $_product->get_title() );
 
 		$missing_shipping_addresses = $missing_billing_addresses = array();
 
-		// Populate order meta data
 		foreach( self::$order_meta_fields as $column ) {
 			switch( $column ) {
 				case 'shipping_method':
 					$method       = ( ! empty( $subscription_details[ self::$mapped_fields['shipping_method'] ] ) ) ? $subscription_details[ self::$mapped_fields['shipping_method'] ] : '';
 					$title        = ( ! empty( $subscription_details[ self::$mapped_fields['shipping_method_title'] ] ) ) ? $subscription_details[ self::$mapped_fields['shipping_method_title'] ] : '';
 
-					$order_meta[] = array( 'key' => '_' . $column, 'value' => $method );
-					$order_meta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
 					$order_meta[] = array( 'key' => '_recurring_shipping_method', 'value' => $method );
 					$order_meta[] = array( 'key' => '_recurring_shipping_method_title', 'value' => $title );
+					$post_meta[] = array( 'key' => '_' . $column, 'value' => $method );
+					$post_meta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
 
 					if( empty( $method ) || empty( $title ) ) {
 						// set up warning message to show admin -  Do i need be more specific??
@@ -255,7 +260,7 @@ class WCS_Import_Parser {
 				case 'shipping_postcode':
 				case 'shipping_state':
 				case 'shipping_country':
-					$value = ( ! empty( $subscription_details[ self::$mapped_fields[ $column ] ] ) ) ? $subscription_details[ self::$mapped_fields[ $column ] ] : '';
+					$value = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : '';
 
 					if ( empty( $value ) ) {
 						$metadata = get_user_meta( $user_id, $column );
@@ -266,7 +271,7 @@ class WCS_Import_Parser {
 						$missing_shipping_addresses[] = $column;
 					}
 
-					$order_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
 
 				case 'billing_address_1':
@@ -274,7 +279,7 @@ class WCS_Import_Parser {
 				case 'billing_postcode':
 				case 'billing_state':
 				case 'billing_country':
-					$value = ( ! empty( $subscription_details[self::$mapped_fields[$column]] ) ) ? $subscription_details[self::$mapped_fields[$column]] : '';
+					$value = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : '';
 
 					if ( empty( $value ) ) {
 						$metadata = get_user_meta( $user_id, $column );

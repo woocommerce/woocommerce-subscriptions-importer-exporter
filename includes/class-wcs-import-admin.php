@@ -302,11 +302,10 @@ class WCS_Import_Admin {
 			'email_customer' => $_GET['email_customer'],
 		);
 
-		$action = add_query_arg( $url_params, $this->admin_url );
-
+		$action      = add_query_arg( $url_params, $this->admin_url );
 		$button_text = ( 'yes' == $_GET['test_mode'] ) ? __( 'Test CSV', 'wcs-importer' ) : __( 'Run Import', 'wcs-importer' );
+		$row_number  = 1;
 
-		$row_number = 1;
 		$subscription_fields = array( 'customer_id', 'product_id', 'status', 'start_date', 'next_payment_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
 		?>
 
@@ -539,14 +538,17 @@ class WCS_Import_Admin {
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 
 		if ( isset( $_POST['file_id'] ) && isset( $_POST['row_num'] ) ) {
-			$file_path          = get_attached_file( absint( $_POST['file_id'] ) );
-			$mapped_fields      = get_post_meta( absint( $_POST['file_id'] ), '_mapped_rules', true );
-			$file_pointer_start = ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0;
-			$file_pointer_end   = ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0;
-			$starting_row_num   = absint( $_POST['row_num'] );
-			$test_mode          = isset( $_POST['test_mode'] ) ? $_POST['test_mode'] : false;
-			$email_customer     = isset( $_POST['email_customer'] ) ? $_POST['email_customer'] : false;
-			$results = WCS_Import_Parser::import_data( $file_path, $mapped_fields, $file_pointer_start, $file_pointer_end, $starting_row_num, $test_mode, $email_customer );
+			$results = WCS_Import_Parser::import_data( array(
+					'file_path'       => get_attached_file( absint( $_POST['file_id'] ) ),
+					'mapped_fields'   => get_post_meta( absint( $_POST['file_id'] ), '_mapped_rules', true ),
+					'file_start'      => ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0,
+					'file_end'        => ( isset( $_POST['end'] ) ) ? absint( $_POST['end'] ) : 0,
+					'starting_row'    => absint( $_POST['row_num'] ),
+					'test_mode'       => isset( $_POST['test_mode'] ) ? $_POST['test_mode'] : false,
+					'email_customer'  => isset( $_POST['email_customer'] ) ? $_POST['email_customer'] : false,
+					'add_memberships' => isset( $_POST['add_memberships'] ) ? $_POST['add_memberships'] : false,
+				)
+			);
 
 			header( 'Content-Type: application/json; charset=utf-8' );
 			echo json_encode( $results );
