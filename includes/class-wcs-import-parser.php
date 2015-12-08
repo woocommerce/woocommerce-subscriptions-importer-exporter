@@ -150,9 +150,6 @@ class WCS_Import_Parser {
 	 *
 	 * @since 1.0
 	 */
-	public static function format_data_from_csv( $data, $file_encoding ) {
-		return ( $file_encoding == 'UTF-8' ) ? $data : utf8_encode( $data );
-	}
 
 	/**
 	 * Import Subscription
@@ -170,11 +167,7 @@ class WCS_Import_Parser {
 			$result['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
 		}
 
-		// Check customer id is valid or create one
-		$user_id = self::check_customer( $subscription_details );
-
-		if ( empty( $user_id ) ) {
-			$result['error'][] = __( 'An error occurred with the customer information provided.', ' wcs_import' );
+		$user_id = wcsi_check_customer( $data, self::$fields, self::$test_mode );
 
 		} elseif ( is_wp_error( $user_id ) ) {
 			$result['error'][] = $user_id->get_error_message();
@@ -614,172 +607,47 @@ class WCS_Import_Parser {
 	}
 
 	/**
-	 * Check the product is a woocommerce subscription - an error status will show up on table if this is not the case.
 	 *
 	 * @since 1.0
 	 */
-	public static function check_product( $product_id ) {
-		$is_subscription = WC_Subscriptions_Product::is_subscription( $product_id );
-		return ( empty( $is_subscription ) ) ? false : true;
 	}
 
 	/**
-	 * Checks customer information and creates a new store customer when no customer Id has been given
 	 *
 	 * @since 1.0
 	 */
-	public static function check_customer( $subscription_details ) {
-		$customer_email = ( ! empty ( $subscription_details[ self::$mapped_fields['customer_email'] ] ) ) ? $subscription_details[ self::$mapped_fields['customer_email'] ] : '';
-		$username       = ( ! empty ( $subscription_details[ self::$mapped_fields['customer_username'] ] ) ) ? $subscription_details[ self::$mapped_fields['customer_username'] ] : '';
-		$customer_id    = ( ! empty ( $subscription_details[ self::$mapped_fields['customer_id'] ] ) ) ? $subscription_details[ self::$mapped_fields['customer_id'] ] : '';
 
-		if ( ! empty( $subscription_details[ self::$mapped_fields['customer_password'] ] ) ) {
-			$password           = $subscription_details[ self::$mapped_fields['customer_password'] ];
-			$password_generated = false;
-		} else {
-			$password           = wp_generate_password( 12, true );
-			$password_generated = true;
-		}
 
-		$found_customer = false;
 
-		if ( empty( $customer_id ) ) {
 
-			// check for registered email if customer id is not set
-			if ( is_email( $customer_email ) ) {
-				$found_customer = email_exists( $customer_email );
-			}
 
-			// if customer still not found, check by username
-			if ( ! $found_customer && ! empty( $username ) ) {
-				$found_customer = username_exists( $username );
-			}
 
-			if ( ! $found_customer && is_email( $customer_email ) ) {
 
-				// In test mode, we just want to know if a user account can be created - as we have a valid email address, it can be.
-				if ( self::$test_mode ) {
 
-					$found_customer = true;
 
-				} else {
-
-					// Not in test mode, create a user account for this email
-					if ( empty( $username ) ) {
-						$maybe_username = explode( '@', $customer_email );
-						$maybe_username = sanitize_user( $maybe_username[0] );
-						$counter = 1;
-						$username = $maybe_username;
-						while ( username_exists( $username ) ) {
-							$username = $maybe_username . $counter;
-							$counter++;
 						}
 					}
 
-					$found_customer = wp_create_user( $username, $password, $customer_email );
 
-					if ( ! is_wp_error( $found_customer ) ) {
 
-						// update user meta data
-						foreach( self::$user_data_titles as $key ) {
-							switch( $key ) {
-								case 'billing_email':
-									// user billing email if set in csv otherwise use the user's account email
-									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $customer_email;
-									update_user_meta( $found_customer, $key, $meta_value );
-									break;
 
-								case 'billing_first_name':
-									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : $username;
-									update_user_meta( $found_customer, $key, $meta_value );
-									update_user_meta( $found_customer, 'first_name', $meta_value );
-									break;
 
-								case 'billing_last_name':
-									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
-									update_user_meta( $found_customer, $key, $meta_value );
-									update_user_meta( $found_customer, 'last_name', $meta_value );
-									break;
 
-								case 'shipping_first_name':
-								case 'shipping_last_name':
-								case 'shipping_address_1':
-								case 'shipping_address_2':
-								case 'shipping_city':
-								case 'shipping_postcode':
-								case 'shipping_state':
-								case 'shipping_country':
-									// Set the shipping address fields to match the billing fields if not specified in CSV
-									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
 
-									if ( empty ( $meta_value ) ) {
-										$n_key = str_replace( "shipping", "billing", $key );
-										$meta_value = ( ! empty( $subscription_details[ self::$mapped_fields[$n_key]] ) ) ? $subscription_details[self::$mapped_fields[$n_key]] : '';
-									}
 
-									update_user_meta( $found_customer, $key, $meta_value );
-									break;
 
-								default:
-									$meta_value = ( ! empty( $subscription_details[self::$mapped_fields[ $key ]] ) ) ? $subscription_details[self::$mapped_fields[ $key ]] : '';
-									update_user_meta( $found_customer, $key, $meta_value );
-							}
-						}
 
-						// sets all new user's roles to the value set as default_inactive_role
-						WC_Subscriptions_Manager::make_user_inactive( $found_customer );
-
-						// send user registration email if admin as chosen to do so
-						if ( self::$email_customer && function_exists( 'wp_new_user_notification' ) ) {
-							// keep the previous value of the option so the original value can be restored
-							$previous_option = get_option( 'woocommerce_registration_generate_password' );
-
-							// force the option value so that the password will appear in the email
-							update_option( 'woocommerce_registration_generate_password', 'yes' );
-							do_action( 'woocommerce_created_customer', $found_customer, array( 'user_pass' => $password ), true );
-
-							update_option( 'woocommerce_registration_generate_password', $previous_option );
-						}
-					}
-				}
-			}
-			return $found_customer;
-		} else {
-			// check customer id
-			$found_customer = get_user_by( 'id', $customer_id );
-
-			if ( ! empty( $found_customer ) && ! is_wp_error( $found_customer ) ) {
-				return absint( $customer_id );
 			}
 
-			return $found_customer;
+			}
 		}
 	}
 
 	/**
-	 * Calculates the number of payments between the start_date and expiry_date
-	 * based on the period (i.e. Day, Month etc); return 0 if expiry_date is not in the future.
 	 *
 	 * @since 1.0
 	 */
-	public static function calculate_sub_length( $start_date, $expiry_date, $period ) {
 
-		if ( $expiry_date <= $start_date ) {
-			return -1;
-		}
-
-		// $days = the number of days between start and expiry dates
-		$days = ceil( ( $expiry_date - $start_date ) / ( 60 * 60 * 24 ) );
-
-		switch ( $period ) {
-			case 'day' :
-				return $days;
-			case 'week' :
-				return floor( $days / 7 );
-			case 'month' :
-				return floor( $days / 30 );
-			case 'year' :
-				return floor( $days / 365 );
 		}
 	}
 }
