@@ -70,31 +70,34 @@ class WCS_Import_Admin {
 
 				$file_positions = $row_start = array();
 
-				$count = 0;
-				$total = 0;
+				$count        = 0;
+				$total        = 0;
 				$previous_pos = 0;
-				$position = 0;
-				$row_start[] = 1;
-
-				$mapped_fields = get_post_meta( $file_id, '_mapped_rules', true );
+				$position     = 0;
+				$row_start[]  = 1;
 
 				if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
-					$row = $raw_headers = array();
+					$row       = $raw_headers = array();
 
 					$header = fgetcsv( $handle, 0 );
 					while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== FALSE ) {
 						$count++;
-						foreach ( $header as $key => $heading ) {
-							if ( ! $heading ) continue;
-							$s_heading = strtolower( $heading );
-						}
 
+						foreach ( $header as $key => $heading ) {
+
+							if ( ! $heading ) {
+								continue;
+							}
+
+							$s_heading         = strtolower( $heading );
 							$row[ $s_heading ] = ( isset( $postmeta[ $key ] ) ) ? wcsi_format_data( $postmeta[$key], $enc ) : '';
+						}
 
 						if ( $count >= $this->rows_per_request ) {
 							$previous_pos = $position;
-							$position = ftell( $handle );
-							$row_start[] = end( $row_start ) + $count;
+							$position     = ftell( $handle );
+							$row_start[]  = end( $row_start ) + $count;
+
 							reset( $row_start );
 
 							$count = 0;
