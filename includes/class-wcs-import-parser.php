@@ -10,78 +10,49 @@ class WCS_Import_Parser {
 	static $test_mode;
 	static $email_customer;
 
-	static $order_meta_fields = array(
-		"order_shipping",
-		"order_shipping_tax",
-		"order_tax",
-		"cart_discount",
-		"order_discount",
-		"order_total",
-		"order_recurring_total",
-		"payment_method",
-		"shipping_method",
-		"customer_user",
-		"billing_first_name",
-		"billing_last_name",
-		"billing_company",
-		"billing_address_1",
-		"billing_address_2",
-		"billing_city",
-		"billing_state",
-		"billing_postcode",
-		"billing_country",
-		"billing_email",
-		"billing_phone",
-		"shipping_first_name",
-		"shipping_last_name",
-		"shipping_company",
-		"shipping_address_1",
-		"shipping_address_2",
-		"shipping_city",
-		"shipping_state",
-		"shipping_postcode",
-		"shipping_country",
+
+
+	/** Subscription post meta */
+	public static $order_meta_fields = array(
+		'order_shipping',
+		'order_shipping_tax',
+		'order_tax',
+		'cart_discount',
+		'cart_discount_tax',
+		'order_discount',
+		'order_total',
+		'payment_method',
+		'shipping_method',
+
+		'billing_first_name', // Billing Address Info
+		'billing_last_name',
+		'billing_company',
+		'billing_address_1',
+		'billing_address_2',
+		'billing_city',
+		'billing_state',
+		'billing_postcode',
+		'billing_country',
+		'billing_email',
+		'billing_phone',
+
+		'shipping_first_name', // Shipping Address Info
+		'shipping_last_name',
+		'shipping_company',
+		'shipping_address_1',
+		'shipping_address_2',
+		'shipping_city',
+		'shipping_state',
+		'shipping_postcode',
+		'shipping_country',
 	);
 
-	// User meta data
-	static $user_data_titles = array (
-		"billing_first_name",
-		"billing_last_name",
-		"billing_company",
-		"billing_address_1",
-		"billing_address_2",
-		"billing_city",
-		"billing_state",
-		"billing_postcode",
-		"billing_country",
-		"billing_email",
-		"billing_phone",
-		"shipping_first_name",
-		"shipping_last_name",
-		"shipping_company",
-		"shipping_address_1",
-		"shipping_address_2",
-		"shipping_city",
-		"shipping_state",
-		"shipping_postcode",
-		"shipping_country",
-	);
-
-	static $order_item_meta_fields = array (
-		"recurring_line_total",
-		"recurring_line_tax",
-		"recurring_line_subtotal",
-		"recurring_line_subtotal_tax",
-		"line_subtotal",
-		"line_total",
-		"line_tax",
-		"line_subtotal_tax",
-	);
-
-	static $supported_payment_gateways = array (
-		'paypal'                        => array( 'PayPal Subscriber ID' ),
-		'stripe'                        => array( '_stripe_customer_id' ),
-		'authorize_net_cim_credit_card' => array( '_wc_authorize_net_cim_credit_card_customer_id', '_wc_authorize_net_cim_credit_card_payment_token' ),
+	/* Subscription line item meta */
+	public static $order_item_meta_fields = array (
+		'line_subtotal',
+		'line_total',
+		'line_tax',
+		'line_subtotal_tax',
 	);
 
 	/**
