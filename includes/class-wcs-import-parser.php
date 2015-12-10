@@ -181,7 +181,7 @@ class WCS_Import_Parser {
 					$post_meta[] = array( 'key' => '_' . $column, 'value' => $method );
 					$post_meta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
 
-					if( empty( $method ) || empty( $title ) ) {
+					if( empty( $method ) && ! $_product->is_virtual() ) {
 						$result['warning'][] = __( 'Shipping method and title for the subscription have been left as empty. ', 'wcs-importer' );
 					}
 					break;
@@ -264,7 +264,13 @@ class WCS_Import_Parser {
 			}
 		}
 
+		if ( ! $_product->is_virtual() ) {
+			if ( ! empty( $missing_shipping_addresses ) ) {
+				$result['warning'][] = esc_html__( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-importer' );
+			}
 
+			if ( ! empty( $missing_billing_addresses ) ) {
+				$result['warning'][] = esc_html__( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-importer' );
 			}
 		}
 
