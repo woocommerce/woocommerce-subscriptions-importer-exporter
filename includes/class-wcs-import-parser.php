@@ -3,6 +3,7 @@
 class WCS_Import_Parser {
 
 	private static $results = array();
+	public static $logger   = null;
 
 	/* The current row number of CSV */
 	private static $row_number;
@@ -161,6 +162,7 @@ class WCS_Import_Parser {
 
 		if ( ! empty( $result['error'] ) ) {
 			$result['status'] = 'failed';
+			self::log( sprintf( 'Row #%s failed: %s', $result['row_number'], print_r( $result['error'], true ) ) );
 
 			array_push( self::$results, $result );
 			return;
@@ -459,6 +461,24 @@ class WCS_Import_Parser {
 
 		}
 		return $username;
+	}
+
+	/**
+	 * Log all the things during an import
+	 *
+	 * @since 1.0
+	 * @param string $message
+	 * @param string $log Defaults to wcs-importer
+	 */
+	public static function log( $message, $log = 'wcs-importer' ) {
+
+		if ( ! self::$test_mode && ( ! defined( 'WCSI_LOG' ) || false !== WCSI_LOG ) ) {
+			if ( ! self::$logger ) {
+				self::$logger = new WC_Logger();
+			}
+
+			self::$logger->add( $log, $message );
+		}
 	}
 }
 
