@@ -550,6 +550,26 @@ class WCS_Import_Parser {
 		}
 		return $warnings;
 	}
+
+	/**
+	 * Save download permission to the subscription.
+	 *
+	 * @since 1.0
+	 * @param WC_Subscription $subscription
+	 * @param WC_Product $product
+	 * @param int $quantity
+	 */
+	public static function save_download_permissions( $subscription, $product, $quantity = 1 ) {
+
+		if ( $product && $product->exists() && $product->is_downloadable() ) {
+			$downloads  = $product->get_files();
+			$product_id = isset( $product->variation_id ) ? $product->variation_id : $product->id;
+
+			foreach ( array_keys( $downloads ) as $download_id ) {
+				wc_downloadable_file_permission( $download_id, $product_id, $subscription, $quantity );
+			}
+		}
+	}
 }
 
 ?>
