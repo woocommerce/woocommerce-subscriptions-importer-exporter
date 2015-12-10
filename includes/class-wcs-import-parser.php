@@ -480,6 +480,76 @@ class WCS_Import_Parser {
 			self::$logger->add( $log, $message );
 		}
 	}
+
+	/**
+	 * Set the payment method meta on the imported subscription or on user meta
+	 *
+	 * @since 1.0
+	 * @param WC_Subscription $subscription
+	 * @param array $data Current line from the CSV
+	 */
+	private static function set_payment_meta( $subscription, $data ) {
+
+		$warnings         = array();
+		$payment_gateways = WC()->payment_gateways->get_available_payment_gateways();
+		$payment_method   = $subscription->payment_method;
+
+
+		if ( ! empty( $payment_method ) ) {
+
+			$payment_method_table = apply_filters( 'woocommerce_subscription_payment_meta', array(), $subscription );
+			$payment_gateway      = ( isset( $payment_gateways[ $payment_method ] ) ) ? $payment_gateways[ $payment_method ] : '';
+
+			if ( ! empty( $payment_gateway ) && isset( $payment_method_table[ $payment_gateway->id ] ) ) {
+				$payment_method_data = $payment_method_table[ $payment_gateway->id ];
+				$meta_set            = false;
+
+				foreach ( $payment_method_data as $meta_table => &$meta ) {
+
+					if ( ! is_array( $meta ) ) {
+						continue;
+					}
+
+					foreach ( $meta as $meta_key => &$meta_data ) {
+
+						switch ( $meta_table ) {
+							case 'post_meta':
+							case 'postmeta':
+								$payment_meta_fields = self::$fields['payment_method_post_meta'];
+								break;
+							case 'user_meta':
+							case 'usermeta':
+								$payment_meta_fields = self::$fields['payment_method_user_meta'];
+								break;
+							default :
+								$payment_meta_fields = array();
+						}
+
+						if ( in_array( $meta_key, $payment_meta_fields ) ) {
+							$meta_data['value'] = ( ! empty( $data[ $meta_key ] ) ) ? $data[ $meta_key ] : '';
+							$meta_set = true;
+						}
+					}
+				}
+
+				if ( $meta_set ) {
+					$subscription->set_payment_method( $payment_gateway, $payment_method_data );
+				} else {
+					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %s subscription (%s). The next renewal is going to fail if you leave this.', 'wcs-importer' ), $payment_method, $subscription->id );
+				}
+
+			} else {
+
+				if ( 'paypal' == $payment_method ) {
+					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal. Either PayPal was not enabled or your PayPal account does not have Reference Transaction setup. Learn more about enabling Reference Transactions %shere%s.', 'wcs-importer' ), '<a href="https://support.woothemes.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
+				} else {
+					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewals. Please contact support if you believe this is not correct.', 'wcs-importer' ), $payment_method );
+				}
+				$subscription->update_manual();
+			}
+		}
+		return $warnings;
+	}
 }
 
 ?>
