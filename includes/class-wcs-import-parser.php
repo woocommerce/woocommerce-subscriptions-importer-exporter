@@ -425,6 +425,35 @@ class WCS_Import_Parser {
 			array_push( self::$results, $result );
 		}
 	}
+
+	/**
+	 * Get the display name for the given user. Uses the first name and last name or falls back to the display name.
+	 *
+	 * @since 1.0
+	 * @param WP_User|int $customer
+	 */
+	public static function get_user_display_name( $customer ) {
+
+		if ( ! is_object( $customer ) ) {
+			$customer = get_userdata( $customer );
+		}
+
+		$username = '';
+
+		if ( false !== $customer ) {
+			$username  = '<a href="user-edit.php?user_id=' . absint( $customer->ID ) . '">';
+
+			if ( $customer->first_name || $customer->last_name ) {
+				$username .= esc_html( ucfirst( $customer->first_name ) . ' ' . ucfirst( $customer->last_name ) );
+			} else {
+				$username .= esc_html( ucfirst( $customer->display_name ) );
+			}
+
+			$username .= '</a>';
+
+		}
+		return $username;
+	}
 }
 
 ?>
