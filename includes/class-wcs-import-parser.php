@@ -436,12 +436,6 @@ class WCS_Import_Parser {
 					wc_add_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce' ), $cart_item_key, $order_id ), $values['quantity'] - max( 0, $_product->get_total_stock() ) );
 				}
 
-				// add download permissions if specified
-				if( $download_permissions_granted ) {
-					delete_post_meta( $order_id, '_download_permissions_granted' );
-					wc_downloadable_product_permissions( $order_id );
-				}
-
 				// Update the subscription meta data with values in $subscription_meta
 				$subscription_meta = array (
 						'start_date'         => $start_date_gmt,
@@ -547,6 +541,12 @@ class WCS_Import_Parser {
 
 			// Check if the subscription has been successfully added
 			$subscription = WC_Subscriptions_Manager::get_subscription( $subscription_key );
+
+			// add download permissions if specified
+			if( $download_permissions_granted ) {
+				delete_post_meta( $order_id, '_download_permissions_granted' );
+				wc_downloadable_product_permissions( $order_id );
+			}
 
 			// Successfully added subscription. Attach information on each order to the results array.
 			if( ! empty ( $subscription['order_id'] ) && ! empty ( $subscription['product_id'] ) ) {
