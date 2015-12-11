@@ -438,6 +438,7 @@ class WCS_Import_Parser {
 
 				// add download permissions if specified
 				if( $download_permissions_granted ) {
+					delete_post_meta( $order_id, '_download_permissions_granted' );
 					wc_downloadable_product_permissions( $order_id );
 				}
 
