@@ -135,6 +135,7 @@ class WCS_Import_Admin {
 					'rows_per_request' => $this->rows_per_request,
 					'test_mode'        => ( 'yes' == $_GET['test_mode'] ) ? "true" : "false",
 					'email_customer'   => ( 'yes' == $_GET['email_customer'] ) ? "true" : "false",
+					'add_memberships'  => ( 'yes' == $_GET['add_memberships'] ) ? "true" : "false",
 					'total'            => $total,
 				);
 
@@ -203,8 +204,9 @@ class WCS_Import_Admin {
 		$upload_dir = wp_upload_dir();
 
 		// Set defaults for admin flags
-		$test_mode      = ( isset( $_POST['test_mode'] ) ) ? $_POST['test_mode'] : 'yes';
-		$email_customer = ( isset( $_POST['email_customer'] ) ) ? $_POST['email_customer'] : 'no';
+		$test_mode       = ( isset( $_POST['test_mode'] ) ) ? $_POST['test_mode'] : 'yes';
+		$email_customer  = ( isset( $_POST['email_customer'] ) ) ? $_POST['email_customer'] : 'no';
+		$add_memberships = ( isset( $_POST['add_memberships'] ) ) ? $_POST['add_memberships'] : 'yes';
 
 		if ( ! empty( $this->upload_error ) ) : ?>
 			<div id="message" class="error">
@@ -246,6 +248,13 @@ class WCS_Import_Admin {
 							<td>
 								<input type="checkbox" name="email_customer" value="yes" <?php checked( $email_customer, 'yes' ); ?> />
 								<em><?php esc_html_e( 'If importing new users, you can email customers their account details.', 'wcs-importer' ); ?></em>
+							</td>
+						</tr>
+						<tr>
+							<th><?php esc_html_e( 'Attach memberships plans', 'wcs-importer' ); ?></th>
+							<td>
+								<input type="checkbox" name="add_memberships" value="yes" <?php checked( $add_memberships, 'yes' ); ?> />
+								<em><?php printf( esc_html__( 'Automatically add the membership to the new subscription if it contains a product that is part of a membership plan (only works with %sWooCommerce Memberships%s).', 'wcs-importer' ), '<a href="">', '</a>' ); ?></em>
 							</td>
 						</tr>
 					</tbody>
@@ -296,10 +305,11 @@ class WCS_Import_Admin {
 		}
 
 		$url_params = array(
-			'step'           => '3',
-			'file_id'        => $file_id,
-			'test_mode'      => $_GET['test_mode'],
-			'email_customer' => $_GET['email_customer'],
+			'step'            => '3',
+			'file_id'         => $file_id,
+			'test_mode'       => $_GET['test_mode'],
+			'email_customer'  => $_GET['email_customer'],
+			'add_memberships' => $_GET['add_memberships'],
 		);
 
 		$action      = add_query_arg( $url_params, $this->admin_url );
@@ -490,9 +500,10 @@ class WCS_Import_Admin {
 			check_admin_referer( 'import-upload' );
 
 			$next_step_url_params = array(
-				'file_id'        => isset( $_GET['file_id'] ) ? $_GET['file_id'] : 0,
-				'test_mode'      => isset( $_REQUEST['test_mode'] ) ? $_REQUEST['test_mode'] : 'no',
-				'email_customer' => isset( $_REQUEST['email_customer'] ) ? $_REQUEST['email_customer'] : 'no',
+				'file_id'         => isset( $_GET['file_id'] ) ? $_GET['file_id'] : 0,
+				'test_mode'       => isset( $_REQUEST['test_mode'] ) ? $_REQUEST['test_mode'] : 'no',
+				'email_customer'  => isset( $_REQUEST['email_customer'] ) ? $_REQUEST['email_customer'] : 'no',
+				'add_memberships' => isset( $_REQUEST['add_memberships'] ) ? $_REQUEST['add_memberships'] : 'no',
 			);
 
 			if ( 'upload_file' == $_POST['action'] ) {
