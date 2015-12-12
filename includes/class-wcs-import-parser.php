@@ -83,9 +83,11 @@ class WCS_Import_Parser {
 		self::$add_memberships = ( $data['add_memberships'] == 'true' ) ? true : false;
 		self::$fields          = $data['mapped_fields'];
 
+		add_action( 'shutdown', __CLASS__ . '::catch_unexpected_shutdown' );
 
 		self::import_start( $file_path, $data['file_start'], $data['file_end'] );
 
+		remove_action( 'shutdown', __CLASS__ . '::catch_unexpected_shutdown' );
 
 		return self::$results;
 	}
@@ -607,6 +609,25 @@ class WCS_Import_Parser {
 					$plan->grant_access_from_purchase( $user_id, $product_id, $subscription_id );
 				}
 			}
+		}
+	}
+
+	/**
+	 * Catch any unexpected shutdowns experienced during the import process
+	 *
+	 * @since 1.0
+	 */
+	public static function catch_unexpected_shutdown() {
+		if ( ! empty( self::$fields ) && ! empty( self::$row ) && $error = error_get_last() ) {
+
+			if ( E_ERROR == $error['type'] ) {
+				self::log( '--------- Expected shutdown during the importer ---------', 'wcs-importer-shutdown' );
+				self::log( 'Mapped Fields: ' . print_r( self::$fields, true ), 'wcs-importer-shutdown' );
+				self::log( 'CSV Row: ' . print_r( self::$row, true ), 'wcs-importer-shutdown' );
+				self::log( sprintf( 'PHP Fatal error %s in %s on line %s.', $error['message'], $error['file'], $error['line'] ), 'wcs-importer-shutdown' );
+			}
+
+			self::$fields = self::$row = null;
 		}
 	}
 }
