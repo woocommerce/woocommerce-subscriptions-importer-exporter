@@ -14,9 +14,12 @@ class WCS_Import_Parser {
 	/* The current row number of CSV */
 	private static $row_number;
 
+	private static $membership_plans = null;
+
 	/* Front-end import settings chosen */
 	public static $test_mode;
 	public static $email_customer;
+	public static $add_memberships;
 
 	/* Specifically for the shutdown handler */
 	public static $fields = array();
@@ -77,6 +80,7 @@ class WCS_Import_Parser {
 		self::$row_number      = $data['starting_row'];
 		self::$test_mode       = ( $data['test_mode'] == 'true' ) ? true : false;
 		self::$email_customer  = ( $data['email_customer'] == 'true' ) ? true : false;
+		self::$add_memberships = ( $data['add_memberships'] == 'true' ) ? true : false;
 		self::$fields          = $data['mapped_fields'];
 
 
@@ -412,6 +416,9 @@ class WCS_Import_Parser {
 							self::save_download_permissions( $subscription, $_product, $quantity );
 						}
 
+						if ( self::$add_memberships ) {
+							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
+						}
 					}
 
 					$wpdb->query( 'COMMIT' );
@@ -575,6 +582,30 @@ class WCS_Import_Parser {
 
 			foreach ( array_keys( $downloads ) as $download_id ) {
 				wc_downloadable_file_permission( $download_id, $product_id, $subscription, $quantity );
+			}
+		}
+	}
+
+	/**
+	 * Add membership plans to imported subscriptions if applicable
+	 *
+	 * @since 1.0
+	 * @param int $user_id
+	 * @param int $subscription_id
+	 * @param int $product_id
+	 */
+	public static function maybe_add_memberships( $user_id, $subscription_id, $product_id ) {
+
+		if ( function_exists( 'wc_memberships_get_membership_plans' ) ) {
+
+			if ( ! self::$membership_plans ) {
+				self::$membership_plans = wc_memberships_get_membership_plans();
+			}
+
+			foreach ( self::$membership_plans as $plan ) {
+				if ( $plan->has_product( $product_id ) ) {
+					$plan->grant_access_from_purchase( $user_id, $product_id, $subscription_id );
+				}
 			}
 		}
 	}
