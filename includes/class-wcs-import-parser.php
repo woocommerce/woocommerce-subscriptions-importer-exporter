@@ -1,5 +1,11 @@
-<?php 
-
+<?php
+/**
+ * The parser class for the Subscriptions CSV Importer.
+ * This class reads a number of lines (can vary) from the CSV and imports the subscriptions into your store.
+ * All errors and unexpected PHP shutdowns will be logged to assist in debugging.
+ *
+ * @since 1.0
+ */
 class WCS_Import_Parser {
 
 	private static $results = array();
@@ -136,7 +142,9 @@ class WCS_Import_Parser {
 	 * @param array $data
 	 */
 	private static function import_subscription( $data ) {
+		global $wpdb;
 
+		self::$row       = $data;
 		$set_manual      = false;
 		$product_id      = absint( $data[ self::$fields['product_id'] ] );
 		$result          = array();
