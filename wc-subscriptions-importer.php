@@ -99,17 +99,6 @@ class WCS_Importer {
 		<?php endif;
 	}
 
-	/**
-	 * Filter the meta query inside @see wcs_get_subscriptions() to only get subscriptions that have been imported.
-	 *
-	 * @since 1.0
-	 * @param array @query_args
-	 * @param array @args
-	 */
-	public static function add_imported_meta_query( $query_args, $args = array() ) {
-		error_log( 'query_args = ' . print_r( $query_args, true ) );
-		return $query_args;
-	}
 }
 
 WCS_Importer::init();
