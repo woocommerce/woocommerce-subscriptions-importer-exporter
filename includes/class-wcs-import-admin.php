@@ -206,7 +206,7 @@ class WCS_Import_Admin {
 		// Set defaults for admin flags
 		$test_mode       = ( isset( $_POST['test_mode'] ) ) ? $_POST['test_mode'] : 'yes';
 		$email_customer  = ( isset( $_POST['email_customer'] ) ) ? $_POST['email_customer'] : 'no';
-		$add_memberships = ( isset( $_POST['add_memberships'] ) ) ? $_POST['add_memberships'] : 'yes';
+		$add_memberships = ( isset( $_POST['add_memberships'] ) ) ? $_POST['add_memberships'] : 'no';
 
 		if ( ! empty( $this->upload_error ) ) : ?>
 			<div id="message" class="error">
@@ -250,13 +250,15 @@ class WCS_Import_Admin {
 								<em><?php esc_html_e( 'If importing new users, you can email customers their account details.', 'wcs-importer' ); ?></em>
 							</td>
 						</tr>
-						<tr>
-							<th><?php esc_html_e( 'Attach memberships plans', 'wcs-importer' ); ?></th>
-							<td>
-								<input type="checkbox" name="add_memberships" value="yes" <?php checked( $add_memberships, 'yes' ); ?> />
-								<em><?php printf( esc_html__( 'Automatically add the membership to the new subscription if it contains a product that is part of a membership plan (only works with %sWooCommerce Memberships%s).', 'wcs-importer' ), '<a href="">', '</a>' ); ?></em>
-							</td>
-						</tr>
+						<?php if ( ! empty( get_option( 'wc_memberships_is_active', false ) ) && class_exists( 'WC_Memberships' ) ) : ?>
+							<tr>
+								<th><?php esc_html_e( 'Attach membership plans', 'wcs-importer' ); ?></th>
+								<td>
+									<input type="checkbox" name="add_memberships" value="no" <?php checked( $add_memberships, 'yes' ); ?> />
+									<em><?php printf( esc_html__( 'Automatically add the membership to the new subscription if it contains a product that is part of a membership plan (only works with %sWooCommerce Memberships%s).', 'wcs-importer' ), '<a href="">', '</a>' ); ?></em>
+								</td>
+							</tr>
+						<?php endif; ?>
 					</tbody>
 				</table>
 				<p class="submit">
