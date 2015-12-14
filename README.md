@@ -97,6 +97,7 @@ The following columns have some requirements for acceptable values or formats.
 ##### Invalid subscription data
 If any of the above columns contains invalid data, they will be shown in the test results. If you choose to ignore the errors and continue to import with invalid data, no subscription will be imported for that row in the CSV.
 
+
 ### Importing Custom Fields
 * `custom_user_meta`, `custom_post_meta` -
 Use these columns to add custom meta on subscription post or user. Multiple columns can be mapped to these custom fields and note that the value of the column header in the CSV will be used as the meta key. For example, if you want to add `'_terms' => true` as post meta. You will need to have a column in your CSV with header `_terms` and map it to `custom_post_meta`.
