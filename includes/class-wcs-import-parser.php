@@ -347,6 +347,7 @@ class WCS_Import_Parser {
 							'start_date'       => $dates_to_update['start'],
 							'billing_interval' => ( ! empty( $data[ self::$fields['billing_interval'] ] ) ) ? $data[ self::$fields['billing_interval'] ] : WC_Subscriptions_Product::get_interval( $_product ),
 							'billing_period'   => ( ! empty( $data[ self::$fields['billing_period'] ] ) ) ? $data[ self::$fields['billing_period'] ] : WC_Subscriptions_Product::get_period( $_product ),
+							'created_via'      => 'importer',
 						)
 					);
 
@@ -354,8 +355,6 @@ class WCS_Import_Parser {
 						throw new Exception( sprintf( esc_html__( 'Could not create subscription: %s', 'wcs-importer' ), $subscription->get_message() ) );
 
 					} else {
-
-						update_post_meta( $subscription->id, '_created_with_wcs_importer', WCS_Importer::$version );
 
 						foreach ( $post_meta as $meta_data ) {
 							update_post_meta( $subscription->id, $meta_data['key'], $meta_data['value'] );
