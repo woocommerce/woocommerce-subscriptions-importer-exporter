@@ -24,6 +24,8 @@ class WCS_Importer {
 
 	public static $wcs_importer;
 
+	public static $wcs_exporter;
+
 	public static $version = '1.0.0';
 
 	public static $plugin_file = __FILE__;
@@ -46,8 +48,10 @@ class WCS_Importer {
 	public static function setup_importer() {
 
 		if ( is_admin() ) {
-			if ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '1.5', '>=' ) ) {
-				self::$wcs_importer = new WCS_Admin_Importer();
+			if ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '2.0', '>=' ) ) {
+				self::$wcs_exporter = new WCS_Export_Admin();
+			} elseif ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '1.5', '>=' ) ) {
+				self::$wcs_importer = new WCS_Import_Admin();
 			} else {
 				add_action( 'admin_notices', __CLASS__ . '::plugin_dependency_notice' );
 			}
