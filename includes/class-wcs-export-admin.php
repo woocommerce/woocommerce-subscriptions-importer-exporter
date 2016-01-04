@@ -43,4 +43,38 @@ class WCS_Export_Admin {
 		wp_enqueue_script( 'wcs-exporter-admin', plugin_dir_url( WCS_Importer::$plugin_file ) . '/assets/js/wcs-exporter.js' );
 	}
 
+	/**
+	 * Export Home page
+	 *
+	 * @since 1.0
+	 */
+	public function export_page() {
+		echo '<div class="wrap woocommerce">';
+		echo '<h2>' . __( 'Subscription CSV Exporter', 'wcs-importer' ) . '</h2>';
+		echo '<h2 class="nav-tab-wrapper woo-nav-tab-wrapper">';
+
+		$tabs = array(
+			'wcsi-export'  => __( 'Export', 'wcs-importer' ),
+			'wcsi-headers' => __( 'CSV Headers', 'wcs-importer' ),
+		);
+
+		$current_tab = ( empty( $_GET[ 'tab' ] ) ) ? 'wcsi-export' : urldecode( $_GET[ 'tab' ] );
+
+		foreach ( $tabs as $tab_id => $tab_title ) {
+
+			$class = ( $tab_id == $current_tab ) ? array( 'nav-tab', 'nav-tab-active', 'wcsi-exporter-tabs' ) : array( 'nav-tab', 'wcsi-exporter-tabs' );
+
+			echo '<a href="#" id="' . $tab_id . '" class="' . implode( ' ', array_map( 'sanitize_html_class', $class ) ) . '">' . esc_html( $tab_title ) . '</a>';
+
+		}
+
+		echo '</h2>';
+		echo '<form class="wcsi-exporter-form" method="POST" action="' . esc_attr( add_query_arg( 'step', 'download' ) ) . '">';
+		$this->home_page();
+		echo '<p class="submit">';
+		echo '<input type="submit" class="button" value="' . esc_html__( 'Export Subscriptions', 'wcs-importer' ) . '" />';
+		echo '</p>';
+		echo '</form>';
+	}
+
 }
