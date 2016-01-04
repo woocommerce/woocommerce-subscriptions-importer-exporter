@@ -22,6 +22,8 @@ class WCS_Export_Admin {
 
 		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
 
+		add_action( 'admin_init', array( &$this, 'export_handler' ) );
+
 		$this->action = admin_url( 'admin.php?page=export_subscriptions' );
 	}
 
@@ -265,6 +267,35 @@ class WCS_Export_Admin {
 		}
 
 		WCS_Export_Writer::process_export( $_POST['filename'] );
+	}
+
+	/**
+	 * Check params sent through as POST and start the export
+	 *
+	 * @since 1.0
+	 */
+	public function export_handler() {
+
+		if ( isset( $_GET['page'] ) && 'export_subscriptions' == $_GET['page'] ) {
+			if ( isset( $_GET['step'] ) && 'download' == $_GET['step'] ) {
+				if ( ! empty( $_POST['mapped'] ) ) {
+					$csv_headers = array();
+
+					foreach ( array_keys( $_POST['mapped'] ) as $column ) {
+						if ( ! empty( $_POST[ $column ] ) ) {
+							$csv_headers[ $column ] = $_POST[ $column ];
+						}
+					}
+				}
+
+				if ( ! empty( $csv_headers ) ) {
+					error_log( 'csv headers = ' . print_r( $csv_headers, true ) );
+					$this->process_download( $csv_headers );
+				} else {
+					$this->error_message = __( 'No csv headers were chosen, please select at least one CSV header to complete the Subscriptions Exporter.', 'wcs-importer' );
+				}
+			}
+		}
 	}
 
 }
