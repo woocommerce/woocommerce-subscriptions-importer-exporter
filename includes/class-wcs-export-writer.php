@@ -53,6 +53,7 @@ class WCS_Export_Writer {
 				case 'start_date':
 				case 'trial_end_date':
 				case 'next_payment_date':
+				case 'last_payment_date':
 				case 'end_date':
 				case 'payment_method':
 				case 'shipping_method':
