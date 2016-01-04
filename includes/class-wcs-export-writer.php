@@ -40,14 +40,6 @@ class WCS_Export_Writer {
 				case 'subscription_status':
 					$value = $subscription->post_status;
 					break;
-				case 'start_date':
-					$value = $subscription->post_date;
-					break;
-				case 'trial_end_date':
-				case 'next_payment_date':
-				case 'end_date':
-					$value = $subscription->get_date( $header_key );
-					break;
 				case 'shipping_total':
 				case 'shipping_tax_total':
 				case 'fee_total':
@@ -58,6 +50,10 @@ class WCS_Export_Writer {
 				case 'order_total':
 					$value = empty( $subscription->{$header_key} ) ? 0 : $subscription->{$header_key};
 					break;
+				case 'start_date':
+				case 'trial_end_date':
+				case 'next_payment_date':
+				case 'end_date':
 				case 'payment_method':
 				case 'shipping_method':
 				case 'billing_first_name':
