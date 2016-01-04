@@ -78,6 +78,66 @@ class WCS_Export_Admin {
 	}
 
 	/**
+	 * Home page for the exporter. Allows the store manager to choose various options for the export.
+	 *
+	 * @since 1.0
+	 */
+	public function home_page() {
+		global $wpdb;
+
+		$statuses           = wcs_get_subscription_statuses();
+		$status_count_query = $wpdb->get_results( "SELECT post_status, COUNT(*) AS count FROM {$wpdb->posts} WHERE post_type = 'shop_subscription' GROUP BY post_status" );
+		$status_count       = array();
+
+		foreach ( $status_count_query as $result ) {
+			$status_count[ $result->post_status ] = $result->count;
+		}
+
+		?>
+			<table class="widefat striped" id="wcsi-export-table">
+				<tbody>
+					<tr>
+						<td width="200"><label for="filename"><?php esc_html_e( 'Export File name', 'wcs-importer' ); ?>:</label></th>
+						<td><input type="text" name="filename" placeholder="export filename" value="<?php echo ! empty( $_POST['filename'] ) ? $_POST['filename'] : 'subscriptions.csv'; ?>" required></td>
+					</tr>
+					<tr>
+						<td style="text-align:top"><?php esc_html_e( 'Subscription Statuses', 'wcs-importer' ); ?>:</td>
+						<td>
+							<?php foreach( $statuses as $status => $status_display ) : ?>
+								<input type="checkbox" name="status[<?php echo $status; ?>]" checked><?php echo $status_display; ?>  [<?php echo ! empty( $status_count[ $status ] ) ? $status_count[ $status ] : 0; ?>]<br>
+							<?php endforeach; ?>
+						</td>
+					</tr>
+					<tr>
+						<td><label for="customer"><?php esc_html_e( 'Export for Customer', 'wcs-importer' ); ?>:</label></td>
+						<td><input type="number" name="customer" value="" placeholder="customer id" /></td>
+					</tr>
+					<tr>
+						<td><label for="payment_method"><?php esc_html_e( 'Payment method', 'wcs-importer' ); ?>:</label></td>
+						<td>
+							<select name="payment_method" id="payment_method">
+								<option value=""><?php esc_html_e( 'Any Payment Method', 'wcs-importer' ) ?></option>
+								<option value="none"><?php esc_html_e( 'None', 'wcs-importer' ) ?></option>
+								<?php
+									foreach ( WC()->payment_gateways->get_available_payment_gateways() as $gateway_id => $gateway ) {
+										echo '<option value="' . esc_attr( $gateway_id ) . '">' . esc_html( $gateway->title ) . '</option>';
+									}?>
+							</select>
+						</td>
+					</tr>
+					<!-- <tr>
+						<td><label for="product"><?php esc_html_e( 'Products', 'wcs-importer' ); ?>:</label></td>
+						<td><input type="text" name="product" value="" placeholder="product ids" /></td>
+					</tr> -->
+				</tbody>
+		</table>
+
+	<?php
+		$this->export_headers();
+
+	}
+
+	/**
 	 * Export headers page
 	 *
 	 * Display a list of all the csv headers that can be exported. Each csv header can be modified and disabled
