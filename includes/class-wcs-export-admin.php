@@ -51,9 +51,18 @@ class WCS_Export_Admin {
 	 * @since 1.0
 	 */
 	public function export_page() {
-		echo '<div class="wrap woocommerce">';
-		echo '<h2>' . __( 'Subscription CSV Exporter', 'wcs-importer' ) . '</h2>';
-		echo '<h2 class="nav-tab-wrapper woo-nav-tab-wrapper">';
+		?>
+
+		<div class="wrap woocommerce">
+		<h2><?php __( 'Subscription CSV Exporter', 'wcs-importer' ); ?></h2>
+
+		<?php if ( ! empty( $this->error_message ) ) : ?>
+			<div id="message" class="error">
+				<p><?php esc_html_e( $this->error_message ); ?></p>
+			</div>
+		<?php endif; ?>
+
+		<h2 class="nav-tab-wrapper woo-nav-tab-wrapper"><?php
 
 		$tabs = array(
 			'wcsi-export'  => __( 'Export', 'wcs-importer' ),
@@ -289,7 +298,6 @@ class WCS_Export_Admin {
 				}
 
 				if ( ! empty( $csv_headers ) ) {
-					error_log( 'csv headers = ' . print_r( $csv_headers, true ) );
 					$this->process_download( $csv_headers );
 				} else {
 					$this->error_message = __( 'No csv headers were chosen, please select at least one CSV header to complete the Subscriptions Exporter.', 'wcs-importer' );
