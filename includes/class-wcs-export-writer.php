@@ -80,6 +80,21 @@ class WCS_Export_Writer {
 					$value = $subscription->{$header_key};
 					break;
 				case 'order_notes':
+					remove_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ) );
+					$notes = get_comments( array( 'post_id' => $subscription->id, 'approve' => 'approve', 'type' => 'order_note' ) );
+					add_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ) );
+
+					$order_notes = array();
+
+					foreach ( $notes as $note ) {
+						$order_notes[] = str_replace( array( "\r", "\n" ), ' ', $note->comment_content );
+					}
+
+					if ( ! empty( $order_notes ) ) {
+						$value = implode( ';', $order_notes );
+					} else {
+						$value = '';
+					}
 
 					break;
 				case 'order_items':
