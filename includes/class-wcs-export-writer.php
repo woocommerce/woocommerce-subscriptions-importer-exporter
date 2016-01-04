@@ -98,7 +98,8 @@ class WCS_Export_Writer {
 
 					break;
 				case 'order_items':
-					$value = '';
+					$value      = '';
+					$line_items = array();
 
 					foreach ( $subscription->get_items() as $item_id => $item ) {
 
@@ -129,10 +130,12 @@ class WCS_Export_Writer {
 
 						if ( $line_item ) {
 							$line_items[] = $line_item;
-							$value = implode( ';', $line_items );
 						}
 					}
 
+					if ( ! empty( $line_items ) ) {
+						$value = implode( ';', $line_items );
+					}
 					break;
 
 				case 'coupon_items':
