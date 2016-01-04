@@ -214,7 +214,7 @@ class WCS_Export_Admin {
 			<tbody>
 				<?php foreach ( $csv_headers as $data => $title ) : ?>
 					<tr>
-						<td width="15" style="text-align:center"><input type="checkbox" name="mapped[<?php echo $data; ?>]"></td>
+						<td width="15" style="text-align:center"><input type="checkbox" name="mapped[<?php echo $data; ?>]" checked></td>
 						<td><label><?php esc_html_e( $title ); ?></label></td>
 						<td><label><?php esc_html_e( $data ); ?></label></td>
 						<td><input type="text" name="<?php esc_attr_e( $data ); ?>" value="<?php esc_attr_e( $data ); ?>" placeholder="<?php esc_attr_e( $data ); ?>"></td>
