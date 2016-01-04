@@ -215,4 +215,29 @@ class WCS_Export_Admin {
 
 	}
 
+	/**
+	 * Query the subscriptions using the users specific filters.
+	 *
+	 * @since 1.0
+	 * @param array $filters
+	 * @return array
+	 */
+	private function get_subscriptions_to_export( $filters ) {
+
+		$args = array(
+			'subscriptions_per_page' => -1,
+			'subscription_status'    => 'none', // don't default to 'any' status if no statuses were chosen
+		);
+
+		if ( ! empty( $filters['statuses'] ) && is_array( $filters['statuses'] ) ) {
+			$args['subscription_status'] = implode(',', $filters['statuses'] );
+		}
+
+		if ( ! empty( $filters['customer'] ) && is_int( $filters['customer'] ) ) {
+			$args['customer_id'] = $filters['customer'];
+		}
+
+		return wcs_get_subscriptions( $args );
+	}
+
 }
