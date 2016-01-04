@@ -267,15 +267,20 @@ class WCS_Export_Admin {
 			'payment_method' => $_POST['payment_method'],
 		);
 
-		WCS_Export_Writer::write_headers( $headers );
-
 		$subscriptions = $this->get_subscriptions_to_export( $filters );
 
-		foreach ( $subscriptions as $subscription ) {
-			WCS_Export_Writer::write_subscriptions_csv_row( $subscription );
+		if ( ! empty( $subscriptions ) ) {
+			WCS_Export_Writer::write_headers( $headers );
+
+			foreach ( $subscriptions as $subscription ) {
+				WCS_Export_Writer::write_subscriptions_csv_row( $subscription );
+			}
+
+			WCS_Export_Writer::process_export( $_POST['filename'] );
+		} else {
+			$this->error_message = __( 'No subscriptions to export given the filters you have selected.', 'wcs-importer' );
 		}
 
-		WCS_Export_Writer::process_export( $_POST['filename'] );
 	}
 
 	/**
