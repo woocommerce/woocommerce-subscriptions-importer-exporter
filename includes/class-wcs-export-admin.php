@@ -240,4 +240,31 @@ class WCS_Export_Admin {
 		return wcs_get_subscriptions( $args );
 	}
 
+	/**
+	 * Function to start the download process
+	 *
+	 * @since 1.0
+	 * @param array $headers
+	 */
+	public function process_download( $headers = array() ) {
+		require_once( 'class-wcs-export-writer.php' );
+
+		$filters = array(
+			'statuses'       => array_keys( $_POST['status'] ),
+			'customer'       => isset( $_POST['customer'] ) ? $_POST['customer'] : '',
+			'product'        => isset( $_POST['product'] ) ? $_POST['product'] : '',
+			'payment_method' => $_POST['payment_method'],
+		);
+
+		WCS_Export_Writer::write_headers( $headers );
+
+		$subscriptions = $this->get_subscriptions_to_export( $filters );
+
+		foreach ( $subscriptions as $subscription ) {
+			WCS_Export_Writer::write_subscriptions_csv_row( $subscription );
+		}
+
+		WCS_Export_Writer::process_export( $_POST['filename'] );
+	}
+
 }
