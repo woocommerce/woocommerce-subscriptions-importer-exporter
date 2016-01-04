@@ -21,6 +21,7 @@ class WCS_Export_Writer {
 		ob_start();
 
 		self::$headers = $headers;
+		self::write( $headers );
 	}
 
 	/**
