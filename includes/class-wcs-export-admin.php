@@ -20,6 +20,8 @@ class WCS_Export_Admin {
 	public function __construct() {
 		add_action( 'admin_menu', array( &$this, 'add_sub_menu' ), 10 );
 
+		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
+
 		$this->action = admin_url( 'admin.php?page=export_subscriptions' );
 	}
 
@@ -30,6 +32,15 @@ class WCS_Export_Admin {
 	 */
 	public function add_sub_menu() {
 		add_submenu_page( 'woocommerce', __( 'Subscription Exporter', 'wcs-importer' ),  __( 'Subscription Exporter', 'wcs-importer' ), 'manage_options', 'export_subscriptions', array( &$this, 'export_page' ) );
+	}
+
+	/**
+	 * Load exporter scripts
+	 *
+	 * @since 1.0
+	 */
+	public function enqueue_scripts() {
+		wp_enqueue_script( 'wcs-exporter-admin', plugin_dir_url( WCS_Importer::$plugin_file ) . '/assets/js/wcs-exporter.js' );
 	}
 
 }
