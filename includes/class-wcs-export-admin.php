@@ -163,7 +163,7 @@ class WCS_Export_Admin {
 			'start_date'           => __( 'Start Date', 'wcs-importer' ),
 			'trial_end_date'       => __( 'Trial End Date', 'wcs-importer' ),
 			'next_payment_date'    => __( 'Next Payment Date', 'wcs-importer' ),
-			'end_payment_date'     => __( 'End Payment Date', 'wcs-importer' ),
+			'end_date'             => __( 'End Date', 'wcs-importer' ),
 			'shipping_total'       => __( 'Total Shipping', 'wcs-importer' ),
 			'shipping_tax_total'   => __( 'Total Shipping Tax', 'wcs-importer' ),
 			'fee_total'            => __( 'Total Subscription Fees', 'wcs-importer' ),
