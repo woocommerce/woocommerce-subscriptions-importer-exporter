@@ -77,4 +77,82 @@ class WCS_Export_Admin {
 		echo '</form>';
 	}
 
+	/**
+	 * Export headers page
+	 *
+	 * Display a list of all the csv headers that can be exported. Each csv header can be modified and disabled
+	 *
+	 * @since 1.0
+	 */
+	public function export_headers() {
+
+		$csv_headers = array(
+			'subscription_id'      => __( 'Subscription ID', 'wcs-importer' ),
+			'subscription_status'  => __( 'Subscription Status', 'wcs-importer' ),
+			'start_date'           => __( 'Start Date', 'wcs-importer' ),
+			'trial_end_date'       => __( 'Trial End Date', 'wcs-importer' ),
+			'next_payment_date'    => __( 'Next Payment Date', 'wcs-importer' ),
+			'end_payment_date'     => __( 'End Payment Date', 'wcs-importer' ),
+			'shipping_total'       => __( 'Total Shipping', 'wcs-importer' ),
+			'shipping_tax_total'   => __( 'Total Shipping Tax', 'wcs-importer' ),
+			'fee_total'            => __( 'Total Subscription Fees', 'wcs-importer' ),
+			'fee_tax_total'        => __( 'Total Fees Tax', 'wcs-importer' ),
+			'tax_total'            => __( 'Subscription Total Tax', 'wcs-importer' ),
+			'cart_discount'        => __( 'Cart Discount', 'wcs-importer' ),
+			'order_discount'       => __( 'Subscription Discount', 'wcs-importer' ),
+			'order_total'          => __( 'Subscription Total', 'wcs-importer' ),
+			'payment_method'       => __( 'Payment Method', 'wcs-importer' ),
+			'shipping_method'      => __( 'Shipping Method', 'wcs-importer' ),
+			'billing_first_name'   => __( 'Billing First Name', 'wcs-importer' ),
+			'billing_last_name'    => __( 'Billing Last Name', 'wcs-importer' ),
+			'billing_email'        => __( 'Billing Email', 'wcs-importer' ),
+			'billing_phone'        => __( 'Billing Phone', 'wcs-importer' ),
+			'billing_address_1'    => __( 'Billing Address 1', 'wcs-importer' ),
+			'billing_address_2'    => __( 'Billing Address 2', 'wcs-importer' ),
+			'billing_postcode'     => __( 'Billing Postcode', 'wcs-importer' ),
+			'billing_city'         => __( 'Billing City', 'wcs-importer' ),
+			'billing_state'        => __( 'Billing State', 'wcs-importer' ),
+			'billing_country'      => __( 'Billing Country', 'wcs-importer' ),
+			'billing_company'      => __( 'Billing Company', 'wcs-importer' ),
+			'shipping_first_name'  => __( 'Shipping First Name', 'wcs-importer' ),
+			'shipping_last_name'   => __( 'Shipping Last Name', 'wcs-importer' ),
+			'shipping_address_1'   => __( 'Shipping Address 1', 'wcs-importer' ),
+			'shipping_address_2'   => __( 'Shipping Address 2', 'wcs-importer' ),
+			'shipping_postcode'    => __( 'Shipping Post code', 'wcs-importer' ),
+			'shipping_city'        => __( 'Shipping City', 'wcs-importer' ),
+			'shipping_state'       => __( 'Shipping State', 'wcs-importer' ),
+			'shipping_country'     => __( 'Shipping Country', 'wcs-importer' ),
+			'shipping_company'     => __( 'Shipping Company', 'wcs-importer' ),
+			'customer_note'        => __( 'Customer Note', 'wcs-importer' ),
+			'order_items'          => __( 'Subscription Items', 'wcs-importer' ),
+			'order_notes'          => __( 'Subscription order notes', 'wcs-importer' ),
+			'coupon_items'         => __( 'Coupons', 'wcs-importer' ),
+			'download_permissions' => __( 'Download Permissions Granted', 'wcs-importer' ),
+		);
+		?>
+
+		<table class="widefat widefat_importer striped" id="wcsi-headers-table" style="display:none;">
+			<thead>
+				<tr>
+					<th><?php esc_html_e( 'Enabled', 'wcs-importer' ); ?></th>
+					<th><?php esc_html_e( 'Subscription Details', 'wcs-importer' ); ?></th>
+					<th><?php esc_html_e( 'Importer Compatible Header', 'wcs-importer' ); ?></th>
+					<th><?php esc_html_e( 'CSV Column Header', 'wcs-importer' ); ?></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ( $csv_headers as $data => $title ) : ?>
+					<tr>
+						<td width="15" style="text-align:center"><input type="checkbox" name="mapped[<?php echo $data; ?>]"></td>
+						<td><label><?php esc_html_e( $title ); ?></label></td>
+						<td><label><?php esc_html_e( $data ); ?></label></td>
+						<td><input type="text" name="<?php esc_attr_e( $data ); ?>" value="<?php esc_attr_e( $data ); ?>" placeholder="<?php esc_attr_e( $data ); ?>"></td>
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+		<?php
+
+	}
+
 }
