@@ -180,4 +180,38 @@ class WCS_Export_Writer {
 		fputcsv( self::$file, $data, ',', '"' );
 	}
 
+	/**
+	 * Process export file
+	 *
+	 * @since 1.0
+	 * @param string $filename
+	 */
+	public static function process_export( $filename = 'subscriptions.csv' ) {
+		$csv = ob_get_clean();
+
+		fclose( self::$file );
+
+		// set headers for download
+		header( apply_filters( 'wcsi_csv_export_download_content_type', 'Content-Type: text/csv; charset=' . get_option( 'blog_charset' ) ) );
+		header( sprintf( 'Content-Disposition: attachment; filename="%s"', $filename ) );
+		header( 'Pragma: no-cache' );
+		header( 'Expires: 0' );
+
+		// clear the output buffer
+		@ini_set( 'zlib.output_compression', 'Off' );
+		@ini_set( 'output_buffering', 'Off' );
+		@ini_set( 'output_handler', '' );
+
+		// open the output buffer for writing
+		$fp = fopen( 'php://output', 'w' );
+
+		// write the generated CSV to the output buffer
+		fwrite( $fp, $csv );
+
+		// close the output buffer
+		fclose( $fp );
+
+		exit;
+	}
+
 }
