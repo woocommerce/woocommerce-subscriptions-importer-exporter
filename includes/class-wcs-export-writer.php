@@ -163,7 +163,7 @@ class WCS_Export_Writer {
 
 					break;
 				case 'download_permissions':
-
+					$value = $subscription->download_permissions_granted ? $subscription->download_permissions_granted : 0;
 					break;
 				default:
 					$value = '';
