@@ -23,4 +23,32 @@ class WCS_Export_Writer {
 		self::$headers = $headers;
 	}
 
+	/**
+	 * Write line to CSV
+	 *
+	 * @since 1.0
+	 * @param array $row
+	 */
+	public static function write( $row ) {
+
+		if ( empty( $row ) ) {
+			return;
+		}
+
+		$data = array();
+
+		foreach ( self::$headers as $header_key => $_ ) {
+
+			if ( ! isset( $row[ $header_key ] ) ) {
+				$row[ $header_key ] = '';
+			}
+
+			// strict string comparison, as values like '0' are valid
+			$value  = ( '' !== $row[ $header_key ] ) ? $row[ $header_key ] : '';
+			$data[] = $value;
+		}
+
+		fputcsv( self::$file, $data, ',', '"' );
+	}
+
 }
