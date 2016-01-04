@@ -244,7 +244,7 @@ class WCS_Export_Admin {
 			$args['subscription_status'] = implode(',', $filters['statuses'] );
 		}
 
-		if ( ! empty( $filters['customer'] ) && is_int( $filters['customer'] ) ) {
+		if ( ! empty( $filters['customer'] ) && is_numeric( $filters['customer'] ) ) {
 			$args['customer_id'] = $filters['customer'];
 		}
 
