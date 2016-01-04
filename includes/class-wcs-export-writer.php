@@ -139,6 +139,7 @@ class WCS_Export_Writer {
 					break;
 
 				case 'coupon_items':
+					$coupon_items = array();
 
 					foreach ( $subscription->get_items( 'coupon' ) as $_ => $coupon_item ) {
 
@@ -147,10 +148,17 @@ class WCS_Export_Writer {
 						$coupon_post = get_post( $coupon->id );
 
 						$coupon_items[] = implode( '|', array(
-							'code:' . $coupon_item['name'],
-							'description:' . ( is_object( $coupon_post ) ? $coupon_post->post_excerpt : '' ),
-							'amount:' . wc_format_decimal( $coupon_item['discount_amount'], 2 ),
-						) );
+								'code:' . $coupon_item['name'],
+								'description:' . ( is_object( $coupon_post ) ? $coupon_post->post_excerpt : '' ),
+								'amount:' . wc_format_decimal( $coupon_item['discount_amount'], 2 ),
+							)
+						);
+					}
+
+					if ( ! empty( $coupon_items ) ) {
+						$value = implode( ';', $coupon_items );
+					} else {
+						$value = '';
 					}
 
 					break;
