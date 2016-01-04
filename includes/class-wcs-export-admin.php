@@ -124,15 +124,15 @@ class WCS_Export_Admin {
 						<td><input type="number" name="customer" value="" placeholder="customer id" /></td>
 					</tr>
 					<tr>
-						<td><label for="payment_method"><?php esc_html_e( 'Payment method', 'wcs-importer' ); ?>:</label></td>
+						<td><label><?php esc_html_e( 'Payment method', 'wcs-importer' ); ?>:</label></td>
 						<td>
-							<select name="payment_method" id="payment_method">
-								<option value=""><?php esc_html_e( 'Any Payment Method', 'wcs-importer' ) ?></option>
-								<option value="none"><?php esc_html_e( 'None', 'wcs-importer' ) ?></option>
-								<?php
-									foreach ( WC()->payment_gateways->get_available_payment_gateways() as $gateway_id => $gateway ) {
-										echo '<option value="' . esc_attr( $gateway_id ) . '">' . esc_html( $gateway->title ) . '</option>';
-									}?>
+							<select name="payment">
+								<option value="any"><?php esc_html_e( 'Any Payment Method', 'wcs-importer' ); ?></option>
+								<option value="none"><?php esc_html_e( 'None', 'wcs-importer' ); ?></option>
+
+								<?php foreach ( WC()->payment_gateways->get_available_payment_gateways() as $gateway_id => $gateway ) : ?>
+									<option value="<?php esc_attr_e( $gateway_id ); ?>"><?php esc_html_e( $gateway->title ); ?></option>;
+								<?php endforeach; ?>
 							</select>
 						</td>
 					</tr>
@@ -248,7 +248,33 @@ class WCS_Export_Admin {
 			$args['customer_id'] = $filters['customer'];
 		}
 
+		if ( ! empty( $filters['payment_method'] ) ) {
+			add_filter( 'woocommerce_get_subscriptions_query_args', array( &$this, 'filter_payment_method' ), 10, 2 );
+		}
+
 		return wcs_get_subscriptions( $args );
+	}
+
+	/**
+	 * Filter the query in @see wcs_get_subscriptions() by payment method.
+	 *
+	 * @since 1.0
+	 * @param array $query_args
+	 * @param array $args
+	 * @return array
+	 */
+	public function filter_payment_method( $query_args, $args ) {
+
+		if ( isset( $_POST['payment'] ) && $_POST['payment'] != 'any' ) {
+			$payment_payment = ( 'none' == $_POST['payment'] ) ? '' : $_POST['payment'];
+
+			$query_args['meta_query'][] = array(
+				'key'   => '_payment_method',
+				'value' => $payment_payment,
+			);
+		}
+
+		return $query_args;
 	}
 
 	/**
@@ -264,7 +290,7 @@ class WCS_Export_Admin {
 			'statuses'       => array_keys( $_POST['status'] ),
 			'customer'       => isset( $_POST['customer'] ) ? $_POST['customer'] : '',
 			'product'        => isset( $_POST['product'] ) ? $_POST['product'] : '',
-			'payment_method' => $_POST['payment_method'],
+			'payment_method' => $_POST['payment'],
 		);
 
 		$subscriptions = $this->get_subscriptions_to_export( $filters );
