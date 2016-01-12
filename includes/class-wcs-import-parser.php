@@ -420,6 +420,10 @@ class WCS_Import_Parser {
 						if ( self::$add_memberships ) {
 							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
 						}
+
+						if ( ! empty( $data[ self::$fields['coupon_items'] ] ) ) {
+							self::add_coupons( $subscription, $data );
+						}
 					}
 
 					$wpdb->query( 'COMMIT' );
@@ -627,6 +631,46 @@ class WCS_Import_Parser {
 			}
 
 			self::$fields = self::$row = null;
+		}
+	}
+
+	/**
+	 * Add coupon line item to the subscription. The discount amount used is based on priority list.
+	 *
+	 * @since 1.0
+	 * @param WC_Subscription $subscription
+	 * @param array $data
+	 */
+	public static function add_coupons( $subscription, $data ) {
+
+		$coupon_items = explode( ';', $data[ self::$fields['coupon_items'] ] );
+
+		if ( ! empty( $coupon_items ) ) {
+			foreach( $coupon_items as $coupon_item ) {
+				$coupon_data = array();
+
+				foreach ( explode( '|', $coupon_item ) as $item ) {
+					list( $name, $value ) = explode( ':', $item );
+					$coupon_data[ trim( $name ) ] = trim( $value );
+				}
+
+				$coupon_code = isset( $coupon_data['code'] ) ? $coupon_data['code'] : '';
+				$coupon      = new WC_Coupon( $coupon_code );
+
+				if ( ! $coupon ) {
+					throw new Exception( sprintf( esc_html__( 'Could not find coupon with code "%s" in your store.', 'wcs-importer' ), $coupon_code ) );
+				} elseif ( isset( $coupon_data['amount'] ) ) {
+					$discount_amount = floatval( $coupon_data['amount'] );
+				} else {
+					$discount_amount = $coupon->discount_amount;
+				}
+
+				$coupon_id = $subscription->add_coupon( $coupon_code, $discount_amount );
+
+				if ( ! $coupon_id ) {
+					throw new Exception( sprintf( esc_html__( 'Coupon "%s" could not be added to subscription.', 'wcs-importer' ), $coupon_code ) );
+				}
+			}
 		}
 	}
 }
