@@ -157,6 +157,7 @@ class WCS_Import_Parser {
 
 		$post_meta = $result['warning'] = $result['error'] = array();
 		$result['row_number']           = self::$row_number;
+		$result['item'] = '';
 
 		if ( empty( self::$fields['product_id'] ) || ! ( wcsi_check_product( $product_id ) ) ) {
 			$result['error'][] = esc_html__( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
@@ -426,6 +427,23 @@ class WCS_Import_Parser {
 						}
 					}
 
+						if ( ! empty( $data[ self::$fields['order_items'] ] ) ) {
+							$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
+
+							if ( ! empty( $order_items ) ) {
+								foreach( $order_items as $order_item ) {
+									$order_data = array();
+
+									foreach ( explode( '|', $order_item ) as $item ) {
+										list( $name, $value ) = explode( ':', $item );
+										$order_data[ trim( $name ) ] = trim( $value );
+									}
+
+									$result['item'] .= self::add_product( $subscription, $order_data );
+								}
+							}
+						}
+
 					$wpdb->query( 'COMMIT' );
 
 				} catch ( Exception $e ) {
@@ -672,6 +690,65 @@ class WCS_Import_Parser {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Adds the line item to the subscription
+	 *
+	 * @since 1.0
+	 * @param WC_Subscription $subscription
+	 * @param array $data
+	 * @return string
+	 */
+	public static function add_product( $subscription, $data ) {
+		$item_args        = array();
+		$item_args['qty'] = isset( $data['quantity'] ) ? $data['quantity'] : 1;
+
+		if ( ! isset( $data['product_id'] ) ) {
+			throw new Exception( __( 'The product_id is missing from CSV.', 'wcs-importer' ) );
+		}
+
+		$_product = wc_get_product( $data['product_id'] );
+
+		if ( ! $_product ) {
+			throw new Exception( sprintf( __( 'No product or variation in your store matches the product ID #%s.', 'wcs-importer' ), $data['product_id'] ) );
+		}
+
+		$product_string = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product->id ), $_product->get_title() );
+
+		foreach ( array( 'total', 'tax', 'subtotal', 'subtotal_tax' ) as $line_item_data ) {
+
+			switch ( $line_item_data ) {
+				case 'total' :
+					$default = WC_Subscriptions_Product::get_price( $data['product_id'] );
+					break;
+				case 'subtotal' :
+					$default = ( ! empty( $data['total'] ) ) ? $data['total'] : WC_Subscriptions_Product::get_price( $data['product_id'] );
+					break;
+				default :
+					$default = 0;
+			}
+			$item_args['totals'][ $line_item_data ] = ( ! empty( $data[ $line_item_data ] ) ) ? $data[ $line_item_data ] : $default;
+		}
+
+		if ( $_product->variation_data ) {
+			$item_args['variation'] = array();
+
+			foreach ( $_product->variation_data as $attribute => $variation ) {
+				$item_args['variation'][ $attribute ] = $variation;
+			}
+			$product_string .= ' [#' . $data['product_id'] . ']';
+		}
+
+		if ( ! self::$test_mode ) {
+			$item_id = $subscription->add_product( $_product, $data['quantity'], $item_args );
+
+			if ( ! $item_id ) {
+				throw new Exception( __( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix up the data from your CSV and try again.', 'wcs-importer' ) );
+			}
+		}
+
+		return $product_string;
 	}
 }
 
