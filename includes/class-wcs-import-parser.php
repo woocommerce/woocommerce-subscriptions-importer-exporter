@@ -300,130 +300,124 @@ class WCS_Import_Parser {
 			}
 		}
 
+		if ( empty( $result['error'] ) || self::$test_mode ) {
+			try {
+				if ( ! self::$test_mode ) {
+					$wpdb->query( 'START TRANSACTION' );
+
+					// add custom user meta before subscription is created
+					foreach ( self::$fields['custom_user_meta'] as $meta_key ) {
+						if ( ! empty( $data[ $meta_key ] ) ) {
+							update_user_meta( $user_id, $meta_key, $data[ $meta_key ] );
+						}
+					}
+
+					$subscription = wcs_create_subscription( array(
+							'customer_id'      => $user_id,
+							'start_date'       => $dates_to_update['start'],
+							'billing_interval' => ( ! empty( $data[ self::$fields['billing_interval'] ] ) ) ? $data[ self::$fields['billing_interval'] ] : 1,
+							'billing_period'   => ( ! empty( $data[ self::$fields['billing_period'] ] ) ) ? $data[ self::$fields['billing_period'] ] : 'month',
+							'created_via'      => 'importer',
+						)
+					);
+
+					if ( is_wp_error( $subscription ) ) {
+						throw new Exception( sprintf( esc_html__( 'Could not create subscription: %s', 'wcs-importer' ), $subscription->get_error_message() ) );
+					}
+
+					foreach ( $post_meta as $meta_data ) {
+						update_post_meta( $subscription->id, $meta_data['key'], $meta_data['value'] );
+					}
+
+					foreach ( self::$fields['custom_post_meta'] as $meta_key ) {
+						if ( ! empty( $data[ $meta_key ] ) ) {
+							update_post_meta( $subscription->id, $meta_key, $data[ $meta_key ] );
+						}
+					}
+
+					foreach ( self::$fields['custom_user_post_meta'] as $meta_key ) {
+						if ( ! empty( $data[ $meta_key ] ) ) {
+							update_post_meta( $subscription->id, $meta_key, $data[ $meta_key ] );
+							update_user_meta( $user_id, $meta_key, $data[ $meta_key ] );
+						}
+					}
+
+					$subscription->update_dates( $dates_to_update );
+					$subscription->update_status( $status );
+
+					if ( $set_manual ) {
+						$subscription->update_manual();
+					} elseif ( ! $subscription->has_status( wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
+						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
+					}
+
+					if ( ! empty( $data[ self::$fields['download_permission_granted'] ] ) && 'true' == $data[ self::$fields['download_permission_granted'] ] ) {
+						self::save_download_permissions( $subscription, $_product, $quantity );
+					}
+
+					if ( self::$add_memberships ) {
+						self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
+					}
+				}
+
+				if ( ! empty( $data[ self::$fields['coupon_items'] ] ) ) {
+					self::add_coupons( $subscription, $data );
+				}
+
+				if ( ! empty( $data[ self::$fields['order_items'] ] ) ) {
+					$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
+
+					if ( ! empty( $order_items ) ) {
+						foreach( $order_items as $order_item ) {
+							$order_data = array();
+
+							foreach ( explode( '|', $order_item ) as $item ) {
+								list( $name, $value ) = explode( ':', $item );
+								$order_data[ trim( $name ) ] = trim( $value );
+							}
+
+							$result['item'] .= self::add_product( $subscription, $order_data );
+						}
+					}
+				}
+
+				// only show the following warnings on the import when the subscription requires shipping
+				if ( ! self::$all_virtual ) {
+					if ( ! empty( $missing_shipping_addresses ) ) {
+						$result['warning'][] = esc_html__( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-importer' );
+					}
+
+					if ( ! empty( $missing_billing_addresses ) ) {
+						$result['warning'][] = esc_html__( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-importer' );
+					}
+
+					if ( empty( $shipping_method ) ) {
+						$result['warning'][] = esc_html__( 'Shipping method and title for the subscription have been left as empty. ', 'wcs-importer' );
+					}
+				}
+
+				$wpdb->query( 'COMMIT' );
+
+			} catch ( Exception $e ) {
+				$wpdb->query( 'ROLLBACK' );
+				$result['error'][] = $e->getMessage();
+			}
+		}
+
 		if ( ! self::$test_mode ) {
 
 			if ( empty( $result['error'] ) ) {
-				try {
-					if ( ! self::$test_mode ) {
-						$wpdb->query( 'START TRANSACTION' );
-
-						// add custom user meta before subscription is created
-						foreach ( self::$fields['custom_user_meta'] as $meta_key ) {
-							if ( ! empty( $data[ $meta_key ] ) ) {
-								update_user_meta( $user_id, $meta_key, $data[ $meta_key ] );
-							}
-						}
-
-						$subscription = wcs_create_subscription( array(
-								'customer_id'      => $user_id,
-								'start_date'       => $dates_to_update['start'],
-								'billing_interval' => ( ! empty( $data[ self::$fields['billing_interval'] ] ) ) ? $data[ self::$fields['billing_interval'] ] : 1,
-								'billing_period'   => ( ! empty( $data[ self::$fields['billing_period'] ] ) ) ? $data[ self::$fields['billing_period'] ] : 'month',
-								'created_via'      => 'importer',
-							)
-						);
-
-						if ( is_wp_error( $subscription ) ) {
-							throw new Exception( sprintf( esc_html__( 'Could not create subscription: %s', 'wcs-importer' ), $subscription->get_error_message() ) );
-						}
-
-						foreach ( $post_meta as $meta_data ) {
-							update_post_meta( $subscription->id, $meta_data['key'], $meta_data['value'] );
-						}
-
-						foreach ( self::$fields['custom_post_meta'] as $meta_key ) {
-							if ( ! empty( $data[ $meta_key ] ) ) {
-								update_post_meta( $subscription->id, $meta_key, $data[ $meta_key ] );
-							}
-						}
-
-						foreach ( self::$fields['custom_user_post_meta'] as $meta_key ) {
-							if ( ! empty( $data[ $meta_key ] ) ) {
-								update_post_meta( $subscription->id, $meta_key, $data[ $meta_key ] );
-								update_user_meta( $user_id, $meta_key, $data[ $meta_key ] );
-							}
-						}
-
-						$subscription->update_dates( $dates_to_update );
-						$subscription->update_status( $status );
-
-						if ( $set_manual ) {
-							$subscription->update_manual();
-						} elseif ( ! $subscription->has_status( wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
-							$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
-						}
-
-						if ( ! empty( $data[ self::$fields['download_permission_granted'] ] ) && 'true' == $data[ self::$fields['download_permission_granted'] ] ) {
-							self::save_download_permissions( $subscription, $_product, $quantity );
-						}
-
-						if ( self::$add_memberships ) {
-							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
-						}
-					}
-
-					if ( ! empty( $data[ self::$fields['coupon_items'] ] ) ) {
-						self::add_coupons( $subscription, $data );
-					}
-
-					if ( ! empty( $data[ self::$fields['order_items'] ] ) ) {
-						$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
-
-						if ( ! empty( $order_items ) ) {
-							foreach( $order_items as $order_item ) {
-								$order_data = array();
-
-								foreach ( explode( '|', $order_item ) as $item ) {
-									list( $name, $value ) = explode( ':', $item );
-									$order_data[ trim( $name ) ] = trim( $value );
-								}
-
-								$result['item'] .= self::add_product( $subscription, $order_data );
-							}
-						}
-					}
-
-					// only show the following warnings on the import when the subscription requires shipping
-					if ( ! self::$all_virtual ) {
-						if ( ! empty( $missing_shipping_addresses ) ) {
-							$result['warning'][] = esc_html__( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-importer' );
-						}
-
-						if ( ! empty( $missing_billing_addresses ) ) {
-							$result['warning'][] = esc_html__( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-importer' );
-						}
-
-						if ( empty( $shipping_method ) ) {
-							$result['warning'][] = esc_html__( 'Shipping method and title for the subscription have been left as empty. ', 'wcs-importer' );
-						}
-					}
-
-					$wpdb->query( 'COMMIT' );
-
-				} catch ( Exception $e ) {
-					$wpdb->query( 'ROLLBACK' );
-					$result['error'][] = $e->getMessage();
-				}
-			}
-
-			if ( empty( $result['error'] ) ) {
-
 				$result['status']              = 'success';
 				$result['subscription']        = sprintf( '<a href="%s">#%s</a>', esc_url( admin_url( 'post.php?post=' . absint( $subscription->id ) . '&action=edit' ) ), $subscription->get_order_number() );
 				$result['subscription_status'] = $subscription->get_status();
 
-				array_push( self::$results, $result );
 			} else {
-
 				$result['status']  = 'failed';
 				self::log( sprintf( 'Row #%s failed: %s', $result['row_number'], print_r( $result['error'], true ) ) );
-
-				array_push( self::$results, $result );
 			}
-
-		} else {
-			array_push( self::$results, $result );
 		}
+
+		array_push( self::$results, $result );
 	}
 
 	/**
