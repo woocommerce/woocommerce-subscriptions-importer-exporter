@@ -354,6 +354,15 @@ class WCS_Import_Parser {
 					if ( self::$add_memberships ) {
 						self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
 					}
+
+					if ( ! empty( $data[ self::$fields['order_notes'] ] ) ) {
+						$order_notes = explode( ';', $data[ self::$fields['order_notes'] ] );
+
+						foreach ( $order_notes as $order_note ) {
+							$subscription->add_order_note( $order_note );
+						}
+					}
+
 				} else {
 					$subscription = null;
 				}
