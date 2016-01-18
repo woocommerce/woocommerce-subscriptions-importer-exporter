@@ -358,6 +358,8 @@ class WCS_Import_Parser {
 					if ( self::$add_memberships ) {
 						self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
 					}
+				} else {
+					$subscription = null;
 				}
 
 				if ( ! empty( $data[ self::$fields['coupon_items'] ] ) ) {
@@ -631,10 +633,12 @@ class WCS_Import_Parser {
 					$discount_amount = $coupon->discount_amount;
 				}
 
-				$coupon_id = $subscription->add_coupon( $coupon_code, $discount_amount );
+				if ( ! self::$test_mode ) {
+					$coupon_id = $subscription->add_coupon( $coupon_code, $discount_amount );
 
-				if ( ! $coupon_id ) {
-					throw new Exception( sprintf( esc_html__( 'Coupon "%s" could not be added to subscription.', 'wcs-importer' ), $coupon_code ) );
+					if ( ! $coupon_id ) {
+						throw new Exception( sprintf( esc_html__( 'Coupon "%s" could not be added to subscription.', 'wcs-importer' ), $coupon_code ) );
+					}
 				}
 			}
 		}
