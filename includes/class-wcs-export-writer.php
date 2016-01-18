@@ -71,6 +71,8 @@ class WCS_Export_Writer {
 				case 'order_total':
 					$value = empty( $subscription->{$header_key} ) ? 0 : $subscription->{$header_key};
 					break;
+				case 'billing_period':
+				case 'billing_interval':
 				case 'start_date':
 				case 'trial_end_date':
 				case 'next_payment_date':

@@ -162,6 +162,8 @@ class WCS_Export_Admin {
 			'next_payment_date'     => __( 'Next Payment Date', 'wcs-import-export' ),
 			'last_payment_date'     => __( 'Last Payment Date', 'wcs-import-export' ),
 			'end_date'              => __( 'End Date', 'wcs-import-export' ),
+			'billing_period'        => __( 'Billing Period', 'wcs-import-export' ),
+			'billing_interval'      => __( 'Billing Interval', 'wcs-import-export' ),
 			'order_shipping'        => __( 'Total Shipping', 'wcs-import-export' ),
 			'order_shipping_tax'    => __( 'Total Shipping Tax', 'wcs-import-export' ),
 			'fee_total'             => __( 'Total Subscription Fees', 'wcs-import-export' ),
