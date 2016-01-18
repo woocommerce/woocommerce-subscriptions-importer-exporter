@@ -351,10 +351,6 @@ class WCS_Import_Parser {
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
 					}
 
-					if ( ! empty( $data[ self::$fields['download_permission_granted'] ] ) && 'true' == $data[ self::$fields['download_permission_granted'] ] ) {
-						self::save_download_permissions( $subscription, $_product, $quantity );
-					}
-
 					if ( self::$add_memberships ) {
 						self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
 					}
@@ -701,6 +697,10 @@ class WCS_Import_Parser {
 
 			if ( ! $item_id ) {
 				throw new Exception( __( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix up the data from your CSV and try again.', 'wcs-importer' ) );
+			}
+
+			if ( ! empty( self::$row[ self::$fields['download_permission_granted'] ] ) && ( 'true' == self::$row[ self::$fields['download_permission_granted'] ] || '1' == self::$row[ self::$fields['download_permission_granted'] ] ) ) {
+				self::save_download_permissions( $subscription, $_product, $item_args['qty'] );
 			}
 		}
 
