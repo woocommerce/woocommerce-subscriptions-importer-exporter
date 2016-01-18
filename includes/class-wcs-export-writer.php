@@ -56,6 +56,9 @@ class WCS_Export_Writer {
 				case 'subscription_status':
 					$value = $subscription->post_status;
 					break;
+				case 'customer_id':
+					$value = $subscription->customer_user;
+					break;
 				case 'fee_total':
 				case 'fee_tax_total':
 					$value = ${$header_key};
