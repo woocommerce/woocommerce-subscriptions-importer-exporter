@@ -219,7 +219,7 @@ class WCS_Export_Writer {
 						) );
 					}
 
-					if ( ! eÏmpty( $tax_items ) ) {
+					if ( ! empty( $tax_items ) ) {
 						$value = implode( ';', $tax_items );
 					} else {
 						$value = '';
