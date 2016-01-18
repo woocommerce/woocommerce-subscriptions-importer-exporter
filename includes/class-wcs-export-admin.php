@@ -33,7 +33,7 @@ class WCS_Export_Admin {
 	 * @since 1.0
 	 */
 	public function add_sub_menu() {
-		add_submenu_page( 'woocommerce', __( 'Subscription Exporter', 'wcs-importer' ),  __( 'Subscription Exporter', 'wcs-importer' ), 'manage_options', 'export_subscriptions', array( &$this, 'export_page' ) );
+		add_submenu_page( 'woocommerce', __( 'Subscription Exporter', 'wcs-import-export' ),  __( 'Subscription Exporter', 'wcs-import-export' ), 'manage_options', 'export_subscriptions', array( &$this, 'export_page' ) );
 	}
 
 	/**
@@ -54,7 +54,7 @@ class WCS_Export_Admin {
 		?>
 
 		<div class="wrap woocommerce">
-		<h2><?php __( 'Subscription CSV Exporter', 'wcs-importer' ); ?></h2>
+		<h2><?php __( 'Subscription CSV Exporter', 'wcs-import-export' ); ?></h2>
 
 		<?php if ( ! empty( $this->error_message ) ) : ?>
 			<div id="message" class="error">
@@ -65,8 +65,8 @@ class WCS_Export_Admin {
 		<h2 class="nav-tab-wrapper woo-nav-tab-wrapper"><?php
 
 		$tabs = array(
-			'wcsi-export'  => __( 'Export', 'wcs-importer' ),
-			'wcsi-headers' => __( 'CSV Headers', 'wcs-importer' ),
+			'wcsi-export'  => __( 'Export', 'wcs-import-export' ),
+			'wcsi-headers' => __( 'CSV Headers', 'wcs-import-export' ),
 		);
 
 		$current_tab = ( empty( $_GET[ 'tab' ] ) ) ? 'wcsi-export' : urldecode( $_GET[ 'tab' ] );
@@ -83,7 +83,7 @@ class WCS_Export_Admin {
 		echo '<form class="wcsi-exporter-form" method="POST" action="' . esc_attr( add_query_arg( 'step', 'download' ) ) . '">';
 		$this->home_page();
 		echo '<p class="submit">';
-		echo '<input type="submit" class="button" value="' . esc_html__( 'Export Subscriptions', 'wcs-importer' ) . '" />';
+		echo '<input type="submit" class="button" value="' . esc_html__( 'Export Subscriptions', 'wcs-import-export' ) . '" />';
 		echo '</p>';
 		echo '</form>';
 	}
@@ -108,11 +108,11 @@ class WCS_Export_Admin {
 			<table class="widefat striped" id="wcsi-export-table">
 				<tbody>
 					<tr>
-						<td width="200"><label for="filename"><?php esc_html_e( 'Export File name', 'wcs-importer' ); ?>:</label></th>
+						<td width="200"><label for="filename"><?php esc_html_e( 'Export File name', 'wcs-import-export' ); ?>:</label></th>
 						<td><input type="text" name="filename" placeholder="export filename" value="<?php echo ! empty( $_POST['filename'] ) ? $_POST['filename'] : 'subscriptions.csv'; ?>" required></td>
 					</tr>
 					<tr>
-						<td style="text-align:top"><?php esc_html_e( 'Subscription Statuses', 'wcs-importer' ); ?>:</td>
+						<td style="text-align:top"><?php esc_html_e( 'Subscription Statuses', 'wcs-import-export' ); ?>:</td>
 						<td>
 							<?php foreach( $statuses as $status => $status_display ) : ?>
 								<input type="checkbox" name="status[<?php echo $status; ?>]" checked><?php echo $status_display; ?>  [<?php echo ! empty( $status_count[ $status ] ) ? $status_count[ $status ] : 0; ?>]<br>
@@ -120,15 +120,15 @@ class WCS_Export_Admin {
 						</td>
 					</tr>
 					<tr>
-						<td><label for="customer"><?php esc_html_e( 'Export for Customer', 'wcs-importer' ); ?>:</label></td>
+						<td><label for="customer"><?php esc_html_e( 'Export for Customer', 'wcs-import-export' ); ?>:</label></td>
 						<td><input type="number" name="customer" value="" placeholder="customer id" /></td>
 					</tr>
 					<tr>
-						<td><label><?php esc_html_e( 'Payment method', 'wcs-importer' ); ?>:</label></td>
+						<td><label><?php esc_html_e( 'Payment method', 'wcs-import-export' ); ?>:</label></td>
 						<td>
 							<select name="payment">
-								<option value="any"><?php esc_html_e( 'Any Payment Method', 'wcs-importer' ); ?></option>
-								<option value="none"><?php esc_html_e( 'None', 'wcs-importer' ); ?></option>
+								<option value="any"><?php esc_html_e( 'Any Payment Method', 'wcs-import-export' ); ?></option>
+								<option value="none"><?php esc_html_e( 'None', 'wcs-import-export' ); ?></option>
 
 								<?php foreach ( WC()->payment_gateways->get_available_payment_gateways() as $gateway_id => $gateway ) : ?>
 									<option value="<?php esc_attr_e( $gateway_id ); ?>"><?php esc_html_e( $gateway->title ); ?></option>;
@@ -136,10 +136,6 @@ class WCS_Export_Admin {
 							</select>
 						</td>
 					</tr>
-					<!-- <tr>
-						<td><label for="product"><?php esc_html_e( 'Products', 'wcs-importer' ); ?>:</label></td>
-						<td><input type="text" name="product" value="" placeholder="product ids" /></td>
-					</tr> -->
 				</tbody>
 		</table>
 
@@ -158,62 +154,62 @@ class WCS_Export_Admin {
 	public function export_headers() {
 
 		$csv_headers = array(
-			'subscription_id'       => __( 'Subscription ID', 'wcs-importer' ),
-			'subscription_status'   => __( 'Subscription Status', 'wcs-importer' ),
-			'customer_id'           => __( 'Customer ID', 'wcs-importer' ),
-			'start_date'            => __( 'Start Date', 'wcs-importer' ),
-			'trial_end_date'        => __( 'Trial End Date', 'wcs-importer' ),
-			'next_payment_date'     => __( 'Next Payment Date', 'wcs-importer' ),
-			'last_payment_date'     => __( 'Last Payment Date', 'wcs-importer' ),
-			'end_date'              => __( 'End Date', 'wcs-importer' ),
-			'order_shipping'        => __( 'Total Shipping', 'wcs-importer' ),
-			'order_shipping_tax'    => __( 'Total Shipping Tax', 'wcs-importer' ),
-			'fee_total'             => __( 'Total Subscription Fees', 'wcs-importer' ),
-			'fee_tax_total'         => __( 'Total Fees Tax', 'wcs-importer' ),
-			'order_tax'             => __( 'Subscription Total Tax', 'wcs-importer' ),
-			'order_cart_discount'   => __( 'Cart Discount', 'wcs-importer' ),
-			'order_discount'        => __( 'Subscription Discount', 'wcs-importer' ),
-			'order_total'           => __( 'Subscription Total', 'wcs-importer' ),
-			'payment_method'        => __( 'Payment Method', 'wcs-importer' ),
-			'payment_method_title'  => __( 'Payment Method Title', 'wcs-importer' ),
-			'shipping_method'       => __( 'Shipping Method', 'wcs-importer' ),
-			'billing_first_name'    => __( 'Billing First Name', 'wcs-importer' ),
-			'billing_last_name'     => __( 'Billing Last Name', 'wcs-importer' ),
-			'billing_email'         => __( 'Billing Email', 'wcs-importer' ),
-			'billing_phone'         => __( 'Billing Phone', 'wcs-importer' ),
-			'billing_address_1'     => __( 'Billing Address 1', 'wcs-importer' ),
-			'billing_address_2'     => __( 'Billing Address 2', 'wcs-importer' ),
-			'billing_postcode'      => __( 'Billing Postcode', 'wcs-importer' ),
-			'billing_city'          => __( 'Billing City', 'wcs-importer' ),
-			'billing_state'         => __( 'Billing State', 'wcs-importer' ),
-			'billing_country'       => __( 'Billing Country', 'wcs-importer' ),
-			'billing_company'       => __( 'Billing Company', 'wcs-importer' ),
-			'shipping_first_name'   => __( 'Shipping First Name', 'wcs-importer' ),
-			'shipping_last_name'    => __( 'Shipping Last Name', 'wcs-importer' ),
-			'shipping_address_1'    => __( 'Shipping Address 1', 'wcs-importer' ),
-			'shipping_address_2'    => __( 'Shipping Address 2', 'wcs-importer' ),
-			'shipping_postcode'     => __( 'Shipping Post code', 'wcs-importer' ),
-			'shipping_city'         => __( 'Shipping City', 'wcs-importer' ),
-			'shipping_state'        => __( 'Shipping State', 'wcs-importer' ),
-			'shipping_country'      => __( 'Shipping Country', 'wcs-importer' ),
-			'shipping_company'      => __( 'Shipping Company', 'wcs-importer' ),
-			'customer_note'         => __( 'Customer Note', 'wcs-importer' ),
-			'order_items'           => __( 'Subscription Items', 'wcs-importer' ),
-			'order_notes'           => __( 'Subscription order notes', 'wcs-importer' ),
-			'coupon_items'          => __( 'Coupons', 'wcs-importer' ),
-			'fee_items'             => __( 'Fees', 'wcs-importer' ),
-			'tax_items'             => __( 'Taxes', 'wcs-importer' ),
-			'download_permissions'  => __( 'Download Permissions Granted', 'wcs-importer' ),
+			'subscription_id'       => __( 'Subscription ID', 'wcs-import-export' ),
+			'subscription_status'   => __( 'Subscription Status', 'wcs-import-export' ),
+			'customer_id'           => __( 'Customer ID', 'wcs-import-export' ),
+			'start_date'            => __( 'Start Date', 'wcs-import-export' ),
+			'trial_end_date'        => __( 'Trial End Date', 'wcs-import-export' ),
+			'next_payment_date'     => __( 'Next Payment Date', 'wcs-import-export' ),
+			'last_payment_date'     => __( 'Last Payment Date', 'wcs-import-export' ),
+			'end_date'              => __( 'End Date', 'wcs-import-export' ),
+			'order_shipping'        => __( 'Total Shipping', 'wcs-import-export' ),
+			'order_shipping_tax'    => __( 'Total Shipping Tax', 'wcs-import-export' ),
+			'fee_total'             => __( 'Total Subscription Fees', 'wcs-import-export' ),
+			'fee_tax_total'         => __( 'Total Fees Tax', 'wcs-import-export' ),
+			'order_tax'             => __( 'Subscription Total Tax', 'wcs-import-export' ),
+			'order_cart_discount'   => __( 'Cart Discount', 'wcs-import-export' ),
+			'order_discount'        => __( 'Subscription Discount', 'wcs-import-export' ),
+			'order_total'           => __( 'Subscription Total', 'wcs-import-export' ),
+			'payment_method'        => __( 'Payment Method', 'wcs-import-export' ),
+			'payment_method_title'  => __( 'Payment Method Title', 'wcs-import-export' ),
+			'shipping_method'       => __( 'Shipping Method', 'wcs-import-export' ),
+			'billing_first_name'    => __( 'Billing First Name', 'wcs-import-export' ),
+			'billing_last_name'     => __( 'Billing Last Name', 'wcs-import-export' ),
+			'billing_email'         => __( 'Billing Email', 'wcs-import-export' ),
+			'billing_phone'         => __( 'Billing Phone', 'wcs-import-export' ),
+			'billing_address_1'     => __( 'Billing Address 1', 'wcs-import-export' ),
+			'billing_address_2'     => __( 'Billing Address 2', 'wcs-import-export' ),
+			'billing_postcode'      => __( 'Billing Postcode', 'wcs-import-export' ),
+			'billing_city'          => __( 'Billing City', 'wcs-import-export' ),
+			'billing_state'         => __( 'Billing State', 'wcs-import-export' ),
+			'billing_country'       => __( 'Billing Country', 'wcs-import-export' ),
+			'billing_company'       => __( 'Billing Company', 'wcs-import-export' ),
+			'shipping_first_name'   => __( 'Shipping First Name', 'wcs-import-export' ),
+			'shipping_last_name'    => __( 'Shipping Last Name', 'wcs-import-export' ),
+			'shipping_address_1'    => __( 'Shipping Address 1', 'wcs-import-export' ),
+			'shipping_address_2'    => __( 'Shipping Address 2', 'wcs-import-export' ),
+			'shipping_postcode'     => __( 'Shipping Post code', 'wcs-import-export' ),
+			'shipping_city'         => __( 'Shipping City', 'wcs-import-export' ),
+			'shipping_state'        => __( 'Shipping State', 'wcs-import-export' ),
+			'shipping_country'      => __( 'Shipping Country', 'wcs-import-export' ),
+			'shipping_company'      => __( 'Shipping Company', 'wcs-import-export' ),
+			'customer_note'         => __( 'Customer Note', 'wcs-import-export' ),
+			'order_items'           => __( 'Subscription Items', 'wcs-import-export' ),
+			'order_notes'           => __( 'Subscription order notes', 'wcs-import-export' ),
+			'coupon_items'          => __( 'Coupons', 'wcs-import-export' ),
+			'fee_items'             => __( 'Fees', 'wcs-import-export' ),
+			'tax_items'             => __( 'Taxes', 'wcs-import-export' ),
+			'download_permissions'  => __( 'Download Permissions Granted', 'wcs-import-export' ),
 		);
 		?>
 
 		<table class="widefat widefat_importer striped" id="wcsi-headers-table" style="display:none;">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Enabled', 'wcs-importer' ); ?></th>
-					<th><?php esc_html_e( 'Subscription Details', 'wcs-importer' ); ?></th>
-					<th><?php esc_html_e( 'Importer Compatible Header', 'wcs-importer' ); ?></th>
-					<th><?php esc_html_e( 'CSV Column Header', 'wcs-importer' ); ?></th>
+					<th><?php esc_html_e( 'Enabled', 'wcs-import-export' ); ?></th>
+					<th><?php esc_html_e( 'Subscription Details', 'wcs-import-export' ); ?></th>
+					<th><?php esc_html_e( 'Importer Compatible Header', 'wcs-import-export' ); ?></th>
+					<th><?php esc_html_e( 'CSV Column Header', 'wcs-import-export' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -309,7 +305,7 @@ class WCS_Export_Admin {
 
 			WCS_Export_Writer::process_export( $_POST['filename'] );
 		} else {
-			$this->error_message = __( 'No subscriptions to export given the filters you have selected.', 'wcs-importer' );
+			$this->error_message = __( 'No subscriptions to export given the filters you have selected.', 'wcs-import-export' );
 		}
 
 	}
@@ -336,7 +332,7 @@ class WCS_Export_Admin {
 				if ( ! empty( $csv_headers ) ) {
 					$this->process_download( $csv_headers );
 				} else {
-					$this->error_message = __( 'No csv headers were chosen, please select at least one CSV header to complete the Subscriptions Exporter.', 'wcs-importer' );
+					$this->error_message = __( 'No csv headers were chosen, please select at least one CSV header to complete the Subscriptions Exporter.', 'wcs-import-export' );
 				}
 			}
 		}

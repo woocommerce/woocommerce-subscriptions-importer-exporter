@@ -161,7 +161,7 @@ class WCS_Import_Parser {
 
 		// Check Product id a woocommerce product
 		if ( empty( self::$mapped_fields['product_id'] ) || ! ( self::check_product( $subscription_details[self::$mapped_fields['product_id']] ) ) ) {
-			$result['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
+			$result['error'][] = __( 'The product_id is not a subscription product in your store.', 'wcs-import-export' );
 		}
 
 		// Check customer id is valid or create one
@@ -203,7 +203,7 @@ class WCS_Import_Parser {
 					$order_meta[] = array( 'key' => '_recurring_shipping_method_title', 'value' => $title );
 					if( empty( $method ) || empty( $title ) ) {
 						// set up warning message to show admin -  Do i need be more specific??
-						$result['warning'][] = __( 'Shipping method and/or title for the order has been set to empty. ', 'wcs-importer' );
+						$result['warning'][] = __( 'Shipping method and/or title for the order has been set to empty. ', 'wcs-import-export' );
 					}
 					break;
 				case 'order_shipping':
@@ -246,7 +246,7 @@ class WCS_Import_Parser {
 
 					if ( $use_manual_recurring ) {
 						$order_meta[] = array( 'key' => '_wcs_requires_manual_renewal', 'value' => 'true' );
-						$result['warning'][] = __( 'No recognisable payment method has been specified. Defaulting to manual recurring payments. ', 'wcs-importer' );
+						$result['warning'][] = __( 'No recognisable payment method has been specified. Defaulting to manual recurring payments. ', 'wcs-import-export' );
 					} else {
 
 						foreach ( $tmp_ordermeta as $tmp_meta ) {
@@ -342,10 +342,10 @@ class WCS_Import_Parser {
 			}
 		}
 		if( ! empty( $missing_shipping_addresses ) ) {
-			$result['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-importer' );
+			$result['warning'][] = __( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-import-export' );
 		}
 		if ( ! empty( $missing_billing_addresses ) ) {
-			$result['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-importer' );
+			$result['warning'][] = __( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-import-export' );
 		}
 
 		// Check and set download permissions boolean, will run in test-mode
@@ -353,7 +353,7 @@ class WCS_Import_Parser {
 		if( strcmp( $download_permission, 'true' ) == 0 || strcmp( $download_permission, 'yes' ) == 0 ) {
 			$download_permissions_granted = true;
 			if( get_option( 'woocommerce_downloads_grant_access_after_payment' ) == 'no' ) {
-				$result['warning'][] = __( 'Download permissions cannot be granted because your current WooCommerce settings have disabled this feature.', 'wcs-importer' );
+				$result['warning'][] = __( 'Download permissions cannot be granted because your current WooCommerce settings have disabled this feature.', 'wcs-import-export' );
 				$download_permissions_granted = false;
 			}
 		}
@@ -368,7 +368,7 @@ class WCS_Import_Parser {
 					'post_date'     => $start_date,
 					'post_date_gmt' => $start_date_gmt,
 					'post_type'     => 'shop_order',
-					'post_title' 	=> sprintf( __( 'Order &ndash; %s', 'wcs-importer' ), strftime( _x( '%b %d, %Y @ %I:%M %p', 'Order date parsed by strftime', 'wcs-importer' ) ) ),
+					'post_title' 	=> sprintf( __( 'Order &ndash; %s', 'wcs-import-export' ), strftime( _x( '%b %d, %Y @ %I:%M %p', 'Order date parsed by strftime', 'wcs-import-export' ) ) ),
 					'post_status'   => 'publish',
 					'ping_status'   => 'closed',
 					'post_author'   => 1,
@@ -487,7 +487,7 @@ class WCS_Import_Parser {
 						wc_update_order_item_meta( $item_id, '_subscription_length', $new_sub_length );
 					} else { // set subscription as expired and display warning to admin
 						$subscription_meta['status'] = 'expired';
-						$result['warning'][] = __( 'Subscription set as expired due to the expiry date given in the CSV being invalid.', 'wcs-importer' );
+						$result['warning'][] = __( 'Subscription set as expired due to the expiry date given in the CSV being invalid.', 'wcs-import-export' );
 
 					}
 				}
@@ -498,7 +498,7 @@ class WCS_Import_Parser {
 						$subscription_meta['status'] = strtolower( $subscription_details[self::$mapped_fields['subscription_status']] );
 					} else {
 						$subscription_meta['status'] = 'pending';
-						$result['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-importer' );
+						$result['warning'][] = __( 'No subscription status was specified. Subscription has been created with the status "pending". ', 'wcs-import-export' );
 					}
 				}
 
@@ -563,7 +563,7 @@ class WCS_Import_Parser {
 			}
 		} else {
 			if( empty( self::$mapped_fields['subscription_status'] ) && empty( $subscription_details[self::$mapped_fields['subscription_status']] ) ) {
-				$result['warning'][] = __( 'No subscription status was specified. Subscription will be created with the status "pending". ', 'wcs-importer' );
+				$result['warning'][] = __( 'No subscription status was specified. Subscription will be created with the status "pending". ', 'wcs-import-export' );
 			}
 			$result['row_number'] = self::$starting_row_number;
 			array_push( self::$results, $result );
