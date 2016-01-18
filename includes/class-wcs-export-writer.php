@@ -56,7 +56,7 @@ class WCS_Export_Writer {
 				case 'last_payment_date':
 				case 'end_date':
 				case 'payment_method':
-				case 'shipping_method':
+				case 'payment_method_title':
 				case 'billing_first_name':
 				case 'billing_last_name':
 				case 'billing_email':
@@ -165,6 +165,25 @@ class WCS_Export_Writer {
 					break;
 				case 'download_permissions':
 					$value = $subscription->download_permissions_granted ? $subscription->download_permissions_granted : 0;
+					break;
+				case 'shipping_method':
+					$shipping_lines = array();
+
+					foreach ( $subscription->get_shipping_methods() as $shipping_item_id => $shipping_item ) {
+						$shipping_lines[] = implode( '|', array(
+								'method_id:' . $shipping_item['method_id'],
+								'method_title:' . $shipping_item['name'],
+								'total:' . wc_format_decimal( $shipping_item['cost'], 2 ),
+							)
+						);
+					}
+
+					if ( ! empty( $shipping_lines ) ) {
+						$value = implode( ';', $shipping_lines );
+					} else {
+						$value = '';
+					}
+
 					break;
 				default :
 					$value = '';
