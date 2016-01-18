@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: WooCommerce Subscriptions CSV Importer
- * Plugin URI:
- * Description: CSV Importer to bring your subscriptions to Woocommerce.
+ * Plugin Name: WooCommerce Subscriptions CSV Importer and Exporter
+ * Plugin URI: https://github.com/Prospress/woocommerce-subscriptions-importer
+ * Description: A CSV importer built solely to help bring your subscriptions to WooCommerce (WC Subscriptions exporter included) :dancer:
  * Version: 1.0
  * Author: Prospress Inc
  * Author URI: http://prospress.com
@@ -67,9 +67,9 @@ class WCS_Importer_Exporter {
 	public static function action_links( $links ) {
 
 		$plugin_links = array(
-			'<a href="' . esc_url( admin_url( 'admin.php?page=import_subscription' ) ) . '">' . esc_html__( 'Import', 'wcs-importer' ) . '</a>',
-			'<a href="https://github.com/Prospress/woocommerce-subscriptions-importer/blob/master/README.md">' . esc_html__( 'Docs', 'wcs-importer' ) . '</a>',
-			'<a href="https://github.com/Prospress/woocommerce-subscriptions-importer/issues/new">' . esc_html__( 'Support', 'wcs-importer' ) . '</a>',
+			'<a href="' . esc_url( admin_url( 'admin.php?page=import_subscription' ) ) . '">' . esc_html__( 'Import', 'wcs-import-export' ) . '</a>',
+			'<a href="https://github.com/Prospress/woocommerce-subscriptions-importer/blob/master/README.md">' . esc_html__( 'Docs', 'wcs-import-export' ) . '</a>',
+			'<a href="https://github.com/Prospress/woocommerce-subscriptions-importer/issues/new">' . esc_html__( 'Support', 'wcs-import-export' ) . '</a>',
 		);
 
 		return array_merge( $plugin_links, $links );
@@ -88,16 +88,16 @@ class WCS_Importer_Exporter {
 		if ( ! class_exists( 'WC_Subscriptions' ) || ! class_exists( 'WC_Subscriptions_Admin' ) ) :
 			if ( is_woocommerce_active() ) : ?>
 				<div id="message" class="error">
-					<p><?php printf( esc_html__( '%sWooCommerce Subscriptions Importer is inactive.%s The %sWooCommerce Subscriptions plugin%s must be active for WooCommerce Subscriptions Importer to work. Please %sinstall & activate%s WooCommerce.', 'wcs-importer' ), '<strong>', '</strong>', '<a href="http://www.woothemes.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">', '</a>' ); ?></p>
+					<p><?php printf( esc_html__( '%sWooCommerce Subscriptions Importer is inactive.%s The %sWooCommerce Subscriptions plugin%s must be active for WooCommerce Subscriptions Importer to work. Please %sinstall & activate%s WooCommerce.', 'wcs-import-export' ), '<strong>', '</strong>', '<a href="http://www.woothemes.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">', '</a>' ); ?></p>
 				</div>
 			<?php else : ?>
 				<div id="message" class="error">
-					<p><?php printf( esc_html__( '%sWooCommerce Subscriptions Importer is inactive. %sBoth %sWooCommerce%s and %sWooCommerce Subscriptions%s plugins must be active for WooCommerce Subscriptions Importer to work. Please %sinstall & activate%s these plugins before continuing.', 'wcs-importer' ), '<strong>', '</strong>', '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>', '<a href="http://www.woothemes.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . admin_url( 'plugins.php' ) . '">', '</a>' ); ?></p>
+					<p><?php printf( esc_html__( '%sWooCommerce Subscriptions Importer is inactive. %sBoth %sWooCommerce%s and %sWooCommerce Subscriptions%s plugins must be active for WooCommerce Subscriptions Importer to work. Please %sinstall & activate%s these plugins before continuing.', 'wcs-import-export' ), '<strong>', '</strong>', '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>', '<a href="http://www.woothemes.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . admin_url( 'plugins.php' ) . '">', '</a>' ); ?></p>
 				</div>
 			<?php endif;?>
 		<?php elseif ( ! class_exists( 'WC_Subscriptions' ) || version_compare( WC_Subscriptions::$version, '2.0', '<' ) ) : ?>
 			<div id="message" class="error">
-				<p><?php printf( esc_html__( '%sWooCommerce Subscriptions Importer is inactive.%s The %sWooCommerce Subscriptions%s version 2.0 (or greater) is required to safely run WooCommerce Subscriptions Importer. Please %supdate & activate%s WooCommerce Subscriptions.', 'wcs-importer' ), '<strong>', '</strong>', '<a href="http://www.woothemes.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . admin_url( 'plugins.php' ) . '">', '&nbsp;&raquo;</a>' ); ?></p>
+				<p><?php printf( esc_html__( '%sWooCommerce Subscriptions Importer is inactive.%s The %sWooCommerce Subscriptions%s version 2.0 (or greater) is required to safely run WooCommerce Subscriptions Importer. Please %supdate & activate%s WooCommerce Subscriptions.', 'wcs-import-export' ), '<strong>', '</strong>', '<a href="http://www.woothemes.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . admin_url( 'plugins.php' ) . '">', '&nbsp;&raquo;</a>' ); ?></p>
 			</div>
 		<?php endif;
 	}
