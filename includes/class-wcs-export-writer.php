@@ -31,6 +31,22 @@ class WCS_Export_Writer {
 	 * @param WC_Subscription $subscription
 	 */
 	public static function write_subscriptions_csv_row( $subscription ) {
+		$fee_total = $fee_tax_total = 0;
+		$fee_items = array();
+
+		if ( 0 != sizeof( array_intersect( array_keys( self::$headers ), array( 'fee_total', 'fee_tax_total', 'fee_itmes') ) ) ) {
+			foreach ( $subscription->get_fees() as $fee_id => $fee ) {
+
+				$fee_items[] = implode( '|', array(
+					'name:' . $fee['name'],
+					'total:' . wc_format_decimal( $fee['line_total'], 2 ),
+					'tax:' . wc_format_decimal( $fee['line_tax'], 2 ),
+				) );
+
+				$fee_total     += $fee['line_total'];
+				$fee_tax_total += $fee['line_tax'];
+			}
+		}
 
 		foreach ( self::$headers as $header_key => $_ ) {
 			switch ( $header_key ) {
@@ -40,12 +56,14 @@ class WCS_Export_Writer {
 				case 'subscription_status':
 					$value = $subscription->post_status;
 					break;
-				case 'shipping_total':
-				case 'shipping_tax_total':
 				case 'fee_total':
 				case 'fee_tax_total':
-				case 'tax_total':
-				case 'cart_discount':
+					$value = ${$header_key};
+					break;
+				case 'order_shipping':
+				case 'order_shipping_tax':
+				case 'order_tax':
+				case 'order_cart_discount':
 				case 'order_discount':
 				case 'order_total':
 					$value = empty( $subscription->{$header_key} ) ? 0 : $subscription->{$header_key};
@@ -184,6 +202,9 @@ class WCS_Export_Writer {
 						$value = '';
 					}
 
+					break;
+				case 'fee_items':
+					$value = implode( ';', $fee_items );
 					break;
 				default :
 					$value = '';
