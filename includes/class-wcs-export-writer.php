@@ -134,10 +134,11 @@ class WCS_Export_Writer {
 						}
 
 						$line_item = array(
-							'name'     => html_entity_decode( $item['name'], ENT_NOQUOTES, 'UTF-8' ),
-							'quantity' => $item['qty'],
-							'total'    => wc_format_decimal( $subscription->get_line_total( $item ), 2 ),
-							'meta'     => html_entity_decode( $meta, ENT_NOQUOTES, 'UTF-8' ),
+							'product_id' => function_exists( 'wcs_get_canonical_product_id' ) ? wcs_get_canonical_product_id( $item ) : '',
+							'name'       => html_entity_decode( $item['name'], ENT_NOQUOTES, 'UTF-8' ),
+							'quantity'   => $item['qty'],
+							'total'      => wc_format_decimal( $subscription->get_line_total( $item ), 2 ),
+							'meta'       => html_entity_decode( $meta, ENT_NOQUOTES, 'UTF-8' ),
 						);
 
 						// add line item tax
