@@ -318,7 +318,7 @@ class WCS_Import_Admin {
 		$button_text = ( 'yes' == $_GET['test_mode'] ) ? __( 'Test CSV', 'wcs-importer' ) : __( 'Run Import', 'wcs-importer' );
 		$row_number  = 1;
 
-		$subscription_fields = array( 'customer_id', 'product_id', 'status', 'start_date', 'next_payment_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
+		$subscription_fields = array( 'customer_id', 'status', 'start_date', 'next_payment_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
 		?>
 
 		<h3><?php esc_html_e( 'Step 2: Map Fields to Column Names', 'wcs-importer' ); ?></h3>
@@ -360,7 +360,6 @@ class WCS_Import_Admin {
 									<option value="coupon_items" <?php selected( $header, 'coupon_items' ); ?>>coupon_items</option>
 									<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
 									<option value="shipping_method_title" <?php selected( $header, 'shipping_method_title' ); ?>>shipping_method_title</option>
-									<option value="quantity" <?php selected( $header, 'quantity' ); ?>>quantity</option>
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Payment Method Meta', 'wcs-importer' ); ?>">
@@ -421,7 +420,6 @@ class WCS_Import_Admin {
 			'payment_method_post_meta'    => array(),
 			'payment_method_user_meta'    => array(),
 			'customer_id'                 => '',
-			'product_id'                  => '',
 			'status'                      => '',
 			'start_date'                  => '',
 			'trial_end_date'              => '',
@@ -453,11 +451,6 @@ class WCS_Import_Admin {
 			'shipping_country'            => '',
 			'shipping_method'             => '',
 			'shipping_method_title'       => '',
-			'line_total'                  => '',
-			'line_tax'                    => '',
-			'line_subtotal'               => '',
-			'line_subtotal_tax'           => '',
-			'quantity'                    => '',
 			'order_discount'              => '',
 			'cart_discount'               => '',
 			'cart_discount_tax'           => '',
