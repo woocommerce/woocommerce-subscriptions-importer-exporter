@@ -15,6 +15,7 @@ class WCS_Import_Parser {
 	private static $row_number;
 
 	private static $membership_plans = null;
+	private static $all_virtual      = true;
 
 	/* Front-end import settings chosen */
 	public static $test_mode;
@@ -58,14 +59,6 @@ class WCS_Import_Parser {
 		'shipping_state',
 		'shipping_postcode',
 		'shipping_country',
-	);
-
-	/* Subscription line item meta */
-	public static $order_item_meta_fields = array (
-		'line_subtotal',
-		'line_total',
-		'line_tax',
-		'line_subtotal_tax',
 	);
 
 	/**
@@ -150,18 +143,15 @@ class WCS_Import_Parser {
 	private static function import_subscription( $data ) {
 		global $wpdb;
 
-		self::$row       = $data;
-		$set_manual      = false;
-		$product_id      = absint( $data[ self::$fields['product_id'] ] );
-		$result          = array();
-
-		$post_meta = $result['warning'] = $result['error'] = array();
-		$result['row_number']           = self::$row_number;
-		$result['item'] = '';
-
-		if ( empty( self::$fields['product_id'] ) || ! ( wcsi_check_product( $product_id ) ) ) {
-			$result['error'][] = esc_html__( 'The product_id is not a subscription product in your store.', 'wcs-importer' );
-		}
+		self::$row  = $data;
+		$set_manual = false;
+		$post_meta  = array();
+		$result     = array(
+			'warning'    => array(),
+			'error'      => array(),
+			'item'       => '',
+			'row_number' => self::$row_number,
+		);
 
 		$user_id = wcsi_check_customer( $data, self::$fields, self::$test_mode );
 
@@ -183,24 +173,16 @@ class WCS_Import_Parser {
 			return;
 		}
 
-		$_product       = wc_get_product( $product_id );
-		$quantity       = ( ! empty( $data[ self::$fields['quantity'] ] ) ) ? $data[ self::$fields['quantity'] ] : 1;
-		$result['item'] = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product->id ), $_product->get_title() );
-
 		$missing_shipping_addresses = $missing_billing_addresses = array();
 
 		foreach( self::$order_meta_fields as $column ) {
 			switch( $column ) {
 				case 'shipping_method':
-					$method = ( ! empty( $data[ self::$fields['shipping_method'] ] ) ) ? $data[ self::$fields['shipping_method'] ] : '';
-					$title  = ( ! empty( $data[ self::$fields['shipping_method_title'] ] ) ) ? $data[ self::$fields['shipping_method_title'] ] : $method;
+					$shipping_method = ( ! empty( $data[ self::$fields['shipping_method'] ] ) ) ? $data[ self::$fields['shipping_method'] ] : '';
+					$title           = ( ! empty( $data[ self::$fields['shipping_method_title'] ] ) ) ? $data[ self::$fields['shipping_method_title'] ] : $shipping_method;
 
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $method );
+					$post_meta[] = array( 'key' => '_' . $column, 'value' => $shipping_method );
 					$post_meta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
-
-					if( empty( $method ) && ! $_product->is_virtual() ) {
-						$result['warning'][] = __( 'Shipping method and title for the subscription have been left as empty. ', 'wcs-importer' );
-					}
 					break;
 
 				case 'order_shipping':
@@ -266,10 +248,8 @@ class WCS_Import_Parser {
 				case 'order_total':
 					if ( ! empty( $data[ self::$fields[ $column ] ] ) ) {
 						$value = $data[ self::$fields[ $column ] ];
-					} elseif ( ! empty( $data[ self::$fields[ 'line_total' ] ] ) ) {
-						$value = $data[ self::$fields[ 'line_total' ] ];
 					} else {
-						$value = $quantity * $_product->subscription_price;
+						$value = 0;
 					}
 
 					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
@@ -278,16 +258,6 @@ class WCS_Import_Parser {
 				default:
 					$value       = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : '';
 					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
-			}
-		}
-
-		if ( ! $_product->is_virtual() ) {
-			if ( ! empty( $missing_shipping_addresses ) ) {
-				$result['warning'][] = esc_html__( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-importer' );
-			}
-
-			if ( ! empty( $missing_billing_addresses ) ) {
-				$result['warning'][] = esc_html__( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-importer' );
 			}
 		}
 
@@ -334,28 +304,28 @@ class WCS_Import_Parser {
 
 			if ( empty( $result['error'] ) ) {
 				try {
-					$wpdb->query( 'START TRANSACTION' );
+					if ( ! self::$test_mode ) {
+						$wpdb->query( 'START TRANSACTION' );
 
-					// add custom user meta before subscription is created
-					foreach ( self::$fields['custom_user_meta'] as $meta_key ) {
-						if ( ! empty( $data[ $meta_key ] ) ) {
-							update_user_meta( $user_id, $meta_key, $data[ $meta_key ] );
+						// add custom user meta before subscription is created
+						foreach ( self::$fields['custom_user_meta'] as $meta_key ) {
+							if ( ! empty( $data[ $meta_key ] ) ) {
+								update_user_meta( $user_id, $meta_key, $data[ $meta_key ] );
+							}
 						}
-					}
 
-					$subscription = wcs_create_subscription( array(
-							'customer_id'      => $user_id,
-							'start_date'       => $dates_to_update['start'],
-							'billing_interval' => ( ! empty( $data[ self::$fields['billing_interval'] ] ) ) ? $data[ self::$fields['billing_interval'] ] : WC_Subscriptions_Product::get_interval( $_product ),
-							'billing_period'   => ( ! empty( $data[ self::$fields['billing_period'] ] ) ) ? $data[ self::$fields['billing_period'] ] : WC_Subscriptions_Product::get_period( $_product ),
-							'created_via'      => 'importer',
-						)
-					);
+						$subscription = wcs_create_subscription( array(
+								'customer_id'      => $user_id,
+								'start_date'       => $dates_to_update['start'],
+								'billing_interval' => ( ! empty( $data[ self::$fields['billing_interval'] ] ) ) ? $data[ self::$fields['billing_interval'] ] : 1,
+								'billing_period'   => ( ! empty( $data[ self::$fields['billing_period'] ] ) ) ? $data[ self::$fields['billing_period'] ] : 'month',
+								'created_via'      => 'importer',
+							)
+						);
 
-					if ( is_wp_error( $subscription ) ) {
-						throw new Exception( sprintf( esc_html__( 'Could not create subscription: %s', 'wcs-importer' ), $subscription->get_message() ) );
-
-					} else {
+						if ( is_wp_error( $subscription ) ) {
+							throw new Exception( sprintf( esc_html__( 'Could not create subscription: %s', 'wcs-importer' ), $subscription->get_error_message() ) );
+						}
 
 						foreach ( $post_meta as $meta_data ) {
 							update_post_meta( $subscription->id, $meta_data['key'], $meta_data['value'] );
@@ -374,37 +344,6 @@ class WCS_Import_Parser {
 							}
 						}
 
-						$item_args        = array();
-						$item_args['qty'] = $quantity;
-
-						foreach ( array( 'total', 'tax', 'subtotal', 'subtotal_tax' ) as $line_item_data ) {
-
-							switch ( $line_item_data ) {
-								case 'subtotal' :
-								case 'total' :
-									$default = WC_Subscriptions_Product::get_price( $product_id );
-									break;
-								default :
-									$default = 0;
-							}
-							$item_args['totals'][ $line_item_data ] = ( ! empty( $data[ self::$fields[ 'line_' . $line_item_data ] ] ) ) ? $data[ self::$fields[ 'line_' . $line_item_data ] ] : $default;
-						}
-
-						if ( $_product->variation_data ) {
-							$item_args['variation'] = array();
-
-							foreach ( $_product->variation_data as $attribute => $variation ) {
-								$item_args['variation'][ $attribute ] = $variation;
-							}
-							$result['item'] .= ' [#' . $product_id . ']';
-						}
-
-						$item_id = $subscription->add_product( $_product, $quantity, $item_args );
-
-						if ( ! $item_id ) {
-							throw new Exception( sprintf( esc_html__( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix up the data from your CSV and try again.', 'wcs-importer' ), $result['item'] ) );
-						}
-
 						$subscription->update_dates( $dates_to_update );
 						$subscription->update_status( $status );
 
@@ -421,28 +360,43 @@ class WCS_Import_Parser {
 						if ( self::$add_memberships ) {
 							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
 						}
+					}
 
-						if ( ! empty( $data[ self::$fields['coupon_items'] ] ) ) {
-							self::add_coupons( $subscription, $data );
+					if ( ! empty( $data[ self::$fields['coupon_items'] ] ) ) {
+						self::add_coupons( $subscription, $data );
+					}
+
+					if ( ! empty( $data[ self::$fields['order_items'] ] ) ) {
+						$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
+
+						if ( ! empty( $order_items ) ) {
+							foreach( $order_items as $order_item ) {
+								$order_data = array();
+
+								foreach ( explode( '|', $order_item ) as $item ) {
+									list( $name, $value ) = explode( ':', $item );
+									$order_data[ trim( $name ) ] = trim( $value );
+								}
+
+								$result['item'] .= self::add_product( $subscription, $order_data );
+							}
 						}
 					}
 
-						if ( ! empty( $data[ self::$fields['order_items'] ] ) ) {
-							$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
-
-							if ( ! empty( $order_items ) ) {
-								foreach( $order_items as $order_item ) {
-									$order_data = array();
-
-									foreach ( explode( '|', $order_item ) as $item ) {
-										list( $name, $value ) = explode( ':', $item );
-										$order_data[ trim( $name ) ] = trim( $value );
-									}
-
-									$result['item'] .= self::add_product( $subscription, $order_data );
-								}
-							}
+					// only show the following warnings on the import when the subscription requires shipping
+					if ( ! self::$all_virtual ) {
+						if ( ! empty( $missing_shipping_addresses ) ) {
+							$result['warning'][] = esc_html__( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-importer' );
 						}
+
+						if ( ! empty( $missing_billing_addresses ) ) {
+							$result['warning'][] = esc_html__( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-importer' );
+						}
+
+						if ( empty( $shipping_method ) ) {
+							$result['warning'][] = esc_html__( 'Shipping method and title for the subscription have been left as empty. ', 'wcs-importer' );
+						}
+					}
 
 					$wpdb->query( 'COMMIT' );
 
@@ -738,6 +692,10 @@ class WCS_Import_Parser {
 				$item_args['variation'][ $attribute ] = $variation;
 			}
 			$product_string .= ' [#' . $data['product_id'] . ']';
+		}
+
+		if ( self::$all_virtual && ! $_product->is_virtual() ) {
+			self::$all_virtual = false;
 		}
 
 		if ( ! self::$test_mode ) {
