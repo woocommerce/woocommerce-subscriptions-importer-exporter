@@ -202,6 +202,7 @@ class WCS_Export_Admin {
 			'order_notes'           => __( 'Subscription order notes', 'wcs-importer' ),
 			'coupon_items'          => __( 'Coupons', 'wcs-importer' ),
 			'fee_items'             => __( 'Fees', 'wcs-importer' ),
+			'tax_items'             => __( 'Taxes', 'wcs-importer' ),
 			'download_permissions'  => __( 'Download Permissions Granted', 'wcs-importer' ),
 		);
 		?>

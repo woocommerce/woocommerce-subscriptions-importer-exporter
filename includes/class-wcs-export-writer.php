@@ -209,6 +209,22 @@ class WCS_Export_Writer {
 				case 'fee_items':
 					$value = implode( ';', $fee_items );
 					break;
+				case 'tax_items':
+					$tax_items = array();
+
+					foreach ( $subscription->get_tax_totals() as $tax_code => $tax ) {
+						$tax_items[] = implode( '|', array(
+							'code:' . $tax_code,
+							'total:' . wc_format_decimal( $tax->amount, 2 ),
+						) );
+					}
+
+					if ( ! empty( $tax_items ) ) {
+						$value = implode( ';', $tax_items );
+					} else {
+						$value = '';
+					}
+					break;
 				default :
 					$value = '';
 			}
