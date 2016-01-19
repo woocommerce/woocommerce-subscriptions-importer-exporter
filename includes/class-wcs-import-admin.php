@@ -352,7 +352,7 @@ class WCS_Import_Admin {
 									<?php endforeach; ?>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Subscription Item Meta', 'wcs-importer' ); ?>">
-									<?php foreach ( WCS_Import_Parser::$order_meta_fields as $option ) : ?>
+									<?php foreach ( array_merge( WCS_Import_Parser::$order_meta_fields, WCS_Import_Parser::$user_meta_fields ) as $option ) : ?>
 										<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
 									<?php endforeach; ?>
 									<option value="order_items" <?php selected( $header, 'order_items' ); ?>>order_items</option>

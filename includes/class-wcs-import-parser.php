@@ -37,7 +37,9 @@ class WCS_Import_Parser {
 		'order_total',
 		'payment_method',
 		'shipping_method',
+	);
 
+	public static $user_meta_fields = array(
 		'billing_first_name', // Billing Address Info
 		'billing_last_name',
 		'billing_company',
@@ -175,7 +177,7 @@ class WCS_Import_Parser {
 
 		$missing_shipping_addresses = $missing_billing_addresses = array();
 
-		foreach( self::$order_meta_fields as $column ) {
+		foreach( array_merge( self::$order_meta_fields, self::$user_meta_fields ) as $column ) {
 			switch( $column ) {
 				case 'shipping_method':
 					$shipping_method = ( ! empty( $data[ self::$fields['shipping_method'] ] ) ) ? $data[ self::$fields['shipping_method'] ] : '';
