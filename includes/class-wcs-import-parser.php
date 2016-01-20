@@ -389,6 +389,33 @@ class WCS_Import_Parser {
 					$shipping_method = self::add_shipping_lines( $subscription, $data );
 				}
 
+				if ( ! empty( $data[ self::$fields['tax_items'] ] ) ) {
+					$tax_items = explode( ';', $data[ self::$fields['tax_items'] ] );
+
+					if ( ! empty( $tax_items ) ) {
+						foreach( $tax_items as $tax_item ) {
+							$tax_data = array();
+
+							foreach ( explode( '|', $tax_item ) as $item ) {
+								list( $name, $value ) = explode( ':', $item );
+								$tax_data[ trim( $name ) ] = trim( $value );
+							}
+
+							if ( ! empty( $tax_data['code'] ) ) {
+								if ( ! self::$test_mode ) {
+									$tax_id = $subscription->add_tax( $tax_data['code'], ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) ) ? $data[ self::$fields['order_shipping_tax'] ] : 0, ( ! empty( $data[ self::$fields['order_tax'] ] ) ) ? $data[ self::$fields['order_tax'] ] : 0 );
+
+									if ( ! $tax_id ) {
+										$result['warning'][] = esc_html__( 'Tax line item could not properly be added to this subscription. Please review this subscription.', 'wcs-importer' );
+									}
+								}
+							} else {
+								$result['warning'][] = esc_html__( sprintf( 'Missing tax code from column: %s', self::$fields['tax_items'] ), 'wcs-importer' );
+							}
+						}
+					}
+				}
+
 				// only show the following warnings on the import when the subscription requires shipping
 				if ( ! self::$all_virtual ) {
 					if ( ! empty( $missing_shipping_addresses ) ) {
