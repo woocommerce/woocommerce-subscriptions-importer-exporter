@@ -390,6 +390,10 @@ class WCS_Import_Parser {
 					}
 				}
 
+				if ( ! empty( $data[ self::$fields['fee_items'] ] ) ) {
+					self::add_fees( $subscription, $data );
+				}
+
 				// only show the following warnings on the import when the subscription requires shipping
 				if ( ! self::$all_virtual ) {
 					if ( ! empty( $missing_shipping_addresses ) ) {
@@ -716,6 +720,61 @@ class WCS_Import_Parser {
 		}
 
 		return $product_string;
+	}
+
+	/**
+	 * Import fee line items
+	 *
+	 * @since 1.0
+	 * @param WC_Subscription $subscription
+	 * @param array $data
+	 */
+	public static function add_fees( $subscription, $data ) {
+		$fee_items = explode( ';', $data[ self::$fields['fee_items'] ] );
+
+		if ( ! empty( $fee_items ) ) {
+			foreach( $fee_items as $fee_item ) {
+				$fee_data = array();
+
+				foreach ( explode( '|', $fee_item ) as $item ) {
+					list( $name, $value ) = explode( ':', $item );
+					$fee_data[ trim( $name ) ] = trim( $value );
+				}
+
+				if ( empty( $fee_data['name'] ) ) {
+					throw new Exception( __( 'Fee name is missing from your CSV. This subscription has not been imported.', 'wcs-importer' ) );
+				}
+
+				$fee            = new stdClass();
+				$fee->id        = sanitize_title( $fee_data['name'] );
+				$fee->name      = $fee_data['name'];
+				$fee->amount    = isset( $fee_data['total'] ) ? floatval( $fee_data['total'] ) : 0;
+				$fee->taxable   = false;
+				$fee->tax       = 0;
+				$fee->tax_data  = array();
+				$fee->tax_class = '';
+
+				if ( ! empty( $fee_data['tax'] ) ) {
+
+					if ( empty( $fee_data['tax_class'] ) ) {
+						throw new Exception( __( 'You must include a tax_class and tax amount when importing fee taxes. This subscription has not been imported.', 'wcs-importer' ) );
+					}
+
+					$fee->tax       = wc_format_refund_total( $fee_data['tax'] );
+					$fee->tax_class = $fee_data['tax_class'];
+					$fee->taxable   = true;
+				}
+
+				if ( ! self::$test_mode ) {
+
+					$fee_id = $subscription->add_fee( $fee );
+
+					if ( ! $fee_id ) {
+						throw new Exception( __( 'Could not add the fee to your subscription, the subscription has not been imported.', 'wcs-importer' ) );
+					}
+				}
+			}
+		}
 	}
 }
 
