@@ -355,12 +355,12 @@ class WCS_Import_Admin {
 									<?php foreach ( array_merge( WCS_Import_Parser::$order_meta_fields, WCS_Import_Parser::$user_meta_fields ) as $option ) : ?>
 										<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
 									<?php endforeach; ?>
+									<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
 									<option value="order_items" <?php selected( $header, 'order_items' ); ?>>order_items</option>
 									<option value="order_notes" <?php selected( $header, 'order_notes' ); ?>>order_notes</option>
 									<option value="coupon_items" <?php selected( $header, 'coupon_items' ); ?>>coupon_items</option>
 									<option value="fee_items" <?php selected( $header, 'fee_items' ); ?>>fee_items</option>
 									<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
-									<option value="shipping_method_title" <?php selected( $header, 'shipping_method_title' ); ?>>shipping_method_title</option>
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Payment Method Meta', 'wcs-importer' ); ?>">
@@ -451,7 +451,6 @@ class WCS_Import_Admin {
 			'shipping_postcode'           => '',
 			'shipping_country'            => '',
 			'shipping_method'             => '',
-			'shipping_method_title'       => '',
 			'order_discount'              => '',
 			'cart_discount'               => '',
 			'cart_discount_tax'           => '',

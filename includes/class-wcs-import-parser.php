@@ -36,7 +36,6 @@ class WCS_Import_Parser {
 		'order_discount',
 		'order_total',
 		'payment_method',
-		'shipping_method',
 	);
 
 	public static $user_meta_fields = array(
@@ -179,14 +178,6 @@ class WCS_Import_Parser {
 
 		foreach( array_merge( self::$order_meta_fields, self::$user_meta_fields ) as $column ) {
 			switch( $column ) {
-				case 'shipping_method':
-					$shipping_method = ( ! empty( $data[ self::$fields['shipping_method'] ] ) ) ? $data[ self::$fields['shipping_method'] ] : '';
-					$title           = ( ! empty( $data[ self::$fields['shipping_method_title'] ] ) ) ? $data[ self::$fields['shipping_method_title'] ] : $shipping_method;
-
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $shipping_method );
-					$post_meta[] = array( 'key' => '_shipping_method_title', 'value' => $title );
-					break;
-
 				case 'order_shipping':
 					$value       = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : 0;
 					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
@@ -392,6 +383,10 @@ class WCS_Import_Parser {
 
 				if ( ! empty( $data[ self::$fields['fee_items'] ] ) ) {
 					self::add_fees( $subscription, $data );
+				}
+
+				if ( ! empty( $data[ self::$fields['shipping_method'] ] ) ) {
+					$shipping_method = self::add_shipping_lines( $subscription, $data );
 				}
 
 				// only show the following warnings on the import when the subscription requires shipping
@@ -775,6 +770,47 @@ class WCS_Import_Parser {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Import subscription shipping lines
+	 *
+	 * @since 1.0
+	 * @param WC_Subscription $subscription
+	 * @param array $data
+	 * @return string Shipping Method
+	 */
+	public static function add_shipping_lines( $subscription, $data ) {
+		$shipping_items   = explode( ';', $data[ self::$fields['shipping_method'] ] );
+		$shipping_method  = '';
+
+		if ( ! empty( $shipping_items ) ) {
+			foreach( $shipping_items as $shipping_item ) {
+				$shipping_line = array();
+
+				foreach ( explode( '|', $shipping_item ) as $item ) {
+					list( $name, $value ) = explode( ':', $item );
+					$shipping_line[ trim( $name ) ] = trim( $value );
+				}
+
+				if ( ! self::$test_mode ) {
+					$shipping_method = isset( $shipping_line['method_id'] ) ? $shipping_line['method_id'] : '';
+					$shipping_title  = isset( $shipping_line['method_title'] ) ? $shipping_line['method_title'] : $shipping_method;
+
+					$rate        = new WC_Shipping_Rate( $shipping_method, $shipping_title, isset( $shipping_line['total'] ) ? floatval( $shipping_line['total'] ) : 0, array(), $shipping_method );
+					$shipping_id = $subscription->add_shipping( $rate );
+
+					if ( ! $shipping_id ) {
+						throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription, a subscription not been created for this row.', 'wcs-importer' ) );
+					}
+
+					update_post_meta( $subscription->id, '_shipping_method', $shipping_method );
+					update_post_meta( $subscription->id, '_shipping_method_title', $shipping_title );
+				}
+			}
+		}
+
+		return $shipping_method;
 	}
 }
 
