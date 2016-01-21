@@ -48,6 +48,32 @@ class WCS_Export_Writer {
 			}
 		}
 
+		if ( isset( self::$headers['payment_method_post_meta'] ) || isset( self::$headers['payment_method_user_meta'] ) ) {
+			$payment_method_table = apply_filters( 'woocommerce_subscription_payment_meta', array(), $subscription );
+
+			if ( is_array( $payment_method_table ) && ! empty( $payment_method_table[ $subscription->payment_method ] ) ) {
+				$post_meta = $user_meta = array();
+
+				foreach ( $payment_method_table[ $subscription->payment_method ] as $meta_table => $meta ) {
+					foreach ( $meta as $meta_key => $meta_data ) {
+						switch ( $meta_table ) {
+							case 'post_meta':
+							case 'postmeta':
+								$post_meta[] = $meta_key . ':' . $meta_data['value'];
+								break;
+							case 'usermeta':
+							case 'user_meta':
+								$user_meta[] = $meta_key . ':' . $meta_data['value'];
+								break;
+						}
+					}
+				}
+
+				$payment_post_meta = implode( '|', $post_meta );
+				$payment_user_meta = implode( '|', $user_meta );
+			}
+		}
+
 		foreach ( self::$headers as $header_key => $_ ) {
 			switch ( $header_key ) {
 				case 'subscription_id':
@@ -102,6 +128,12 @@ class WCS_Export_Writer {
 				case 'shipping_company':
 				case 'customer_note':
 					$value = $subscription->{$header_key};
+					break;
+				case 'payment_method_post_meta':
+					$value = ( ! empty( $payment_post_meta ) ) ? $payment_post_meta : '';
+					break;
+				case 'payment_method_user_meta':
+					$value = ( ! empty( $payment_user_meta ) ) ? $payment_user_meta : '';
 					break;
 				case 'order_notes':
 					remove_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ) );

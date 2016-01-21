@@ -136,12 +136,15 @@ class WCS_Export_Admin {
 							</select>
 						</td>
 					</tr>
+					<tr>
+						<td><label><?php esc_html_e( 'Payment method CC Tokens', 'wcs-import-export' ); ?>:</label></td>
+						<td><input type="checkbox" name="paymentmeta"><?php esc_html_e( 'Export your customers payment and credit cart tokens to the CSV', 'wcs-import-export' ); ?></td>
+					</tr>
 				</tbody>
 		</table>
 
 	<?php
 		$this->export_headers();
-
 	}
 
 	/**
@@ -174,6 +177,8 @@ class WCS_Export_Admin {
 			'order_total'           => __( 'Subscription Total', 'wcs-import-export' ),
 			'payment_method'        => __( 'Payment Method', 'wcs-import-export' ),
 			'payment_method_title'  => __( 'Payment Method Title', 'wcs-import-export' ),
+			'payment_method_post_meta' => __( 'Payment Method Post Meta', 'wcs-import-export' ),
+			'payment_method_user_meta' => __( 'Payment Method User Meta', 'wcs-import-export' ),
 			'shipping_method'       => __( 'Shipping Method', 'wcs-import-export' ),
 			'billing_first_name'    => __( 'Billing First Name', 'wcs-import-export' ),
 			'billing_last_name'     => __( 'Billing Last Name', 'wcs-import-export' ),
@@ -296,9 +301,15 @@ class WCS_Export_Admin {
 			'payment_method' => $_POST['payment'],
 		);
 
+		WC_Payment_Gateways::instance();
 		$subscriptions = $this->get_subscriptions_to_export( $filters );
 
 		if ( ! empty( $subscriptions ) ) {
+			if ( empty( $_POST['paymentmeta'] ) ) {
+				unset( $headers['payment_method_post_meta'] );
+				unset( $headers['payment_method_user_meta'] );
+			}
+
 			WCS_Export_Writer::write_headers( $headers );
 
 			foreach ( $subscriptions as $subscription ) {
