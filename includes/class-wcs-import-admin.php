@@ -340,8 +340,6 @@ class WCS_Import_Admin {
 							<select name="mapto[<?php echo $header; ?>]">
 								<option value="0"><?php esc_html_e( 'Do not import', 'wcs-importer' ); ?></option>
 								<optgroup label="<?php esc_attr_e( 'Custom', 'wcs-importer' ); ?>">
-									<option value='payment_method_post_meta'>payment_method_post_meta</option>
-									<option value='payment_method_user_meta'>payment_method_user_meta</option>
 									<option value="custom_user_post_meta">custom_user_post_meta</option>
 									<option value="custom_user_meta">custom_user_meta</option>
 									<option value="custom_post_meta">custom_post_meta</option>
@@ -362,6 +360,8 @@ class WCS_Import_Admin {
 									<option value="fee_items" <?php selected( $header, 'fee_items' ); ?>>fee_items</option>
 									<option value="tax_items" <?php selected( $header, 'tax_items' ); ?>>tax_items</option>
 									<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
+									<option value="payment_method_post_meta" <?php selected( $header, 'payment_method_post_meta' ); ?>>payment_method_post_meta</option>
+									<option value="payment_method_user_meta" <?php selected( $header, 'payment_method_user_meta' ); ?>>payment_method_user_meta</option>
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Payment Method Meta', 'wcs-importer' ); ?>">
@@ -419,8 +419,8 @@ class WCS_Import_Admin {
 			'custom_user_meta'            => array(),
 			'custom_post_meta'            => array(),
 			'custom_user_post_meta'       => array(),
-			'payment_method_post_meta'    => array(),
-			'payment_method_user_meta'    => array(),
+			'payment_method_post_meta'    => '',
+			'payment_method_user_meta'    => '',
 			'customer_id'                 => '',
 			'status'                      => '',
 			'start_date'                  => '',
