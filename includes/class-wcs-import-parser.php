@@ -387,7 +387,7 @@ class WCS_Import_Parser {
 				}
 
 				if ( ! empty( $data[ self::$fields['fee_items'] ] ) ) {
-					self::add_fees( $subscription, $data );
+					self::add_fees( $subscription, $data, $chosen_tax_rate_id );
 				}
 
 				if ( ! empty( $data[ self::$fields['shipping_method'] ] ) ) {
@@ -743,8 +743,9 @@ class WCS_Import_Parser {
 	 * @since 1.0
 	 * @param WC_Subscription $subscription
 	 * @param array $data
+	 * @param int chosen_tax_rate_id
 	 */
-	public static function add_fees( $subscription, $data ) {
+	public static function add_fees( $subscription, $data, $chosen_tax_rate_id ) {
 		$fee_items = explode( ';', $data[ self::$fields['fee_items'] ] );
 
 		if ( ! empty( $fee_items ) ) {
@@ -778,10 +779,13 @@ class WCS_Import_Parser {
 					$fee->tax       = wc_format_refund_total( $fee_data['tax'] );
 					$fee->tax_class = $fee_data['tax_class'];
 					$fee->taxable   = true;
+
+					if ( ! empty( $chosen_tax_rate_id ) ) {
+						$fee->tax_data = array( 'total' => array( $chosen_tax_rate_id => $fee->tax ), 'subtotal' => array( $chosen_tax_rate_id => $fee->tax ) );
+					}
 				}
 
 				if ( ! self::$test_mode ) {
-
 					$fee_id = $subscription->add_fee( $fee );
 
 					if ( ! $fee_id ) {
