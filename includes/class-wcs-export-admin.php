@@ -117,7 +117,7 @@ class WCS_Export_Admin {
 						<td style="text-align:top"><?php esc_html_e( 'Subscription Statuses', 'wcs-import-export' ); ?>:</td>
 						<td>
 							<?php foreach( $statuses as $status => $status_display ) : ?>
-								<input type="checkbox" name="status[<?php echo $status; ?>]" checked><?php echo $status_display; ?>  [<?php echo ! empty( $status_count[ $status ] ) ? $status_count[ $status ] : 0; ?>]<br>
+								<input type="checkbox" name="status[<?php echo esc_attr( $status ); ?>]" checked><?php echo esc_html( $status_display ); ?>  [<?php echo esc_html( ! empty( $status_count[ $status ] ) ? $status_count[ $status ] : 0 ); ?>]<br>
 							<?php endforeach; ?>
 						</td>
 					</tr>
