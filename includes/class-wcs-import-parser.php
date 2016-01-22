@@ -381,7 +381,7 @@ class WCS_Import_Parser {
 								$order_data[ trim( $name ) ] = trim( $value );
 							}
 
-							$result['item'] .= self::add_product( $subscription, $order_data );
+							$result['item'] .= self::add_product( $subscription, $order_data, $chosen_tax_rate_id );
 						}
 					}
 				}
@@ -673,7 +673,7 @@ class WCS_Import_Parser {
 	 * @param array $data
 	 * @return string
 	 */
-	public static function add_product( $subscription, $data ) {
+	public static function add_product( $subscription, $data, $chosen_tax_rate_id ) {
 		$item_args        = array();
 		$item_args['qty'] = isset( $data['quantity'] ) ? $data['quantity'] : 1;
 
@@ -715,6 +715,11 @@ class WCS_Import_Parser {
 
 		if ( self::$all_virtual && ! $_product->is_virtual() ) {
 			self::$all_virtual = false;
+		}
+
+		if ( ! empty( $item_args['totals']['tax'] ) && ! empty( $chosen_tax_rate_id ) ) {
+			$item_args['totals']['tax_data']['total']    = array( $chosen_tax_rate_id => $item_args['totals']['tax'] );
+			$item_args['totals']['tax_data']['subtotal'] = array( $chosen_tax_rate_id => $item_args['totals']['tax'] );
 		}
 
 		if ( ! self::$test_mode ) {
