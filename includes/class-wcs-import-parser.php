@@ -798,9 +798,10 @@ class WCS_Import_Parser {
 	 * @since 1.0
 	 * @param WC_Subscription $subscription
 	 * @param array $data
-	 * @return string Shipping Method
+	 * @param int $chosen_tax_rate_id
+	 * @return string
 	 */
-	public static function add_shipping_lines( $subscription, $data ) {
+	public static function add_shipping_lines( $subscription, $data, $chosen_tax_rate_id ) {
 		$shipping_items   = explode( ';', $data[ self::$fields['shipping_method'] ] );
 		$shipping_method  = '';
 
@@ -816,10 +817,13 @@ class WCS_Import_Parser {
 				if ( ! self::$test_mode ) {
 					$shipping_method = isset( $shipping_line['method_id'] ) ? $shipping_line['method_id'] : '';
 					$shipping_title  = isset( $shipping_line['method_title'] ) ? $shipping_line['method_title'] : $shipping_method;
+					$rate            = new WC_Shipping_Rate( $shipping_method, $shipping_title, isset( $shipping_line['total'] ) ? floatval( $shipping_line['total'] ) : 0, array(), $shipping_method );
 
-					$rate        = new WC_Shipping_Rate( $shipping_method, $shipping_title, isset( $shipping_line['total'] ) ? floatval( $shipping_line['total'] ) : 0, array(), $shipping_method );
+					if ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) && ! empty( $chosen_tax_rate_id ) ) {
+						$rate->taxes = array( $chosen_tax_rate_id => $data[ self::$fields['order_shipping_tax'] ] );
+					}
+
 					$shipping_id = $subscription->add_shipping( $rate );
-
 					if ( ! $shipping_id ) {
 						throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription, a subscription not been created for this row.', 'wcs-importer' ) );
 					}
