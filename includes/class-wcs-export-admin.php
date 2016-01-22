@@ -24,6 +24,8 @@ class WCS_Export_Admin {
 
 		add_action( 'admin_init', array( &$this, 'export_handler' ) );
 
+		add_filter( 'woocommerce_screen_ids', array( &$this, 'register_export_screen_id' ) );
+
 		$this->action = admin_url( 'admin.php?page=export_subscriptions' );
 	}
 
@@ -121,7 +123,7 @@ class WCS_Export_Admin {
 					</tr>
 					<tr>
 						<td><label for="customer"><?php esc_html_e( 'Export for Customer', 'wcs-import-export' ); ?>:</label></td>
-						<td><input type="number" name="customer" value="" placeholder="customer id" /></td>
+						<td><input type="hidden" class="wc-customer-search" name="customer" data-placeholder="<?php esc_attr_e( 'Search for a customer&hellip;', 'wcs-import-export' ); ?>" data-selected="" value="" data-allow_clear="true" /></td>
 					</tr>
 					<tr>
 						<td><label><?php esc_html_e( 'Payment method', 'wcs-import-export' ); ?>:</label></td>
@@ -351,4 +353,17 @@ class WCS_Export_Admin {
 		}
 	}
 
+	/**
+	 * Filter screen ids to add the export page so that WooCommerce will load all their admin scripts
+	 *
+	 * @since 1.0
+	 * @param array $screen_ids
+	 */
+	public function register_export_screen_id( $screen_ids ) {
+		if ( isset( $_GET['page'] ) && 'export_subscriptions' == $_GET['page'] ) {
+			$screen_ids[] = 'woocommerce_page_export_subscriptions';
+		}
+
+		return $screen_ids;
+	}
 }
