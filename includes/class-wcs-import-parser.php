@@ -771,13 +771,8 @@ class WCS_Import_Parser {
 				$fee->tax_class = '';
 
 				if ( ! empty( $fee_data['tax'] ) ) {
-
-					if ( empty( $fee_data['tax_class'] ) ) {
-						throw new Exception( __( 'You must include a tax_class and tax amount when importing fee taxes. This subscription has not been imported.', 'wcs-importer' ) );
-					}
-
 					$fee->tax       = wc_format_refund_total( $fee_data['tax'] );
-					$fee->tax_class = $fee_data['tax_class'];
+					$fee->tax_class = ( ! empty( $fee_data['tax_class'] ) ) ? $fee_data['tax_class'] : '';
 					$fee->taxable   = true;
 
 					if ( ! empty( $chosen_tax_rate_id ) ) {
