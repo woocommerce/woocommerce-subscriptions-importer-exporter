@@ -22,13 +22,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<td id="wcs-importer_test_results"><strong><?php echo sprintf( __( '%s0%s tests passed, %s0%s tests failed.', 'wcs-importer' ), '<span id="wcs-test-passed">', '</span>', '<span id="wcs-test-failed">', '</span>' ); ?></strong></td>
 		</tr>
 		<tr>
-			<th colspan="2"><span id="wcs-fatal-details">0</span> <?php esc_html_e( 'Error/s', 'wcs-importer' ); ?>:</th>
+			<th colspan="2"><span id="wcsi-error-count">0</span> <span id="wcsi-error-title"></span>:</th>
 		</tr>
-		<tr><td></td><td id="wcsi_test_errors_details"></td></tr>
+		<tr><td></td><td id="wcsi_test_errors"></td></tr>
 		<tr class="alternate">
-			<th colspan="2"><span id="wcs-warning-details">0</span> <?php esc_html_e( 'Warning/s', 'wcs-importer' ); ?>:</th>
+			<th colspan="2"><span id="wcsi-warning-count">0</span> <span id="wcsi-warning-title"></span>:</th>
 		</tr>
-		<tr class="alternate"><td></td><td id="wcsi_test_warnings_details"></td></tr>
+		<tr class="alternate"><td></td><td id="wcsi_test_warnings"></td></tr>
 	</tbody>
 </table>
 <div id="wcs-completed-message" style="display: none;">

@@ -89,17 +89,15 @@ jQuery(document).ready(function($){
 					$('#wcsi-all-count').html( '(' + import_count + ')' );
 
 				} else {
-					var success = 0,
-						failed = 0,
+					var success  = 0,
+						failed   = 0,
 						critical = 0,
-						minor = 0,
-						tests = 0;
+						minor    = 0;
 
-					var errors = [],
+					var errors   = [],
 						warnings = [];
 
 					for( var i = 0; i < results.length; i++ ) {
-						tests++;
 
 						if( results[i].error.length > 0 ) {
 							failed++;
@@ -127,21 +125,25 @@ jQuery(document).ready(function($){
 
 					$('#wcs-test-passed').html( parseInt( $('#wcs-test-passed').html() ) + success );
 					$('#wcs-test-failed').html( parseInt( $('#wcs-test-failed').html() ) + failed );
-					$('#wcs-fatal-details').html( parseInt( $('#wcs-fatal-details').html() ) + critical );
-					$('#wcs-warning-details').html( parseInt( $('#wcs-warning-details').html() ) + minor );
+
+					$('#wcsi-error-count').html( parseInt( $('#wcsi-error-count').html() ) + critical );
+					$('#wcsi-error-title').html( critical > 1 || critical == 0 ? wcsi_data.errors : wcsi_data.error );
+
+					$('#wcsi-warning-count').html( parseInt( $('#wcsi-warning-count').html() ) + minor );
+					$('#wcsi-warning-title').html( minor > 1 || minor == 0 ? wcsi_data.warnings : wcsi_data.warning );
 
 					var results_text = '';
 					for( key in errors ) {
 						results_text += '[' + errors[key].length + '] ' + key + ' ' + wcsi_data.located_at + ': ' + errors[key].toString() + '.<br/>';
 					}
-					$('#wcsi_test_errors_details').append( results_text );
+					$('#wcsi_test_errors').append( results_text );
 
 					results_text = '';
 					for( warningKey in warnings ) {
 						results_text += '[' + warnings[warningKey].length + '] ' + warningKey + ' ' + wcsi_data.located_at + ': ' + warnings[warningKey].toString() + '.<br/>';
 					}
 
-					$('#wcsi_test_warnings_details').append( results_text );
+					$('#wcsi_test_warnings').append( results_text );
 				}
 
 				counter += 2;
@@ -152,7 +154,7 @@ jQuery(document).ready(function($){
 						$('.finished').html('<td colspan="6" class="row">' + wcsi_data.finished_importing + '</td>');
 					}
 					$('#wcs-completed-message').show();
-					$('#wcs-completed-percent').html( '100%' );
+					$('#wcs-completed-percent').html('100%');
 				} else {
 					// calculate percentage completed
 					$('#wcs-completed-percent').html( ( ( ( ( counter/2 ) * wcsi_data.rows_per_request ) / ( wcsi_data.total * wcsi_data.rows_per_request ) ) * 100).toFixed(0) + '%' );

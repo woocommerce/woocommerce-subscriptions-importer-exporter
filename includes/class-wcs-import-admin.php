@@ -125,6 +125,8 @@ class WCS_Import_Admin {
 					'edit_order' 			=> esc_html__( 'Edit Order', 'wcs-importer' ),
 					'warning'				=> esc_html__( 'Warning', 'wcs-importer' ),
 					'warnings'				=> esc_html__( 'Warnings', 'wcs-importer' ),
+					'error'					=> esc_html__( 'Error', 'wcs-importer' ),
+					'errors'				=> esc_html__( 'Errors', 'wcs-importer' ),
 					'located_at'			=> esc_html__( 'Located at rows', 'wcs-importer' ),
 
 					// Data for procesing the file
