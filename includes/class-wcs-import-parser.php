@@ -818,9 +818,10 @@ class WCS_Import_Parser {
 					$shipping_line[ trim( $name ) ] = trim( $value );
 				}
 
+				$shipping_method = isset( $shipping_line['method_id'] ) ? $shipping_line['method_id'] : '';
+				$shipping_title  = isset( $shipping_line['method_title'] ) ? $shipping_line['method_title'] : $shipping_method;
+
 				if ( ! self::$test_mode ) {
-					$shipping_method = isset( $shipping_line['method_id'] ) ? $shipping_line['method_id'] : '';
-					$shipping_title  = isset( $shipping_line['method_title'] ) ? $shipping_line['method_title'] : $shipping_method;
 					$rate            = new WC_Shipping_Rate( $shipping_method, $shipping_title, isset( $shipping_line['total'] ) ? floatval( $shipping_line['total'] ) : 0, array(), $shipping_method );
 
 					if ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) && ! empty( $chosen_tax_rate_id ) ) {
