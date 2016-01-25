@@ -356,18 +356,22 @@ class WCS_Import_Parser {
 				}
 
 				if ( ! empty( $data[ self::$fields['order_items'] ] ) ) {
-					$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
+					if ( is_numeric( $data[ self::$fields['order_items'] ] ) ) {
+						$result['item'] = self::add_product( $subscription, array( 'product_id' => absint( $data[ self::$fields['order_items'] ] ) ), $chosen_tax_rate_id );
+					} else {
+						$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
 
-					if ( ! empty( $order_items ) ) {
-						foreach( $order_items as $order_item ) {
-							$order_data = array();
+						if ( ! empty( $order_items ) ) {
+							foreach( $order_items as $order_item ) {
+								$item_data = array();
 
-							foreach ( explode( '|', $order_item ) as $item ) {
-								list( $name, $value ) = explode( ':', $item );
-								$order_data[ trim( $name ) ] = trim( $value );
+								foreach ( explode( '|', $order_item ) as $item ) {
+									list( $name, $value ) = explode( ':', $item );
+									$item_data[ trim( $name ) ] = trim( $value );
+								}
+
+								$result['item'] .= self::add_product( $subscription, $item_data, $chosen_tax_rate_id );
 							}
-
-							$result['item'] .= self::add_product( $subscription, $order_data, $chosen_tax_rate_id );
 						}
 					}
 				}
