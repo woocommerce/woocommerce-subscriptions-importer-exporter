@@ -821,25 +821,27 @@ class WCS_Import_Parser {
 					$tax_data[ trim( $name ) ] = trim( $value );
 				}
 
-				if ( ! empty( $tax_data['code'] ) ) {
+				if ( ! empty( $tax_data['id'] ) ) {
+					$tax_rate = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_id = %s", $tax_data['id'] ) );
+				} elseif ( ! empty( $tax_data['code'] ) ) {
 					$tax_rate = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_name = %s ORDER BY tax_rate_priority LIMIT 1", $tax_data['code'] ) );
+				} else {
+					$result['warning'][] = esc_html__( sprintf( 'Missing tax code or ID from column: %s', self::$fields['tax_items'] ), 'wcs-importer' );
+				}
 
-					if ( ! empty( $tax_rate ) ) {
-						if ( ! self::$test_mode ) {
-							$tax_rate = array_pop( $tax_rate );
-							$tax_id   = $subscription->add_tax( $tax_rate->tax_rate_id, ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) ) ? $data[ self::$fields['order_shipping_tax'] ] : 0, ( ! empty( $data[ self::$fields['order_tax'] ] ) ) ? $data[ self::$fields['order_tax'] ] : 0 );
+				if ( ! empty( $tax_rate ) ) {
+					if ( ! self::$test_mode ) {
+						$tax_rate = array_pop( $tax_rate );
+						$tax_id   = $subscription->add_tax( $tax_rate->tax_rate_id, ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) ) ? $data[ self::$fields['order_shipping_tax'] ] : 0, ( ! empty( $data[ self::$fields['order_tax'] ] ) ) ? $data[ self::$fields['order_tax'] ] : 0 );
 
-							if ( ! $tax_id ) {
-								$result['warning'][] = esc_html__( 'Tax line item could not properly be added to this subscription. Please review this subscription.', 'wcs-importer' );
-							} else {
-								$chosen_tax_rate_id = $tax_rate->tax_rate_id;
-							}
+						if ( ! $tax_id ) {
+							$result['warning'][] = esc_html__( 'Tax line item could not properly be added to this subscription. Please review this subscription.', 'wcs-importer' );
+						} else {
+							$chosen_tax_rate_id = $tax_rate->tax_rate_id;
 						}
-					} else {
-						$result['warning'][] = esc_html__( sprintf( 'The tax code "%s" could not be found in your store.', $tax_data['code'] ), 'wcs-importer' );
 					}
 				} else {
-					$result['warning'][] = esc_html__( sprintf( 'Missing tax code from column: %s', self::$fields['tax_items'] ), 'wcs-importer' );
+					$result['warning'][] = esc_html__( sprintf( 'The tax code "%s" could not be found in your store.', $tax_data['code'] ), 'wcs-importer' );
 				}
 			}
 		}
