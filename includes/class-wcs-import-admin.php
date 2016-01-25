@@ -363,7 +363,7 @@ class WCS_Import_Admin {
 									<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
 									<option value="payment_method_post_meta" <?php selected( $header, 'payment_method_post_meta' ); ?>>payment_method_post_meta</option>
 									<option value="payment_method_user_meta" <?php selected( $header, 'payment_method_user_meta' ); ?>>payment_method_user_meta</option>
-									<option value="download_permission_granted" <?php selected( $header, 'download_permission' ); ?>>download_permission_granted</option>
+									<option value="download_permission_granted" <?php selected( $header, 'download_permissions' ); ?>>download_permission_granted</option>
 								</optgroup>
 							</select>
 						</td>
@@ -447,7 +447,6 @@ class WCS_Import_Admin {
 			'shipping_postcode'           => '',
 			'shipping_country'            => '',
 			'shipping_method'             => '',
-			'order_discount'              => '',
 			'cart_discount'               => '',
 			'cart_discount_tax'           => '',
 			'order_shipping_tax'          => '',
