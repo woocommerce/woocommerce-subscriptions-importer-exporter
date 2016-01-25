@@ -356,6 +356,7 @@ class WCS_Import_Admin {
 									<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
 									<option value="order_items" <?php selected( $header, 'order_items' ); ?>>order_items</option>
 									<option value="order_notes" <?php selected( $header, 'order_notes' ); ?>>order_notes</option>
+									<option value="customer_note" <?php selected( $header, 'customer_note' ); ?>>customer_note</option>
 									<option value="coupon_items" <?php selected( $header, 'coupon_items' ); ?>>coupon_items</option>
 									<option value="fee_items" <?php selected( $header, 'fee_items' ); ?>>fee_items</option>
 									<option value="tax_items" <?php selected( $header, 'tax_items' ); ?>>tax_items</option>
@@ -455,6 +456,7 @@ class WCS_Import_Admin {
 			'order_total'                 => '',
 			'order_items'                 => '',
 			'order_notes'                 => '',
+			'customer_note'               => '',
 			'coupon_items'                => '',
 			'fee_items'                   => '',
 			'tax_items'                   => '',
