@@ -177,11 +177,8 @@ class WCS_Import_Parser {
 		foreach( array_merge( self::$order_meta_fields, self::$user_meta_fields ) as $column ) {
 			switch( $column ) {
 				case 'order_shipping':
-					$value       = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : 0;
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
-					break;
-
 				case 'order_shipping_tax':
+				case 'order_total':
 					$value       = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : 0;
 					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
 					break;
@@ -231,16 +228,6 @@ class WCS_Import_Parser {
 
 					if ( empty( $value ) ) {
 						$missing_billing_addresses[] = $column;
-					}
-
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
-					break;
-
-				case 'order_total':
-					if ( ! empty( $data[ self::$fields[ $column ] ] ) ) {
-						$value = $data[ self::$fields[ $column ] ];
-					} else {
-						$value = 0;
 					}
 
 					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
