@@ -120,7 +120,7 @@ class WCS_Import_Admin {
 				$script_data = array(
 					'success' 				=> esc_html__( 'success', 'wcs-importer' ),
 					'failed' 				=> esc_html__( 'failed', 'wcs-importer' ),
-					'error_string'			=> sprintf( esc_html__( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
+					'error_string'			=> esc_html( sprintf( __( 'Row #%s from CSV %sfailed to import%s with error/s: %s', 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ) ),
 					'finished_importing' 	=> esc_html__( 'Finished Importing', 'wcs-importer' ),
 					'edit_order' 			=> esc_html__( 'Edit Order', 'wcs-importer' ),
 					'warning'				=> esc_html__( 'Warning', 'wcs-importer' ),
@@ -133,9 +133,9 @@ class WCS_Import_Admin {
 					'start_row_num'    => $row_start,
 					'ajax_url'         => admin_url( 'admin-ajax.php' ),
 					'rows_per_request' => $this->rows_per_request,
-					'test_mode'        => ( 'yes' == $_GET['test_mode'] ) ? "true" : "false",
-					'email_customer'   => ( 'yes' == $_GET['email_customer'] ) ? "true" : "false",
-					'add_memberships'  => ( 'yes' == $_GET['add_memberships'] ) ? "true" : "false",
+					'test_mode'        => ( 'yes' == $_GET['test_mode'] ) ? 'true' : 'false',
+					'email_customer'   => ( 'yes' == $_GET['email_customer'] ) ? 'true' : 'false',
+					'add_memberships'  => ( 'yes' == $_GET['add_memberships'] ) ? 'true' : 'false',
 					'total'            => $total,
 				);
 
