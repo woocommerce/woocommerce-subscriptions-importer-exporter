@@ -18,6 +18,7 @@ if ( ! function_exists( 'woothemes_queue_update' ) || ! function_exists( 'is_woo
 
 require_once( 'includes/class-wcs-import-admin.php' );
 require_once( 'includes/class-wcs-import-parser.php' );
+require_once( 'includes/class-wcs-import-logger.php' );
 require_once( 'includes/wcsi-functions.php' );
 
 class WCS_Importer {
