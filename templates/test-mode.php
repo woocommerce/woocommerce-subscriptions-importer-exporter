@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <h3><?php esc_html_e( 'Test Run Results', 'wcs-importer' ); ?></h3>
-<table id="wcs-import-progress" class="widefat_importer widefat">
+<table id="wcsi-import-progress" class="widefat_importer widefat">
 	<thead>
 		<tr>
 			<th class="row" colspan="2"><?php esc_html_e( 'Importer Test Results', 'wcs-importer' ); ?></th>
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<tbody>
 		<tr class="alternate">
 			<th width="20"><strong><?php esc_html_e( 'Results', 'wcs-importer' ); ?></strong></th>
-			<td id="wcs-importer_test_results"><strong><?php echo sprintf( __( '%s0%s tests passed, %s0%s tests failed.', 'wcs-importer' ), '<span id="wcs-test-passed">', '</span>', '<span id="wcs-test-failed">', '</span>' ); ?></strong></td>
+			<td id="wcsi-importer_test_results"><strong><?php echo wp_kses( sprintf( __( '%1$s0%2$s tests passed, %3$s0%4$s tests failed.', 'wcs-importer' ), '<span id="wcsi-test-passed">', '</span>', '<span id="wcsi-test-failed">', '</span>' ), array( 'span' => array( 'id' => true ) ) ); ?>	</strong></td>
 		</tr>
 		<tr>
 			<th colspan="2"><span id="wcsi-error-count">0</span> <span id="wcsi-error-title"></span>:</th>
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<tr class="alternate"><td></td><td id="wcsi_test_warnings"></td></tr>
 	</tbody>
 </table>
-<div id="wcs-completed-message" style="display: none;">
+<div id="wcsi-completed-message" style="display: none;">
 	<p><?php esc_html_e( 'Test Finished!', 'wcs-importer' );?></p>
 	<a class="button" href="<?php echo esc_attr( wp_nonce_url( $action, 'import-upload' ) ); ?> "><?php esc_html_e( 'Run Import' , 'wcs-importer' ); ?></a>
 </div>

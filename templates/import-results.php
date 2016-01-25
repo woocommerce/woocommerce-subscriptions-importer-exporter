@@ -10,8 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <h3><?php esc_html_e( 'Importing Results', 'wcs-importer' ); ?></h3>
 
-<p id="wcsi-timeout" style="display: none;"><?php echo sprintf( esc_html__( 'Error: The importing process has timed out. Please check the CSV is correct and do a test run before importing by enabling the checkbox on the Importer Home screen. %s Start Over. %s', 'wcs-importer' ), '<a href="' . $this->admin_url . '">', '</a>' ); ?></p>
-<p id="wcsi-time-completion"><?php echo sprintf( esc_html__( 'Total Estimated Import Time Between:  %s 0%s minutes. ( %s0%s Completed! )', 'wcs-importer'), '<span id="wcs-estimated-time">', '</span>', '<span id="wcs-completed-percent">', '%</span>' ); ?></p>
+<p id="wcsi-timeout" style="display: none;">
+	<?php echo wp_kses( sprintf( __( 'Error: The importing process has timed out. Please check the CSV is correct and do a test run before importing by enabling the checkbox on the Importer Home screen. %s Start Over. %s', 'wcs-importer' ), '<a href="' . $this->admin_url . '">', '</a>' ), array( 'a' => array( 'href' => true ) ) ); ?>
+</p>
+<p id="wcsi-time-completion">
+	<?php echo wp_kses( sprintf( __( 'Total Estimated Import Time Between: %1$s 0%2$s minutes. ( %3$s0%4$s Completed! )', 'wcs-importer' ), '<span id="wcsi-estimated-time">', '</span>', '<span id="wcsi-completed-percent">', '</span>' ), array( 'span' => array( 'id' => true ) ) ); ?>
+</p>
 <br class="clear">
 <ul class="subsubsub">
 	<li class="wcsi-status-li" data-value="all"><a href="#"><?php esc_html_e( 'All', 'wcs-importer' ); ?></a><span id="wcsi-all-count">(0)</span></li>
@@ -38,6 +42,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<tbody id="wcsi-warning-tbody" style="display: none;"></tbody>
 	<tbody id="wcsi-failed-tbody" style="display: none;"></tbody>
 </table>
-<p id="wcs-completed-message" style="display: none;">
-	<?php printf( esc_html__( 'Import Complete! %sView Subscriptions%s or %sImport another file%s.', 'wcs-importer' ), '<a href="' . esc_url( admin_url( 'edit.php?post_type=shop_subscription' ) ) . '">', '</a>', '<a href="' . esc_url( $this->admin_url ) . '">', '</a>' ); ?>
+<p id="wcsi-completed-message" style="display: none;">
+	<?php echo wp_kses( sprintf( __( 'Import Complete! %1$sView Subscriptions%2$s or %3$sImport another file%4$s.', 'wcs-importer' ), '<a href="' . esc_url( admin_url( 'edit.php?post_type=shop_subscription' ) ) . '">', '</a>', '<a href="' . esc_url( $this->admin_url ) . '">', '</a>' ), array( 'a' => array( 'href' => true ) ) ); ?>
 </p>
