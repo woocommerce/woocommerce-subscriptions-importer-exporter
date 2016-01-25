@@ -12,18 +12,6 @@ function wcsi_format_data( $data, $file_encoding = 'UTF-8' ) {
 }
 
 /**
- * Check the product is a woocommerce subscription - an error status will show up on table if this is not the case.
- *
- * @since 1.0
- * @param int $product_id
- */
-function wcsi_check_product( $product_id = '' ) {
-	$is_subscription = WC_Subscriptions_Product::is_subscription( $product_id );
-
-	return ( empty( $is_subscription ) ) ? false : true;
-}
-
-/**
  * Checks customer information and creates a new store customer when no customer id has been given
  *
  * @since 1.0
@@ -155,18 +143,4 @@ function wcsi_check_customer( $data, $mapped_fields, $test_mode ) {
 	}
 
 	return $found_customer;
-}
-
-/**
- * Get all Subscriptions posts that were imported using the CSV importer
- *
- * @since 1.0
- * @param
- */
-function wcsi_get_imported_subscriptions( $args = array() ) {
-	add_filter( 'woocommerce_get_subscriptions_query_args', 'WCS_Importer::add_imported_meta_query' );
-	$subscriptions = wcs_get_subscriptions( $args );
-	remove_filter( 'woocommerce_get_subscriptions_query_args', 'WCS_Importer::add_imported_meta_query' );
-
-	return $subscriptions;
 }
