@@ -676,7 +676,7 @@ class WCS_Import_Parser {
 		}
 
 		if ( ! self::$test_mode ) {
-			$item_id = $subscription->add_product( $_product, $data['quantity'], $item_args );
+			$item_id = $subscription->add_product( $_product, $item_args['qty'], $item_args );
 
 			if ( ! $item_id ) {
 				throw new Exception( __( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix up the data from your CSV and try again.', 'wcs-importer' ) );
