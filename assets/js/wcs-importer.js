@@ -5,6 +5,8 @@ jQuery(document).ready(function ($) {
         warning_count = 0,
         error_count = 0,
         estimate,
+        $wcsi_timeout = $('#wcsi-timeout'),
+        $wcsi_completed_message = $('#wcs-completed-message'),
         ajax_import = function (start_pos, end_pos, row_start) {
             var data = {
                 action:           'wcs_import_request',
@@ -39,7 +41,13 @@ jQuery(document).ready(function ($) {
                         warning_alternate,
                         warningString,
                         errorString = '',
-                        results_text = '';
+                        results_text,
+                        $wcsi_all_tbody = $('#wcsi-all-tbody'),
+                        $wcsi_warning_tbody = $('#wcsi-warning-tbody'),
+                        $wcsi_test_passed = $('#wcs-test-passed'),
+                        $wcsi_test_failed = $('#wcs-test-failed'),
+                        $wcsi_error_count = $('#wcsi-error-count'),
+                        $wcsi_warning_count = $('#wcsi-warning-count');
 
                     if (wcsi_data.test_mode === 'false') {
                         for (i = 0; i < results.length; i += 1) {
@@ -55,20 +63,20 @@ jQuery(document).ready(function ($) {
                                 table_data += '<td class="row column-status"><mark class="' + results[i].subscription_status + '">' + results[i].subscription_status + '</mark></td>';
                                 table_data += '<td class="row">' + warnings.length + '</td>';
 
-                                $('#wcsi-all-tbody').append('<tr class="' + row_classes + '">' + table_data + '</tr>');
+                                $wcsi_all_tbody.append('<tr class="' + row_classes + '">' + table_data + '</tr>');
 
                                 if (warnings.length > 0) {
                                     warning_alternate = (warning_count % 2) ? '' : 'alternate';
                                     warningString = '<td class="warning" colspan="6">' + ((warnings.length > 1) ? wcsi_data.warnings : wcsi_data.warning) + ':';
 
-                                    $('#wcsi-warning-tbody').append('<tr class="' + warning_alternate + '">' + table_data + '</tr>');
+                                    $wcsi_warning_tbody.append('<tr class="' + warning_alternate + '">' + table_data + '</tr>');
 
                                     for (x = 0; x < warnings.length; x += 1) {
                                         warningString += '<br>' + (x + 1) + '. ' + warnings[x];
                                     }
 
-                                    $('#wcsi-all-tbody').append('<tr class="' + row_classes + '">' + warningString + '</td></tr>');
-                                    $('#wcsi-warning-tbody').append('<tr class="' + warning_alternate + '">' + warningString + '</td></tr>');
+                                    $wcsi_all_tbody.append('<tr class="' + row_classes + '">' + warningString + '</td></tr>');
+                                    $wcsi_warning_tbody.append('<tr class="' + warning_alternate + '">' + warningString + '</td></tr>');
 
                                     warning_count += 1;
                                 }
@@ -89,7 +97,7 @@ jQuery(document).ready(function ($) {
 
                         import_count += results.length;
 
-                        $('#wcsi-warning-count').html('(' + warning_count + ')');
+                        $wcsi_warning_count.html('(' + warning_count + ')');
                         $('#wcsi-failed-count').html('(' + error_count + ')');
                         $('#wcsi-all-count').html('(' + import_count + ')');
                     } else {
@@ -118,13 +126,13 @@ jQuery(document).ready(function ($) {
                             }
                         }
 
-                        $('#wcs-test-passed').html(parseInt($('#wcs-test-passed').html()) + success);
-                        $('#wcs-test-failed').html(parseInt($('#wcs-test-failed').html()) + failed);
+                        $wcsi_test_passed.html(parseInt($wcsi_test_passed.html()) + success);
+                        $wcsi_test_failed.html(parseInt($wcsi_test_failed.html()) + failed);
 
-                        $('#wcsi-error-count').html(parseInt($('#wcsi-error-count').html()) + critical);
+                        $wcsi_error_count.html(parseInt($wcsi_error_count.html()) + critical);
                         $('#wcsi-error-title').html(critical > 1 || critical === 0 ? wcsi_data.errors : wcsi_data.error);
 
-                        $('#wcsi-warning-count').html(parseInt($('#wcsi-warning-count').html()) + minor);
+                        $wcsi_warning_count.html(parseInt($wcsi_warning_count.html()) + minor);
                         $('#wcsi-warning-title').html(minor > 1 || minor === 0 ? wcsi_data.warnings : wcsi_data.warning);
 
                         results_text = '';
@@ -152,7 +160,7 @@ jQuery(document).ready(function ($) {
                             $('.importer-loading').addClass('finished').removeClass('importer-loading');
                             $('.finished').html('<td colspan="6" class="row">' + wcsi_data.finished_importing + '</td>');
                         }
-                        $('#wcs-completed-message').show();
+                        $wcsi_completed_message.show();
                         $('#wcs-completed-percent').html('100%');
                     } else {
                         // calculate percentage completed
@@ -163,9 +171,9 @@ jQuery(document).ready(function ($) {
                 error: function (xmlhttprequest, textstatus) {
                     $('.importer-loading').addClass('finished').removeClass('importer-loading');
                     if (textstatus === 'timeout') {
-                        $('#wcsi-timeout').show();
-                        $('#wcs-completed-message').html($('#wcsi-timeout').html());
-                        $('#wcs-completed-message').show();
+                        $wcsi_timeout.show();
+                        $wcsi_completed_message.html($wcsi_timeout.html());
+                        $wcsi_completed_message.show();
                         $('#wcsi-time-completion').hide();
                     }
                 }
