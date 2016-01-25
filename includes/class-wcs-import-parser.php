@@ -32,7 +32,6 @@ class WCS_Import_Parser {
 		'order_tax',
 		'cart_discount',
 		'cart_discount_tax',
-		'order_discount',
 		'order_total',
 		'payment_method',
 	);
@@ -253,11 +252,11 @@ class WCS_Import_Parser {
 			}
 		}
 
-		if ( empty( $data[ self::$fields['status'] ] ) ) {
+		if ( empty( $data[ self::$fields['subscription_status'] ] ) ) {
 			$status              = 'pending';
 			$result['warning'][] = esc_html__( 'No subscription status was specified. The subscription will be created with the status "pending". ', 'wcs-importer' );
 		} else {
-			$status = $data[ self::$fields['status'] ];
+			$status = $data[ self::$fields['subscription_status'] ];
 		}
 
 		$dates_to_update = array( 'start' => ( ! empty( $data[ self::$fields['start_date'] ] ) ) ? gmdate( 'Y-m-d H:i:s', strtotime( $data[ self::$fields['start_date'] ] ) ) : gmdate( 'Y-m-d H:i:s', time() - 1 ) );
@@ -421,7 +420,7 @@ class WCS_Import_Parser {
 			if ( empty( $result['error'] ) ) {
 				$result['status']              = 'success';
 				$result['subscription']        = sprintf( '<a href="%s">#%s</a>', esc_url( admin_url( 'post.php?post=' . absint( $subscription->id ) . '&action=edit' ) ), $subscription->get_order_number() );
-				$result['subscription_status'] = $subscription->get_status();
+				$result['subscription_status'] = $status;
 
 			} else {
 				$result['status']  = 'failed';

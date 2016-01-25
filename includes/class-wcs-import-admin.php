@@ -318,7 +318,7 @@ class WCS_Import_Admin {
 		$button_text = ( 'yes' == $_GET['test_mode'] ) ? __( 'Test CSV', 'wcs-importer' ) : __( 'Run Import', 'wcs-importer' );
 		$row_number  = 1;
 
-		$subscription_fields = array( 'customer_id', 'status', 'start_date', 'next_payment_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
+		$subscription_fields = array( 'customer_id', 'subscription_status', 'start_date', 'next_payment_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
 		?>
 
 		<h3><?php esc_html_e( 'Step 2: Map Fields to Column Names', 'wcs-importer' ); ?></h3>
@@ -362,13 +362,7 @@ class WCS_Import_Admin {
 									<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
 									<option value="payment_method_post_meta" <?php selected( $header, 'payment_method_post_meta' ); ?>>payment_method_post_meta</option>
 									<option value="payment_method_user_meta" <?php selected( $header, 'payment_method_user_meta' ); ?>>payment_method_user_meta</option>
-									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
-								</optgroup>
-								<optgroup label="<?php esc_attr_e( 'Payment Method Meta', 'wcs-importer' ); ?>">
-									<option value="_stripe_customer_id" <?php selected( $header, 'stripe_customer_id' ); ?>>stripe_customer_id</option>
-									<option value="_paypal_subscription_id" <?php selected( $header, 'paypal_subscription_id' ); ?>>_paypal_subscription_id</option>
-									<option value="_wc_authorize_net_cim_credit_card_payment_token" <?php selected( $header, 'wc_authorize_net_cim_payment_profile_id' ); ?>>wc_authorize_net_cim_payment_profile_id</option>
-									<option value="_wc_authorize_net_cim_credit_card_customer_id" <?php selected( $header, 'wc_authorize_net_cim_customer_profile_id' ); ?>>wc_authorize_net_cim_customer_profile_id</option>
+									<option value="download_permission_granted" <?php selected( $header, 'download_permission' ); ?>>download_permission_granted</option>
 								</optgroup>
 							</select>
 						</td>
@@ -422,7 +416,7 @@ class WCS_Import_Admin {
 			'payment_method_post_meta'    => '',
 			'payment_method_user_meta'    => '',
 			'customer_id'                 => '',
-			'status'                      => '',
+			'subscription_status'         => '',
 			'start_date'                  => '',
 			'trial_end_date'              => '',
 			'next_payment_date'           => '',
