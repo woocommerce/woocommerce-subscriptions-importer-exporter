@@ -8,13 +8,13 @@
  */
 class WCS_Import_Parser {
 
-	private static $results = array();
+	public static $results = array();
 
 	/* The current row number of CSV */
-	private static $row_number;
+	public static $row_number;
 
-	private static $membership_plans = null;
-	private static $all_virtual      = true;
+	public static $membership_plans = null;
+	public static $all_virtual      = true;
 
 	/* Front-end import settings chosen */
 	public static $test_mode;
@@ -140,7 +140,7 @@ class WCS_Import_Parser {
 	 * @since 1.0
 	 * @param array $data
 	 */
-	private static function import_subscription( $data ) {
+	public static function import_subscription( $data ) {
 		global $wpdb;
 
 		self::$row  = $data;
@@ -468,7 +468,7 @@ class WCS_Import_Parser {
 	 * @param WC_Subscription $subscription
 	 * @param array $data Current line from the CSV
 	 */
-	private static function set_payment_meta( $subscription, $data ) {
+	public static function set_payment_meta( $subscription, $data ) {
 		$warnings         = array();
 		$payment_gateways = WC()->payment_gateways->get_available_payment_gateways();
 		$payment_method   = $subscription->payment_method;
