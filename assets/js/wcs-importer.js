@@ -11,6 +11,7 @@ jQuery(document).ready(function ($) {
         $wcsi_completed_message = $('#wcsi-completed-message'),
         $importer_loading = $('.importer-loading'),
         $subsubsub = $('.subsubsub'),
+        $wcsi_progress = $('#wcsi-progress'),
         ajax_import = function (start_pos, end_pos, row_start) {
             var data = {
                 action:           'wcs_import_request',
@@ -216,7 +217,7 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         var id = $(this).parent('li').attr('data-value');
 
-        $('#wcsi-progress tbody').hide();
-        $('#wcsi-' + id + '-tbody').show();
+        $wcsi_progress.find('tbody').hide();
+        $wcsi_progress.find('#wcsi-' + id + '-tbody').show();
     });
 });
