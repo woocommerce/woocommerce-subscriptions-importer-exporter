@@ -10,6 +10,7 @@ jQuery(document).ready(function ($) {
         $wcsi_estimated_time = $('#wcsi-estimated-time'),
         $wcsi_completed_message = $('#wcsi-completed-message'),
         $importer_loading = $('.importer-loading'),
+        $subsubsub = $('.subsubsub'),
         ajax_import = function (start_pos, end_pos, row_start) {
             var data = {
                 action:           'wcs_import_request',
@@ -211,7 +212,7 @@ jQuery(document).ready(function ($) {
     }
     ajax_import(wcsi_data.file_positions[counter], wcsi_data.file_positions[counter + 1], wcsi_data.start_row_num[counter / 2]);
 
-    $('.subsubsub').on('click', 'a', function (e) {
+    $subsubsub.on('click', 'a', function (e) {
         e.preventDefault();
         var id = $(this).parent('li').attr('data-value');
 
