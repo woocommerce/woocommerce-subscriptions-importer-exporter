@@ -12,6 +12,7 @@ jQuery(document).ready(function ($) {
         $importer_loading = $('.importer-loading'),
         $subsubsub = $('.subsubsub'),
         $wcsi_progress = $('#wcsi-progress'),
+        $finished = $('.finished'),
         ajax_import = function (start_pos, end_pos, row_start) {
             var data = {
                 action:           'wcs_import_request',
@@ -183,7 +184,7 @@ jQuery(document).ready(function ($) {
                     if ((counter / 2) >= wcsi_data.total) {
                         if (wcsi_data.test_mode === 'false') {
                             $importer_loading.addClass('finished').removeClass('importer-loading');
-                            $('.finished').html('<td colspan="6" class="row">' + wcsi_data.finished_importing + '</td>');
+                            $finished.html('<td colspan="6" class="row">' + wcsi_data.finished_importing + '</td>');
                         }
                         $wcsi_completed_message.show();
                         $wcsi_completed_percent.html('100%');
