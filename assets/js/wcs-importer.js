@@ -47,7 +47,6 @@ jQuery(document).ready(function ($) {
                     var i,
                         x,
                         c,
-                        key,
                         warnings = [],
                         success  = 0,
                         failed   = 0,
@@ -58,9 +57,7 @@ jQuery(document).ready(function ($) {
                         row_classes,
                         warning_alternate,
                         warning_string,
-                        warning_key,
                         error_string = '',
-                        results_text,
                         append_text = '',
                         append_failed_text = '';
 
@@ -160,22 +157,9 @@ jQuery(document).ready(function ($) {
                         $wcsi_warning_count.html(parseInt($wcsi_warning_count.html()) + minor);
                         $wcsi_warning_title.html(minor > 1 || minor === 0 ? wcsi_data.warnings : wcsi_data.warning);
 
-                        results_text = '';
-                        for (key in errors) {
-                            if (errors.hasOwnProperty(key)) {
-                                results_text += '[' + errors[key].length + '] ' + key + ' ' + wcsi_data.located_at + ': ' + errors[key].toString() + '.<br/>';
-                            }
-                        }
-                        $wcsi_test_errors.append(results_text);
+                        populate_test_errors(errors, wcsi_data);
 
-                        results_text = '';
-                        for (warning_key in warnings) {
-                            if (warnings.hasOwnProperty(warning_key)) {
-                                results_text += '[' + warnings[warning_key].length + '] ' + warning_key + ' ' + wcsi_data.located_at + ': ' + warnings[warning_key].toString() + '.<br/>';
-                            }
-                        }
-
-                        $wcsi_test_warnings.append(results_text);
+                        populate_test_warnings(warnings, wcsi_data);
                     }
 
                     counter += 2;
@@ -204,6 +188,27 @@ jQuery(document).ready(function ($) {
                 }
 
             });
+        },
+        populate_test_errors = function (errors, wcsi_data) {
+            var results_text = '',
+                key;
+            for (key in errors) {
+                if (errors.hasOwnProperty(key)) {
+                    results_text += '[' + errors[key].length + '] ' + key + ' ' + wcsi_data.located_at + ': ' + errors[key].toString() + '.<br/>';
+                }
+            }
+            $wcsi_test_errors.append(results_text);
+        },
+        populate_test_warnings = function (warnings, wcsi_data) {
+            var results_text = '',
+                key;
+            for (key in warnings) {
+                if (warnings.hasOwnProperty(key)) {
+                    results_text += '[' + warnings[key].length + '] ' + key + ' ' + wcsi_data.located_at + ': ' + warnings[key].toString() + '.<br/>';
+                }
+            }
+
+            $wcsi_test_warnings.append(results_text);
         };
 
     if (wcsi_data.test_mode === 'false') {
