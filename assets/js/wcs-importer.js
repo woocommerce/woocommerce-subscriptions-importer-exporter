@@ -60,7 +60,8 @@ jQuery(document).ready(function ($) {
 
                                 table_data += '<td class="row ' + ((warnings.length > 0) ? 'warning' : 'success') + '">' + wcsi_data.success + '</td>';
                                 table_data += '<td class="row">' + (results[i].subscription !== null  ? results[i].subscription : '-') + '</td>';
-                                table_data += '<td class="row">' + results[i].item + '</td><td class="row">' + results[i].username + '</td>';
+                                table_data += '<td class="row">' + results[i].item + '</td>';
+                                table_data += '<td class="row">' + results[i].username + '</td>';
                                 table_data += '<td class="row column-status"><mark class="' + results[i].subscription_status + '">' + results[i].subscription_status + '</mark></td>';
                                 table_data += '<td class="row">' + warnings.length + '</td>';
 
