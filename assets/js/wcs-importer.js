@@ -59,6 +59,7 @@ jQuery(document).ready(function ($) {
                         warning_string,
                         error_string = '',
                         append_text = '',
+                        append_warning_text = '',
                         append_failed_text = '';
 
                     if (wcsi_data.test_mode === 'false') {
@@ -84,14 +85,14 @@ jQuery(document).ready(function ($) {
                                     warning_alternate = (warning_count % 2) ? '' : 'alternate';
                                     warning_string = '<td class="warning" colspan="6">' + ((warnings.length > 1) ? wcsi_data.warnings : wcsi_data.warning) + ':';
 
-                                    $wcsi_warning_tbody.append('<tr class="' + warning_alternate + '">' + table_data + '</tr>');
+                                    append_warning_text += '<tr class="' + warning_alternate + '">' + table_data + '</tr>';
 
                                     for (x = 0; x < warnings.length; x += 1) {
                                         warning_string += '<br>' + (x + 1) + '. ' + warnings[x];
                                     }
                                     warning_string += '</td>';
 
-                                    append_text += '<tr class="' + warning_alternate + '">' + warning_string + '</tr>';
+                                    append_text += '<tr class="' + row_classes + '">' + warning_string + '</tr>';
 
                                     warning_count += 1;
                                 }
@@ -105,13 +106,16 @@ jQuery(document).ready(function ($) {
                                 table_data = table_data.replace('{row_number}', results[i].row_number);
                                 table_data = table_data.replace('{error_messages}', error_string);
 
-                                append_text = append_failed_text = '<tr class="' + row_classes + ' error-import">' + table_data + '</tr>';
+                                append_text += '<tr class="' + row_classes + ' error-import">' + table_data + '</tr>';
+                                append_failed_text += '<tr class="' + row_classes + ' error-import">' + table_data + '</tr>';
+
                                 error_count += 1;
                             }
                         }
 
                         // Add all the strings to the dom once instead of on every iteration
                         $wcsi_all_tbody.append(append_text);
+                        $wcsi_warning_tbody.append(append_warning_text);
 
                         if (append_failed_text.length) {
                             $wcsi_failed_tbody.append(append_failed_text);
