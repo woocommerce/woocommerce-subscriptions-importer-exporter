@@ -211,7 +211,7 @@ jQuery(document).ready(function ($) {
     }
     ajax_import(wcsi_data.file_positions[counter], wcsi_data.file_positions[counter + 1], wcsi_data.start_row_num[counter / 2]);
 
-    $('.wcsi-status-li a').click(function (e) {
+    $('.subsubsub').on('click', 'a', function (e) {
         e.preventDefault();
         var id = $(this).parent('li').attr('data-value');
 
