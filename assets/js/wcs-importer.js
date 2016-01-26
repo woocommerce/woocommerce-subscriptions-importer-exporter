@@ -29,7 +29,6 @@ jQuery(document).ready(function ($) {
                         x,
                         c,
                         key,
-                        warningKey,
                         warnings = [],
                         success  = 0,
                         failed   = 0,
@@ -39,8 +38,9 @@ jQuery(document).ready(function ($) {
                         table_data,
                         row_classes,
                         warning_alternate,
-                        warningString,
-                        errorString = '',
+                        warning_string,
+                        warning_key,
+                        error_string = '',
                         results_text,
                         $wcsi_all_tbody = $('#wcsi-all-tbody'),
                         $wcsi_warning_tbody = $('#wcsi-warning-tbody'),
@@ -68,28 +68,28 @@ jQuery(document).ready(function ($) {
 
                                 if (warnings.length > 0) {
                                     warning_alternate = (warning_count % 2) ? '' : 'alternate';
-                                    warningString = '<td class="warning" colspan="6">' + ((warnings.length > 1) ? wcsi_data.warnings : wcsi_data.warning) + ':';
+                                    warning_string = '<td class="warning" colspan="6">' + ((warnings.length > 1) ? wcsi_data.warnings : wcsi_data.warning) + ':';
 
                                     $wcsi_warning_tbody.append('<tr class="' + warning_alternate + '">' + table_data + '</tr>');
 
                                     for (x = 0; x < warnings.length; x += 1) {
-                                        warningString += '<br>' + (x + 1) + '. ' + warnings[x];
+                                        warning_string += '<br>' + (x + 1) + '. ' + warnings[x];
                                     }
 
-                                    $wcsi_all_tbody.append('<tr class="' + row_classes + '">' + warningString + '</td></tr>');
-                                    $wcsi_warning_tbody.append('<tr class="' + warning_alternate + '">' + warningString + '</td></tr>');
+                                    $wcsi_all_tbody.append('<tr class="' + row_classes + '">' + warning_string + '</td></tr>');
+                                    $wcsi_warning_tbody.append('<tr class="' + warning_alternate + '">' + warning_string + '</td></tr>');
 
                                     warning_count += 1;
                                 }
                             } else {
                                 table_data += '<td class="row error-import">' + wcsi_data.failed + '</td>';
                                 for (x = 0; x < results[i].error.length; x += 1) {
-                                    errorString += '<br>' + (x + 1) + '. ' + results[i].error[x];
+                                    error_string += '<br>' + (x + 1) + '. ' + results[i].error[x];
                                 }
 
                                 table_data += '<td colspan="5">' + wcsi_data.error_string + '</td>';
                                 table_data = table_data.replace('{row_number}', results[i].row_number);
-                                table_data = table_data.replace('{error_messages}', errorString);
+                                table_data = table_data.replace('{error_messages}', error_string);
 
                                 $('<tr class="' + row_classes + ' error-import">' + table_data + '</tr>').appendTo('#wcsi-all-tbody, #wcsi-failed-tbody');
                                 error_count += 1;
@@ -145,9 +145,9 @@ jQuery(document).ready(function ($) {
                         $('#wcsi_test_errors').append(results_text);
 
                         results_text = '';
-                        for (warningKey in warnings) {
-                            if (warnings.hasOwnProperty(warningKey)) {
-                                results_text += '[' + warnings[warningKey].length + '] ' + warningKey + ' ' + wcsi_data.located_at + ': ' + warnings[warningKey].toString() + '.<br/>';
+                        for (warning_key in warnings) {
+                            if (warnings.hasOwnProperty(warning_key)) {
+                                results_text += '[' + warnings[warning_key].length + '] ' + warning_key + ' ' + wcsi_data.located_at + ': ' + warnings[warning_key].toString() + '.<br/>';
                             }
                         }
 
