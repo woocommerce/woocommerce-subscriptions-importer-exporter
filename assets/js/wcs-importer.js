@@ -13,6 +13,20 @@ jQuery(document).ready(function ($) {
         $subsubsub = $('.subsubsub'),
         $wcsi_progress = $('#wcsi-progress'),
         $finished = $('.finished'),
+        $wcsi_all_tbody = $('#wcsi-all-tbody'),
+        $wcsi_failed_tbody = $('#wcsi-failed-tbody'),
+        $wcsi_warning_tbody = $('#wcsi-warning-tbody'),
+        $wcsi_test_passed = $('#wcsi-test-passed'),
+        $wcsi_test_failed = $('#wcsi-test-failed'),
+        $wcsi_error_count = $('#wcsi-error-count'),
+        $wcsi_warning_count = $('#wcsi-warning-count'),
+        $wcsi_all_count = $('#wcsi-all-count'),
+        $wcsi_failed_count = $('#wcsi-failed-count'),
+        $wcsi_error_title = $('#wcsi-error-title'),
+        $wcsi_warning_title = $('#wcsi-warning-title'),
+        $wcsi_test_errors = $('#wcsi_test_errors'),
+        $wcsi_test_warnings = $('#wcsi_test_warnings'),
+        $wcsi_completed_percent = $('#wcsi-completed-percent'),
         ajax_import = function (start_pos, end_pos, row_start) {
             var data = {
                 action:           'wcs_import_request',
@@ -49,21 +63,7 @@ jQuery(document).ready(function ($) {
                         error_string = '',
                         results_text,
                         append_text = '',
-                        append_failed_text = '',
-                        $wcsi_all_tbody = $('#wcsi-all-tbody'),
-                        $wcsi_failed_tbody = $('#wcsi-failed-tbody'),
-                        $wcsi_warning_tbody = $('#wcsi-warning-tbody'),
-                        $wcsi_test_passed = $('#wcsi-test-passed'),
-                        $wcsi_test_failed = $('#wcsi-test-failed'),
-                        $wcsi_error_count = $('#wcsi-error-count'),
-                        $wcsi_warning_count = $('#wcsi-warning-count'),
-                        $wcsi_all_count = $('#wcsi-all-count'),
-                        $wcsi_failed_count = $('#wcsi-failed-count'),
-                        $wcsi_error_title = $('#wcsi-error-title'),
-                        $wcsi_warning_title = $('#wcsi-warning-title'),
-                        $wcsi_test_errors = $('#wcsi_test_errors'),
-                        $wcsi_test_warnings = $('#wcsi_test_warnings'),
-                        $wcsi_completed_percent = $('#wcsi-completed-percent');
+                        append_failed_text = '';
 
                     if (wcsi_data.test_mode === 'false') {
                         for (i = 0; i < results.length; i += 1) {
