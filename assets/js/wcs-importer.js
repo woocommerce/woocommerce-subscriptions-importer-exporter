@@ -45,6 +45,8 @@ jQuery(document).ready(function ($) {
                         warning_key,
                         error_string = '',
                         results_text,
+                        append_text = '',
+                        append_failed_text = '',
                         $wcsi_all_tbody = $('#wcsi-all-tbody'),
                         $wcsi_failed_tbody = $('#wcsi-failed-tbody'),
                         $wcsi_warning_tbody = $('#wcsi-warning-tbody'),
@@ -67,6 +69,7 @@ jQuery(document).ready(function ($) {
 
                             if (results[i].status === 'success') {
                                 warnings = results[i].warning;
+                                append_text += '<tr class="' + row_classes + '">';
 
                                 table_data += '<td class="row ' + ((warnings.length > 0) ? 'warning' : 'success') + '">' + wcsi_data.success + '</td>';
                                 table_data += '<td class="row">' + (results[i].subscription !== null  ? results[i].subscription : '-') + '</td>';
@@ -75,7 +78,8 @@ jQuery(document).ready(function ($) {
                                 table_data += '<td class="row column-status"><mark class="' + results[i].subscription_status + '">' + results[i].subscription_status + '</mark></td>';
                                 table_data += '<td class="row">' + warnings.length + '</td>';
 
-                                $wcsi_all_tbody.append('<tr class="' + row_classes + '">' + table_data + '</tr>');
+                                append_text += table_data;
+                                append_text += '</tr>';
 
                                 if (warnings.length > 0) {
                                     warning_alternate = (warning_count % 2) ? '' : 'alternate';
@@ -86,9 +90,9 @@ jQuery(document).ready(function ($) {
                                     for (x = 0; x < warnings.length; x += 1) {
                                         warning_string += '<br>' + (x + 1) + '. ' + warnings[x];
                                     }
+                                    warning_string += '</td>';
 
-                                    $wcsi_all_tbody.append('<tr class="' + row_classes + '">' + warning_string + '</td></tr>');
-                                    $wcsi_warning_tbody.append('<tr class="' + warning_alternate + '">' + warning_string + '</td></tr>');
+                                    append_text += '<tr class="' + warning_alternate + '">' + warning_string + '</tr>';
 
                                     warning_count += 1;
                                 }
@@ -102,9 +106,16 @@ jQuery(document).ready(function ($) {
                                 table_data = table_data.replace('{row_number}', results[i].row_number);
                                 table_data = table_data.replace('{error_messages}', error_string);
 
-                                $('<tr class="' + row_classes + ' error-import">' + table_data + '</tr>').appendTo('#wcsi-all-tbody, #wcsi-failed-tbody');
+                                append_text = append_failed_text = '<tr class="' + row_classes + ' error-import">' + table_data + '</tr>';
                                 error_count += 1;
                             }
+                        }
+
+                        // Add all the strings to the dom once instead of on every iteration
+                        $wcsi_all_tbody.append(append_text);
+
+                        if (append_failed_text.length) {
+                            $wcsi_failed_tbody.append(append_failed_text);
                         }
 
                         import_count += results.length;
