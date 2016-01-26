@@ -23,7 +23,7 @@
 }
 
 #wcsi-progress tr.importer-loading td {
-	background: url('../assets/images/ajax-loader.gif') no-repeat center center;
+	background: url('../images/ajax-loader.gif') no-repeat center center;
 	height: 32px;
 }
 
