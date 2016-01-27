@@ -79,7 +79,7 @@ These are the general formatting rules which your CSV data must adhere to:
 |`order_items`|mixed|Can simply be a product or variation ID. For more advanced imports see [Importing Order Items](#importing-order-items).|
 |`coupon_items`|array|See section [Importing subscriptions with coupons](#importing-subscriptions-with-coupons) for more details.|
 |`fee_items`|array|See [Attaching fees to your imported subscriptions](#attaching-fees-to-imported-subscriptions) for more info.|
-|`tax_items`|array|Find more information under section: [Adding taxes to your imported subscriptions](#adding-taxes-to-imported-subscriptions).|
+|`tax_items`|mixed|Can simply be the tax code or tax id. Find more information on tax ids and codes or adding multiple tax items under section: [Adding taxes to your imported subscriptions](#adding-taxes-to-imported-subscriptions).|
 
 
 If any of the above columns contains invalid data, the importer will display these during in the test results. If you choose to ignore the errors and continue to import with invalid data, no subscription will be imported for that row in the CSV.
