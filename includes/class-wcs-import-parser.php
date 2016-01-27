@@ -816,9 +816,17 @@ class WCS_Import_Parser {
 			foreach( $tax_items as $tax_item ) {
 				$tax_data = array();
 
-				foreach ( explode( '|', $tax_item ) as $item ) {
-					list( $name, $value ) = explode( ':', $item );
-					$tax_data[ trim( $name ) ] = trim( $value );
+				if ( false !== strpos( $tax_item, ':' ) ) {
+					foreach ( explode( '|', $tax_item ) as $item ) {
+						list( $name, $value ) = explode( ':', $item );
+						$tax_data[ trim( $name ) ] = trim( $value );
+					}
+				} elseif ( 1 == count( $tax_items ) ) {
+					if ( is_numeric( $tax_item ) ) {
+						$tax_data['id'] = $tax_item;
+					} else {
+						$tax_data['code'] = $tax_item;
+					}
 				}
 
 				if ( ! empty( $tax_data['id'] ) ) {
