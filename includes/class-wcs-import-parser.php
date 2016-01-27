@@ -760,21 +760,26 @@ class WCS_Import_Parser {
 	public static function add_shipping_lines( $subscription, $data, $chosen_tax_rate_id ) {
 		$shipping_items   = explode( ';', $data[ self::$fields['shipping_method'] ] );
 		$shipping_method  = '';
+		$default_total    = ( ! empty( $data[ self::$fields['order_shipping'] ] ) ) ? $data[ self::$fields['order_shipping'] ] : 0;
 
 		if ( ! empty( $shipping_items ) ) {
 			foreach( $shipping_items as $shipping_item ) {
 				$shipping_line = array();
 
-				foreach ( explode( '|', $shipping_item ) as $item ) {
-					list( $name, $value ) = explode( ':', $item );
-					$shipping_line[ trim( $name ) ] = trim( $value );
+				if ( false !== strpos( $shipping_item, ':' ) ) {
+					foreach ( explode( '|', $shipping_item ) as $item ) {
+						list( $name, $value ) = explode( ':', $item );
+						$shipping_line[ trim( $name ) ] = trim( $value );
+					}
+				} else {
+					$shipping_line['method_id'] = $shipping_item;
 				}
 
 				$shipping_method = isset( $shipping_line['method_id'] ) ? $shipping_line['method_id'] : '';
 				$shipping_title  = isset( $shipping_line['method_title'] ) ? $shipping_line['method_title'] : $shipping_method;
 
 				if ( ! self::$test_mode ) {
-					$rate            = new WC_Shipping_Rate( $shipping_method, $shipping_title, isset( $shipping_line['total'] ) ? floatval( $shipping_line['total'] ) : 0, array(), $shipping_method );
+					$rate = new WC_Shipping_Rate( $shipping_method, $shipping_title, isset( $shipping_line['total'] ) ? floatval( $shipping_line['total'] ) : $default_total, array(), $shipping_method );
 
 					if ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) && ! empty( $chosen_tax_rate_id ) ) {
 						$rate->taxes = array( $chosen_tax_rate_id => $data[ self::$fields['order_shipping_tax'] ] );

@@ -69,8 +69,7 @@ These are the general formatting rules which your CSV data must adhere to:
 |`payment_method_title`|String||
 |`payment_method_post_meta`|array|See [Importing payment post and user meta](#importing-payment-post-and-user-meta) for more information.|
 |`payment_method_user_meta`|array|See [Importing payment post and user meta](#importing-payment-post-and-user-meta) for more information.|
-|`shipping_method`|array|This should be the shipping method id as seen in the table at **WooCommerce > Settings > Shipping** page, i.e. `"free_shipping"` or `"flat_rate"`, defaults to an empty shipping method.|
-|`shipping_method_title`|String||
+|`shipping_method`|mixed|This can be either the shipping method id as seen in the table at **WooCommerce > Settings > Shipping** page, i.e. `"free_shipping"` or `"flat_rate"`, or this can be an in the format `"shipping_id:flat_rate:|shipping_total:Flat Rate|total:10.00"`.|
 |`download_permissions`|int|Can be either 1 (meaning that subscription needs download permissions granted) or 0.|
 |`custom_user_meta`|mixed|Multiple columns can be mapped to this column and note that the value of the column header in the CSV will be used as the meta key. For example, if you want to add `'_terms' => true` as user meta. You will need to have a column in your CSV with header `_terms` and map it to `custom_user_meta`. Custom user meta is added to the user _before_ the subscription is created.|
 |`custom_post_meta`|mixed|Multiple columns can be mapped to this column and note that the value of the column header in the CSV will be used as the meta key. For example, if you want to add `'_terms' => true` as post meta. You will need to have a column in your CSV with header `_terms` and map it to `custom_post_meta`. Custom user meta is added to the user _before_ the subscription is created while post meta is added immediately after.|
