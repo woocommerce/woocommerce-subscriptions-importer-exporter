@@ -346,6 +346,10 @@ class WCS_Import_Parser {
 					$subscription = null;
 				}
 
+				if ( $set_manual ) {
+					$result['warning'][] = esc_html__( 'No payment method was given in CSV and so the subscription has been set to manual renewal.', 'wcs-importer' );
+				}
+
 				if ( ! empty( $data[ self::$fields['coupon_items'] ] ) ) {
 					self::add_coupons( $subscription, $data );
 				}
