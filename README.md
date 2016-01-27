@@ -3,7 +3,7 @@
 The WooCommerce Subscriptions CSV Import Suite allows you to easily import your subscriptions from a CSV file straight into your WooCommerce Store. This is particularly useful when migrating stores and importing from a different eCommerce platform - which may or may not use exactly the same fields as WooCommerce.
 
 ## Before Installing - PayPal Standard is not supported!
-Due to PayPal Standard limitations ([more info]()) the importer will not allow you to migrate PayPal Standard subscriptions. Note that these limitations do not apply to PayPal Reference Transactions and therefore the CSV importer can migrate your RT customers.
+Due to PayPal Standard limitations (more info [here](https://docs.woothemes.com/document/subscriptions/payment-gateways/#paypal-limitations)) the importer will not allow you to migrate PayPal Standard subscriptions. Note that these limitations do not apply to PayPal Reference Transactions and therefore the CSV importer can migrate your RT customers.
 
 If you have subscriptions with PayPal Standard and you're interested in getting your customers to use a different payment method, then please try using the approach explained in our documentation here: https://docs.woothemes.com/document/subscriptions/customers-view/#section-5
 
@@ -67,8 +67,8 @@ These are the general formatting rules which your CSV data must adhere to:
 |`order_total`|float|
 |`payment_method`|String|Set as the Gateway ID which can be seen in table at **WooCommerce > Settings > Checkout**. Leave this blank if you wish to import your subscriptions with manual renewals.|
 |`payment_method_title`|String||
-|`payment_method_post_meta`|array|See [Importing payment post and user meta]() for more information.|
-|`payment_method_user_meta`|array|See [Importing payment post and user meta]() for more information.|
+|`payment_method_post_meta`|array|See [Importing payment post and user meta](#importing-payment-post-and-user-meta) for more information.|
+|`payment_method_user_meta`|array|See [Importing payment post and user meta](#importing-payment-post-and-user-meta) for more information.|
 |`shipping_method`|array|This should be the shipping method id as seen in the table at **WooCommerce > Settings > Shipping** page, i.e. `"free_shipping"` or `"flat_rate"`, defaults to an empty shipping method.|
 |`shipping_method_title`|String||
 |`download_permissions`|int|Can be either 1 (meaning that subscription needs download permissions granted) or 0.|
@@ -77,10 +77,10 @@ These are the general formatting rules which your CSV data must adhere to:
 |`custom_user_post_meta`|mixed|Use this column if you wish to add custom data to both user and post meta using the same `meta_key` and value. Like previously stated, the value of the column header in the CSV will be used as the meta_key value.|
 |`order_notes`|array|A string of order notes separated by the `;` symbol. For example `"Payment received.;Subscription activated."` will create two order notes on your subscription.|
 |`customer_note`|String||
-|`order_items`|mixed|Can simply be a product or variation ID. For more advanced imports see [Importing Order Items]().|
-|`coupon_items`|array|See section [Importing subscriptions with coupons]() for more details.|
-|`fee_items`|array|See [Attaching fees to your imported subscriptions]() for more info.|
-|`tax_items`|array|Find more information under section: [Adding taxes to your imported subscriptions]().|
+|`order_items`|mixed|Can simply be a product or variation ID. For more advanced imports see [Importing Order Items](#importing-order-items).|
+|`coupon_items`|array|See section [Importing subscriptions with coupons](#importing-subscriptions-with-coupons) for more details.|
+|`fee_items`|array|See [Attaching fees to your imported subscriptions](#attaching-fees-to-imported-subscriptions) for more info.|
+|`tax_items`|array|Find more information under section: [Adding taxes to your imported subscriptions](#adding-taxes-to-imported-subscriptions).|
 
 
 If any of the above columns contains invalid data, the importer will display these during in the test results. If you choose to ignore the errors and continue to import with invalid data, no subscription will be imported for that row in the CSV.
@@ -212,7 +212,7 @@ The minimum requirements for creating a new user is just an email address. If no
 
 ### Step 2: Map the CSV fields
  - Each column header found in the CSV will be listed as a row in the table on this page. Use the dropdown menu to find and match the information to a value known by the importer. <strong>You must not have the same fields mapped more than once unless it's found under the custom group.</strong>
- - List of possible fields to map to are [above](https://github.com/Prospress/woocommerce-subscriptions-importer#columns)
+ - List of possible fields to map to are [above](#columns)
  - Press Import or Test CSV (depending on whether you are running the import in test mode first)
 
 ### Step 3a: Test Mode
@@ -240,7 +240,7 @@ If you are using a payment gateway that is not supported by the CSV Importer (yo
 
 ![Empty Payment Method Field](https://cldup.com/RsNfaSQY8q.png)
 
-The other alternative is to import the subscription with a temporaray payment method (i.e. Stripe) and use valid text as the `_stripe_customer_id` field (a different payment method can be used as long as it is supported by the CSV Importer and supports the changing payment methods feature, see more info on this [here](http://docs.woothemes.com/document/subscriptions/payment-gateways/#section-1)). The stripe payment gateway with random text method is used to force the first payment to fail, allowing your customers to login and setup their preferred payment method by clicking the 'Change Payment Method' button on their My Account page and going through the checkout.
+The other alternative is to import the subscription with a temporaray payment method (i.e. Stripe) and use valid text as the `_stripe_customer_id` field (a different payment method can be used as long as it is supported by the CSV Importer and supports the changing payment methods feature, see more info on this [here](https://docs.woothemes.com/document/subscriptions/payment-gateways/#advanced-features)). The stripe payment gateway with random text method is used to force the first payment to fail, allowing your customers to login and setup their preferred payment method by clicking the 'Change Payment Method' button on their My Account page and going through the checkout.
 
 If the later approach is taken, we strongly recommend that you notify all affected customers about the change to avoid any confusion in the future.
 
