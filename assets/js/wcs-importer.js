@@ -85,14 +85,13 @@ jQuery(document).ready(function ($) {
                                     warning_alternate = (warning_count % 2) ? '' : 'alternate';
                                     warning_string = '<td class="warning" colspan="6">' + ((warnings.length > 1) ? wcsi_data.warnings : wcsi_data.warning) + ':';
 
-                                    append_warning_text += '<tr class="' + warning_alternate + '">' + table_data + '</tr>';
-
                                     for (x = 0; x < warnings.length; x += 1) {
                                         warning_string += '<br>' + (x + 1) + '. ' + warnings[x];
                                     }
                                     warning_string += '</td>';
 
                                     append_text += '<tr class="' + row_classes + '">' + warning_string + '</tr>';
+                                    append_warning_text += '<tr class="' + warning_alternate + '">' + table_data + '</tr><tr class="' + warning_alternate + '">' + warning_string + '</tr>';
 
                                     warning_count += 1;
                                 }
