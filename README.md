@@ -255,11 +255,11 @@ Example:
 
 ### Step 3a: Test Mode
 If you chose to run the import test mode beforehand, you should see something that looks similar to this.
-![Test mode results](https://cldup.com/bFEXxTaBkL.png)
+![Test mode results](https://cldup.com/gfJUvR7WIe-2000x2000.png)
  This table shows all the errors and warnings that occurred while importing without actually creating the new customers and subscriptions. The beauty of running the importer firstly in test mode is that, from here, you can either exit the import process to fix up the CSV or continue importing the file. We strongly recommend you continue to run the importer in test mode until you are satisfied that all the errors are cleared. Unfortunately it's not possible to catch **all** errors when importing your subscriptions. The good news though is that any fatal errors that occurred during the import (i.e. invalid payment method meta) will not create a subscription.
 
 ### Step 3b: Import Completion Table
-![Completion Table Screenshot](https://i.cloudup.com/VVsB5aBCHf-2000x2000.png)
+![Completion Table Screenshot](https://cldup.com/ALx-5YbHHB-2000x2000.png)
 
 ## FAQ
 #### Is it possible to make sure the active subscriptions will still work?
