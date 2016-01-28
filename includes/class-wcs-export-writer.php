@@ -34,7 +34,7 @@ class WCS_Export_Writer {
 		$fee_total = $fee_tax_total = 0;
 		$fee_items = array();
 
-		if ( 0 != sizeof( array_intersect( array_keys( self::$headers ), array( 'fee_total', 'fee_tax_total', 'fee_itmes') ) ) ) {
+		if ( 0 != sizeof( array_intersect( array_keys( self::$headers ), array( 'fee_total', 'fee_tax_total', 'fee_items') ) ) ) {
 			foreach ( $subscription->get_fees() as $fee_id => $fee ) {
 
 				$fee_items[] = implode( '|', array(
