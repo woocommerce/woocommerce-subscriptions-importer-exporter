@@ -177,6 +177,7 @@ class WCS_Export_Admin {
 			'order_cart_discount'      => __( 'Cart Discount', 'wcs-import-export' ),
 			'order_discount'           => __( 'Subscription Discount', 'wcs-import-export' ),
 			'order_total'              => __( 'Subscription Total', 'wcs-import-export' ),
+			'order_currency'           => __( 'Subscription Currency', 'wcs-import-export' ),
 			'payment_method'           => __( 'Payment Method', 'wcs-import-export' ),
 			'payment_method_title'     => __( 'Payment Method Title', 'wcs-import-export' ),
 			'payment_method_post_meta' => __( 'Payment Method Post Meta', 'wcs-import-export' ),
