@@ -127,6 +127,7 @@ class WCS_Export_Writer {
 				case 'shipping_country':
 				case 'shipping_company':
 				case 'customer_note':
+				case 'order_currency':
 					$value = $subscription->{$header_key};
 					break;
 				case 'payment_method_post_meta':
