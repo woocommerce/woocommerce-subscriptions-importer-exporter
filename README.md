@@ -65,6 +65,7 @@ These are the general formatting rules which your CSV data must adhere to:
 |`order_shipping`|float|
 |`order_tax`|float|
 |`order_total`|float|
+|`order_currency`|string|Currency code (i.e. `USD`). Defaults to the stores currency when left empty.
 |`payment_method`|String|Set as the Gateway ID which can be seen in table at **WooCommerce > Settings > Checkout**. Leave this blank if you wish to import your subscriptions with manual renewals.|
 |`payment_method_title`|String||
 |`payment_method_post_meta`|array|See [Importing payment post and user meta](#importing-payment-post-and-user-meta) for more information.|
