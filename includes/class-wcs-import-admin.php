@@ -52,11 +52,11 @@ class WCS_Import_Admin {
 
 		if ( isset( $_GET['page'] ) && 'import_subscription' == $_GET['page'] ) {
 
-			wp_enqueue_style( 'wcs-importer-admin', plugin_dir_url( WCS_Importer::$plugin_file ) . '/assets/css/wcs-importer.css' );
+			wp_enqueue_style( 'wcs-importer-admin', plugin_dir_url( WCS_Importer_Exporter::$plugin_file ) . '/assets/css/wcs-importer.css' );
 
 			if ( isset( $_GET['step'] ) && 3 == absint( $_GET['step'] )  ) {
 
-				wp_enqueue_script( 'wcs-importer-admin', plugin_dir_url( WCS_Importer::$plugin_file ) . '/assets/js/wcs-importer.js' );
+				wp_enqueue_script( 'wcs-importer-admin', plugin_dir_url( WCS_Importer_Exporter::$plugin_file ) . '/assets/js/wcs-importer.js' );
 
 				$file_id = absint( $_GET['file_id'] );
 				$file    = get_attached_file( $_GET['file_id'] );
@@ -169,7 +169,7 @@ class WCS_Import_Admin {
 					<h4><?php printf( esc_html__( '%sBefore you begin%s, please prepare your CSV file.', 'wcs-importer' ), '<strong>', '</strong>' ); ?></h4>
 					<p class="submit">
 						<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a>
-						<a href="<?php echo esc_url( plugins_url( 'wcs-import-sample.csv', WCS_Importer::$plugin_file ) ); ?>" class="button wcs-importer-download"><?php esc_html_e( 'Download Example CSV', 'wcs-importer' ); ?></a>
+						<a href="<?php echo esc_url( plugins_url( 'wcs-import-sample.csv', WCS_Importer_Exporter::$plugin_file ) ); ?>" class="button wcs-importer-download"><?php esc_html_e( 'Download Example CSV', 'wcs-importer' ); ?></a>
 					</p>
 				</div>
 			<?php endif; ?>
@@ -400,9 +400,9 @@ class WCS_Import_Admin {
 				'add_memberships' => $_GET['add_memberships'],
 			),$this->admin_url );
 
-			include( plugin_dir_path( WCS_Importer::$plugin_file ) . 'templates/test-mode.php' );
+			include( plugin_dir_path( WCS_Importer_Exporter::$plugin_file ) . 'templates/test-mode.php' );
 		} else {
-			include( plugin_dir_path( WCS_Importer::$plugin_file ) . 'templates/import-results.php' );
+			include( plugin_dir_path( WCS_Importer_Exporter::$plugin_file ) . 'templates/import-results.php' );
 		}
 	}
 

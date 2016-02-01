@@ -21,7 +21,7 @@ require_once( 'includes/class-wcs-import-parser.php' );
 require_once( 'includes/class-wcs-import-logger.php' );
 require_once( 'includes/wcsi-functions.php' );
 
-class WCS_Importer {
+class WCS_Importer_Exporter {
 
 	public static $wcs_importer;
 
@@ -102,4 +102,4 @@ class WCS_Importer {
 
 }
 
-WCS_Importer::init();
+WCS_Importer_Exporter::init();
