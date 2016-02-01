@@ -138,7 +138,7 @@ function wcsi_check_customer( $data, $mapped_fields, $test_mode = false ) {
 			$found_customer = absint( $customer_id );
 
 		} else {
-			$found_customer = new WP_Error( 'wcsi_invalid_customer', sprintf( __( 'User with ID (#%s) does not exist.', 'wcs-importer' ), $customer_id ) );
+			$found_customer = new WP_Error( 'wcsi_invalid_customer', sprintf( __( 'User with ID (#%s) does not exist.', 'wcs-import-export' ), $customer_id ) );
 		}
 	}
 

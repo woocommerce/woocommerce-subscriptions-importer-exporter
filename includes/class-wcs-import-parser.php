@@ -158,7 +158,7 @@ class WCS_Import_Parser {
 			$result['error'][] = $user_id->get_error_message();
 
 		} elseif ( empty( $user_id ) ) {
-			$result['error'][] = esc_html__( 'An error occurred with the customer information provided.', 'wcs-importer' );
+			$result['error'][] = esc_html__( 'An error occurred with the customer information provided.', 'wcs-import-export' );
 
 		} elseif ( ! self::$test_mode ) {
 			$result['username'] = sprintf( '<a href="%s">%s</a>', get_edit_user_link( $user_id ), self::get_user_display_name( $user_id ) );
@@ -241,7 +241,7 @@ class WCS_Import_Parser {
 
 		if ( empty( $data[ self::$fields['subscription_status'] ] ) ) {
 			$status              = 'pending';
-			$result['warning'][] = esc_html__( 'No subscription status was specified. The subscription will be created with the status "pending". ', 'wcs-importer' );
+			$result['warning'][] = esc_html__( 'No subscription status was specified. The subscription will be created with the status "pending". ', 'wcs-import-export' );
 		} else {
 			$status = $data[ self::$fields['subscription_status'] ];
 		}
@@ -261,19 +261,19 @@ class WCS_Import_Parser {
 			switch ( $date_type ) {
 				case 'end_date' :
 					if ( ! empty( $dates_to_update['last_payment_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['last_payment_date'] ) ) {
-						$result['error'][] = sprintf( __( 'The %s date must occur after the last payment date.', 'wcs-importer' ), $date_type );
+						$result['error'][] = sprintf( __( 'The %s date must occur after the last payment date.', 'wcs-import-export' ), $date_type );
 					}
 
 					if ( ! empty( $dates_to_update['next_payment_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['next_payment_date'] ) ) {
-						$result['error'][] = sprintf( __( 'The %s date must occur after the next payment date.', 'wcs-importer' ), $date_type );
+						$result['error'][] = sprintf( __( 'The %s date must occur after the next payment date.', 'wcs-import-export' ), $date_type );
 					}
 				case 'next_payment_date' :
 					if ( ! empty( $dates_to_update['trial_end_date'] ) && strtotime( $datetime ) < strtotime( $dates_to_update['trial_end_date'] ) ) {
-						$result['error'][] = sprintf( __( 'The %s date must occur after the trial end date.', 'wcs-importer' ), $date_type );
+						$result['error'][] = sprintf( __( 'The %s date must occur after the trial end date.', 'wcs-import-export' ), $date_type );
 					}
 				case 'trial_end_date' :
 					if ( strtotime( $datetime ) <= strtotime( $dates_to_update['start'] ) ) {
-						$result['error'][] = sprintf( __( 'The %s must occur after the start date.', 'wcs-importer' ), $date_type );
+						$result['error'][] = sprintf( __( 'The %s must occur after the start date.', 'wcs-import-export' ), $date_type );
 					}
 			}
 		}
@@ -302,7 +302,7 @@ class WCS_Import_Parser {
 					);
 
 					if ( is_wp_error( $subscription ) ) {
-						throw new Exception( sprintf( esc_html__( 'Could not create subscription: %s', 'wcs-importer' ), $subscription->get_error_message() ) );
+						throw new Exception( sprintf( esc_html__( 'Could not create subscription: %s', 'wcs-import-export' ), $subscription->get_error_message() ) );
 					}
 
 					foreach ( $post_meta as $meta_data ) {
@@ -348,7 +348,7 @@ class WCS_Import_Parser {
 				}
 
 				if ( $set_manual ) {
-					$result['warning'][] = esc_html__( 'No payment method was given in CSV and so the subscription has been set to manual renewal.', 'wcs-importer' );
+					$result['warning'][] = esc_html__( 'No payment method was given in CSV and so the subscription has been set to manual renewal.', 'wcs-import-export' );
 				}
 
 				if ( ! empty( $data[ self::$fields['coupon_items'] ] ) ) {
@@ -392,15 +392,15 @@ class WCS_Import_Parser {
 				// only show the following warnings on the import when the subscription requires shipping
 				if ( ! self::$all_virtual ) {
 					if ( ! empty( $missing_shipping_addresses ) ) {
-						$result['warning'][] = esc_html__( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-importer' );
+						$result['warning'][] = esc_html__( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-import-export' );
 					}
 
 					if ( ! empty( $missing_billing_addresses ) ) {
-						$result['warning'][] = esc_html__( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-importer' );
+						$result['warning'][] = esc_html__( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-import-export' );
 					}
 
 					if ( empty( $shipping_method ) ) {
-						$result['warning'][] = esc_html__( 'Shipping method and title for the subscription have been left as empty. ', 'wcs-importer' );
+						$result['warning'][] = esc_html__( 'Shipping method and title for the subscription have been left as empty. ', 'wcs-import-export' );
 					}
 				}
 
@@ -522,14 +522,14 @@ class WCS_Import_Parser {
 				if ( $meta_set ) {
 					$subscription->set_payment_method( $payment_gateway, $payment_method_data );
 				} else {
-					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %s subscription (%s). The next renewal is going to fail if you leave this.', 'wcs-importer' ), $payment_method, $subscription->id );
+					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %s subscription (%s). The next renewal is going to fail if you leave this.', 'wcs-import-export' ), $payment_method, $subscription->id );
 				}
 
 			} else {
 				if ( 'paypal' == $payment_method ) {
-					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal, defaulted to manual renewals. Either PayPal was not enabled or your PayPal account does not have Reference Transaction setup. Learn more about enabling Reference Transactions %shere%s.', 'wcs-importer' ), '<a href="https://support.woothemes.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
+					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal, defaulted to manual renewals. Either PayPal was not enabled or your PayPal account does not have Reference Transaction setup. Learn more about enabling Reference Transactions %shere%s.', 'wcs-import-export' ), '<a href="https://support.woothemes.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
 				} else {
-					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewals. Please contact support if you believe this is not correct.', 'wcs-importer' ), $payment_method );
+					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewals. Please contact support if you believe this is not correct.', 'wcs-import-export' ), $payment_method );
 				}
 				$subscription->update_manual();
 			}
@@ -605,7 +605,7 @@ class WCS_Import_Parser {
 				$coupon      = new WC_Coupon( $coupon_code );
 
 				if ( ! $coupon ) {
-					throw new Exception( sprintf( esc_html__( 'Could not find coupon with code "%s" in your store.', 'wcs-importer' ), $coupon_code ) );
+					throw new Exception( sprintf( esc_html__( 'Could not find coupon with code "%s" in your store.', 'wcs-import-export' ), $coupon_code ) );
 				} elseif ( isset( $coupon_data['amount'] ) ) {
 					$discount_amount = floatval( $coupon_data['amount'] );
 				} else {
@@ -616,7 +616,7 @@ class WCS_Import_Parser {
 					$coupon_id = $subscription->add_coupon( $coupon_code, $discount_amount );
 
 					if ( ! $coupon_id ) {
-						throw new Exception( sprintf( esc_html__( 'Coupon "%s" could not be added to subscription.', 'wcs-importer' ), $coupon_code ) );
+						throw new Exception( sprintf( esc_html__( 'Coupon "%s" could not be added to subscription.', 'wcs-import-export' ), $coupon_code ) );
 					}
 				}
 			}
@@ -636,13 +636,13 @@ class WCS_Import_Parser {
 		$item_args['qty'] = isset( $data['quantity'] ) ? $data['quantity'] : 1;
 
 		if ( ! isset( $data['product_id'] ) ) {
-			throw new Exception( __( 'The product_id is missing from CSV.', 'wcs-importer' ) );
+			throw new Exception( __( 'The product_id is missing from CSV.', 'wcs-import-export' ) );
 		}
 
 		$_product = wc_get_product( $data['product_id'] );
 
 		if ( ! $_product ) {
-			throw new Exception( sprintf( __( 'No product or variation in your store matches the product ID #%s.', 'wcs-importer' ), $data['product_id'] ) );
+			throw new Exception( sprintf( __( 'No product or variation in your store matches the product ID #%s.', 'wcs-import-export' ), $data['product_id'] ) );
 		}
 
 		$product_string = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product->id ), $_product->get_title() );
@@ -684,7 +684,7 @@ class WCS_Import_Parser {
 			$item_id = $subscription->add_product( $_product, $item_args['qty'], $item_args );
 
 			if ( ! $item_id ) {
-				throw new Exception( __( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix up the data from your CSV and try again.', 'wcs-importer' ) );
+				throw new Exception( __( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix up the data from your CSV and try again.', 'wcs-import-export' ) );
 			}
 
 			if ( ! empty( self::$row[ self::$fields['download_permission_granted'] ] ) && ( 'true' == self::$row[ self::$fields['download_permission_granted'] ] || '1' == self::$row[ self::$fields['download_permission_granted'] ] ) ) {
@@ -716,7 +716,7 @@ class WCS_Import_Parser {
 				}
 
 				if ( empty( $fee_data['name'] ) ) {
-					throw new Exception( __( 'Fee name is missing from your CSV. This subscription has not been imported.', 'wcs-importer' ) );
+					throw new Exception( __( 'Fee name is missing from your CSV. This subscription has not been imported.', 'wcs-import-export' ) );
 				}
 
 				$fee            = new stdClass();
@@ -742,7 +742,7 @@ class WCS_Import_Parser {
 					$fee_id = $subscription->add_fee( $fee );
 
 					if ( ! $fee_id ) {
-						throw new Exception( __( 'Could not add the fee to your subscription, the subscription has not been imported.', 'wcs-importer' ) );
+						throw new Exception( __( 'Could not add the fee to your subscription, the subscription has not been imported.', 'wcs-import-export' ) );
 					}
 				}
 			}
@@ -788,7 +788,7 @@ class WCS_Import_Parser {
 
 					$shipping_id = $subscription->add_shipping( $rate );
 					if ( ! $shipping_id ) {
-						throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription, a subscription not been created for this row.', 'wcs-importer' ) );
+						throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription, a subscription not been created for this row.', 'wcs-import-export' ) );
 					}
 
 					update_post_meta( $subscription->id, '_shipping_method', $shipping_method );
@@ -835,7 +835,7 @@ class WCS_Import_Parser {
 				} elseif ( ! empty( $tax_data['code'] ) ) {
 					$tax_rate = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_name = %s ORDER BY tax_rate_priority LIMIT 1", $tax_data['code'] ) );
 				} else {
-					$result['warning'][] = esc_html__( sprintf( 'Missing tax code or ID from column: %s', self::$fields['tax_items'] ), 'wcs-importer' );
+					$result['warning'][] = esc_html__( sprintf( 'Missing tax code or ID from column: %s', self::$fields['tax_items'] ), 'wcs-import-export' );
 				}
 
 				if ( ! empty( $tax_rate ) ) {
@@ -844,13 +844,13 @@ class WCS_Import_Parser {
 						$tax_id   = $subscription->add_tax( $tax_rate->tax_rate_id, ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) ) ? $data[ self::$fields['order_shipping_tax'] ] : 0, ( ! empty( $data[ self::$fields['order_tax'] ] ) ) ? $data[ self::$fields['order_tax'] ] : 0 );
 
 						if ( ! $tax_id ) {
-							$result['warning'][] = esc_html__( 'Tax line item could not properly be added to this subscription. Please review this subscription.', 'wcs-importer' );
+							$result['warning'][] = esc_html__( 'Tax line item could not properly be added to this subscription. Please review this subscription.', 'wcs-import-export' );
 						} else {
 							$chosen_tax_rate_id = $tax_rate->tax_rate_id;
 						}
 					}
 				} else {
-					$result['warning'][] = esc_html__( sprintf( 'The tax code "%s" could not be found in your store.', $tax_data['code'] ), 'wcs-importer' );
+					$result['warning'][] = esc_html__( sprintf( 'The tax code "%s" could not be found in your store.', $tax_data['code'] ), 'wcs-import-export' );
 				}
 			}
 		}
