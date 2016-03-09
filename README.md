@@ -1,6 +1,11 @@
-# WooCommerce Subscriptions Importer
+# WooCommerce Subscriptions Importer and Exporter
 
-##Overview
+- [Importer Documentation](#subscriptions-importer)
+- [Exporter Documentation](#subscriptions-exporter)
+
+---
+
+# Subscriptions Importer
 The WooCommerce Subscriptions CSV Import Suite allows you to easily import your subscriptions from a CSV file into your WooCommerce Store. This is particularly useful when migrating stores and importing from a different eCommerce platform - which may or may not use exactly the same fields as WooCommerce. Subscriptions are ordered and mapped to existing or new users. The order item is mapped to existing subscription or variable subscription id’s. A total of 58 fields can set in the CSV giving you the utmost control over the import process.
 
 ## Before Installing
@@ -176,7 +181,7 @@ The minimum requirements for creating a new user is simply an email address. If 
   * order_total
   * order_recurring_total
 
-## How to use the Importer
+## Importer Usage
 
 ### Step 0: Make Sure Products Exist
   - The WooCommerce Subscriptions Importer requires an existing subscription product to exist before you can create subscriptions to that product. You can either [create a subscription](http://docs.woothemes.com/document/subscriptions/store-manager-guide/#section-1) manually if you only have a small number of different products, or use the [Product CSV Import Suite](http://www.woothemes.com/products/product-csv-import-suite/) if you need to create a large number of different subscription products.
@@ -218,3 +223,89 @@ Firstly, if you are using a payment gateway that is not supported by the CSV Imp
 If Subscriptions are set to manual renewals, it is very difficult (often impossible) to change them to an automatic renewal payment method, however it is relatively simple to change a payment method from automatic to manual renewals. Beforehand, you can [submit a request](http://support.woothemes.com/) for the payment method that you wish to use to be supported, or the other alternative is to import the subscription with another and use random text as the `stripe_customer_id` (a different payment method can be used as long as it is supported by the CSV Importer and supports the changing payment methods feature, see more info on this [here](http://docs.woothemes.com/document/subscriptions/payment-gateways/#section-1)). The stripe payment gateway with random text method is used to force the first payment to fail, allowing your customers to login and setup their preferred payment method by clicking the 'Change Payment Method' button on their My Account page and going through the checkout.
 
 If the later approach is taken, we strongly recommend that you notify all affected customers about the change to avoid any confusion in the future.
+
+---
+
+# Subscriptions Exporter
+The exporter turns all your subscriptions within WooCommerce into a comma delimited CSV file at the click of a button. It's important to take note that this extension will not export any related orders for your subscriptions (this includes parent and renewal orders, etc); to export renewal orders, you will need the [WooCommerce Order CSV Exporter](https://www.woothemes.com/products/ordercustomer-csv-export/) to do that.
+
+## Exported Columns
+|column|type|description|
+|---|---|---|
+|`subscription_id`        |int|Subscription ID|
+|`subscription_status`    |string|Subscription Status (i.e. `wc-active`, `wc-on-hold`)|
+`customer_id`             |int|Customer ID|
+`start_date`              |Y-m-d H:i:s|Subscription start date|
+`trial_end_date`          |Y-m-d H:i:s|Subscription trial end date (defaults to 0 when the subscription has no trial period|
+`next_payment_date`       |Y-m-d H:i:s|Subscription next payment date|
+`last_payment_date`       |Y-m-d H:i:s|Subscription last payment date|
+`end_date`                |Y-m-d H:i:s|Subscription end date (defaults to 0 when the subscription has no end)|
+`billing_period`          |string|Billing period|
+`billing_interval`        |int|Billing interval|
+`order_shipping`          |float|Total shipping|
+`order_shipping_tax`      |float|Total shipping tax|
+`fee_total`               |float|Total subscription fees|
+`fee_tax_total`           |float|Total fees tax|
+`order_tax`               |float|Subscription total tax|
+`order_cart_discount`     |float|Cart discount|
+`order_discount`          |float|Subscription discount|
+`order_total`             |float|Subscription total|
+`order_currency`          |string|Subscription currency|
+`payment_method`          |string|Payment method id|
+`payment_method_title`    |string|Payment method title|
+`payment_method_post_meta`|string|Payment method post meta|
+`payment_method_user_meta`|string|Payment method user meta|
+`shipping_method`         |string|Shipping method|
+`billing_first_name`      |string|Billing first name|
+`billing_last_name`       |string|Billing last name|
+`billing_email`           |string|Billing email|
+`billing_phone`           |string|Billing phone|
+`billing_address_1`       |string|Billing address 1|
+`billing_address_2`       |string|Billing address 2|
+`billing_postcode`        |string|Billing postcode|
+`billing_city`            |string|Billing city|
+`billing_state`           |string|Billing state|
+`billing_country`         |string|Billing country|
+`billing_company`         |string|Billing company|
+`shipping_first_name`     |string|Shipping first name|
+`shipping_last_name`      |string|Shipping last name|
+`shipping_address_1`      |string|Shipping address 1|
+`shipping_address_2`      |string|Shipping address 2|
+`shipping_postcode`       |string|Shipping post code|
+`shipping_city`           |string|Shipping city|
+`shipping_state`          |string|Shipping state|
+`shipping_country`        |string|Shipping country|
+`shipping_company`        |string|Shipping company|
+`customer_note`           |string|Customer note|
+`order_items`             |string|Subscription Items|
+`order_notes`             |string|Subscription order notes|
+`coupon_items`            |string|Coupons|
+`fee_items`               |string|Fees|
+`tax_items`               |string|Taxes|
+`download_permissions`    |int|Download permissions granted (1 or 0)|
+
+## Export Options
+
+![](https://cldup.com/P9e5V-xjGM.png)
+
+1. **File name**: simply allows you to export a file using a custom name (defaults to `subscriptions.csv`)
+2. **Subscription Status**: filter the subscriptions that are exported by status - untick any statuses you don't want exported (defaults to all statuses)
+3. **Customer**: use the search to export subscriptions that belong to a customer.
+4. **Payment Method**: Use the dropdown to export subscriptions that were purchased with the chosen gateway (defaults to any gateway)
+5. **Payment Method Tokens**: Select whether you want payment method tokens, like a customer or credit card token, to be exported in the CSV (defaults to false)
+
+## Custom CSV Headers
+Before exporting, you have the option to modify the column names which are written to the CSV along with choosen which column headers are exported. For instance, you can choose to just export the customer's billing first and last name, along with the subscriptions order total.
+
+![](https://cldup.com/o2aw3IBCsa.png)
+
+## Exporter Usage
+
+1. Go to **WooCommerce > Subscription Exporter**
+1. On the **Export Tab**:
+    1. Enter a name for the file (or leave as the default)
+    1. Choose the filters to apply to the data which is exported (if any)
+1. Click **CSV Headers**
+1. Click the radio fields under the **Include** column to optionally include or exclude data from the CSV
+1. Change the text use for column headings by editing the **CSV Column Header** column if required
+1. Click **Export Subscriptions**
