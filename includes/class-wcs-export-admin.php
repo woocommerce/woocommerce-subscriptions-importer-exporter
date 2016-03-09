@@ -139,7 +139,7 @@ class WCS_Export_Admin {
 						</td>
 					</tr>
 					<tr>
-						<td><label><?php esc_html_e( 'Payment method CC Tokens', 'wcs-import-export' ); ?>:</label></td>
+						<td><label><?php esc_html_e( 'Payment Method Tokens', 'wcs-import-export' ); ?>:</label></td>
 						<td><input type="checkbox" name="paymentmeta"><?php esc_html_e( 'Export your customers payment and credit cart tokens to the CSV', 'wcs-import-export' ); ?></td>
 					</tr>
 				</tbody>

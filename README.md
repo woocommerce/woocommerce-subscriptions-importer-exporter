@@ -292,7 +292,7 @@ The exporter turns all your subscriptions within WooCommerce into a comma delimi
 2. **Subscription Status**: filter the subscriptions that are exported by status - untick any statuses you don't want exported (defaults to all statuses)
 3. **Customer**: use the search to export subscriptions that belong to a customer.
 4. **Payment Method**: Use the dropdown to export subscriptions that were purchased with the chosen gateway (defaults to any gateway)
-5. **Payment Method CC Tokens**: Select whether you want payment cc tokens to be exported in the CSV (defaults to false)
+5. **Payment Method Tokens**: Select whether you want payment method tokens, like a customer or credit card token, to be exported in the CSV (defaults to false)
 
 ## Custom CSV Headers
 Before exporting, you have the option to modify the column names which are written to the CSV along with choosen which column headers are exported. For instance, you can choose to just export the customer's billing first and last name, along with the subscriptions order total.
