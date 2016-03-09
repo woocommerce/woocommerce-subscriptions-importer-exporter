@@ -297,7 +297,7 @@ The exporter turns all your subscriptions within WooCommerce into a comma delimi
 ## Custom CSV Headers
 Before exporting, you have the option to modify the column names which are written to the CSV along with choosen which column headers are exported. For instance, you can choose to just export the customer's billing first and last name, along with the subscriptions order total.
 
-![](https://cldup.com/Fyid0V3skf-3000x3000.png)
+![](https://cldup.com/o2aw3IBCsa.png)
 
 ## Exporter Usage
 

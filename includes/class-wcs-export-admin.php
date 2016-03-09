@@ -216,7 +216,7 @@ class WCS_Export_Admin {
 		<table class="widefat widefat_importer striped" id="wcsi-headers-table" style="display:none;">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Enabled', 'wcs-import-export' ); ?></th>
+					<th><?php esc_html_e( 'Include', 'wcs-import-export' ); ?></th>
 					<th><?php esc_html_e( 'Subscription Details', 'wcs-import-export' ); ?></th>
 					<th><?php esc_html_e( 'Importer Compatible Header', 'wcs-import-export' ); ?></th>
 					<th><?php esc_html_e( 'CSV Column Header', 'wcs-import-export' ); ?></th>
