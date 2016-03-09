@@ -98,12 +98,12 @@ class WCS_Export_Admin {
 	public function home_page() {
 		global $wpdb;
 
-		$statuses           = wcs_get_subscription_statuses();
-		$status_count       = array();
+		$statuses      = wcs_get_subscription_statuses();
+		$status_counts = array();
 
 		foreach ( wp_count_posts( 'shop_subscription' ) as $status => $count ) {
 			if ( array_key_exists( $status, $statuses ) ) {
-				$status_count[ $status ] = $count;
+				$status_counts[ $status ] = $count;
 			}
 		}
 
@@ -118,7 +118,7 @@ class WCS_Export_Admin {
 						<td style="text-align:top"><?php esc_html_e( 'Subscription Statuses', 'wcs-import-export' ); ?>:</td>
 						<td>
 							<?php foreach( $statuses as $status => $status_display ) : ?>
-								<input type="checkbox" name="status[<?php echo esc_attr( $status ); ?>]" checked><?php echo esc_html( $status_display ); ?>  [<?php echo esc_html( ! empty( $status_count[ $status ] ) ? $status_count[ $status ] : 0 ); ?>]<br>
+								<input type="checkbox" name="status[<?php echo esc_attr( $status ); ?>]" checked><?php echo esc_html( $status_display ); ?>  [<?php echo esc_html( ! empty( $status_counts[ $status ] ) ? $status_counts[ $status ] : 0 ); ?>]<br>
 							<?php endforeach; ?>
 						</td>
 					</tr>
