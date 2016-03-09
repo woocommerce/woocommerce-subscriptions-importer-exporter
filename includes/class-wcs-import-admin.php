@@ -117,15 +117,15 @@ class WCS_Admin_Importer {
 				}
 
 				$script_data = array(
-					'success' 				=> __( 'success', 'wcs-import-export' ),
-					'failed' 				=> __( 'failed', 'wcs-import-export' ),
-					'error_string'			=> sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-import-export' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
-					'finished_importing' 	=> __( 'Finished Importing', 'wcs-import-export' ),
-					'edit_order' 			=> __( 'Edit Order', 'wcs-import-export' ),
-					'warning'				=> __( 'Warning', 'wcs-import-export' ),
-					'warnings'				=> __( 'Warnings', 'wcs-import-export' ),
-					'located_at'			=> __( 'Located at rows', 'wcs-import-export' ),
-					'error_message'         => $error_message,
+					'success'            => __( 'success', 'wcs-import-export' ),
+					'failed'             => __( 'failed', 'wcs-import-export' ),
+					'error_string'       => sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-import-export' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
+					'finished_importing' => __( 'Finished Importing', 'wcs-import-export' ),
+					'edit_order'         => __( 'Edit Order', 'wcs-import-export' ),
+					'warning'            => __( 'Warning', 'wcs-import-export' ),
+					'warnings'           => __( 'Warnings', 'wcs-import-export' ),
+					'located_at'         => __( 'Located at rows', 'wcs-import-export' ),
+					'error_message'      => $error_message,
 
 					// Data for procesing the file
 					'file_id'          => absint( $_GET['file_id'] ),
