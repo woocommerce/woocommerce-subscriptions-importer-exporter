@@ -99,11 +99,12 @@ class WCS_Export_Admin {
 		global $wpdb;
 
 		$statuses           = wcs_get_subscription_statuses();
-		$status_count_query = $wpdb->get_results( "SELECT post_status, COUNT(*) AS count FROM {$wpdb->posts} WHERE post_type = 'shop_subscription' GROUP BY post_status" );
 		$status_count       = array();
 
-		foreach ( $status_count_query as $result ) {
-			$status_count[ $result->post_status ] = $result->count;
+		foreach ( wp_count_posts( 'shop_subscription' ) as $status => $count ) {
+			if ( array_key_exists( $status, $statuses ) ) {
+				$status_count[ $status ] = $count;
+			}
 		}
 
 		?>
