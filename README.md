@@ -181,7 +181,7 @@ The minimum requirements for creating a new user is simply an email address. If 
   * order_total
   * order_recurring_total
 
-## How to use the Importer
+## Importer Usage
 
 ### Step 0: Make Sure Products Exist
   - The WooCommerce Subscriptions Importer requires an existing subscription product to exist before you can create subscriptions to that product. You can either [create a subscription](http://docs.woothemes.com/document/subscriptions/store-manager-guide/#section-1) manually if you only have a small number of different products, or use the [Product CSV Import Suite](http://www.woothemes.com/products/product-csv-import-suite/) if you need to create a large number of different subscription products.
@@ -299,7 +299,7 @@ Before exporting, you have the option to modify the column names which are writt
 
 ![](https://cldup.com/Fyid0V3skf-3000x3000.png)
 
-## How to use!
+## Exporter Usage
 
 1. Locate the exporter by navigation to **WooCommerce > Subscription Exporter**
 2. On the Export Tab, choose a name for the file and use the options to filter which subscriptions are exported
