@@ -286,7 +286,7 @@ The exporter turns all your subscriptions within WooCommerce into a comma delimi
 
 ## Export Options
 
-![](https://cldup.com/CBeC8E4ecs-2000x2000.png)
+![](https://cldup.com/P9e5V-xjGM.png)
 
 1. **File name**: simply allows you to export a file using a custom name (defaults to `subscriptions.csv`)
 2. **Subscription Status**: filter the subscriptions that are exported by status - untick any statuses you don't want exported (defaults to all statuses)
