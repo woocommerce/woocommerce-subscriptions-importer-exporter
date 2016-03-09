@@ -126,7 +126,7 @@ class WCS_Export_Admin {
 						<td><input type="hidden" class="wc-customer-search" name="customer" data-placeholder="<?php esc_attr_e( 'Search for a customer&hellip;', 'wcs-import-export' ); ?>" data-selected="" value="" data-allow_clear="true" /></td>
 					</tr>
 					<tr>
-						<td><label><?php esc_html_e( 'Payment method', 'wcs-import-export' ); ?>:</label></td>
+						<td><label><?php esc_html_e( 'Payment Method', 'wcs-import-export' ); ?>:</label></td>
 						<td>
 							<select name="payment">
 								<option value="any"><?php esc_html_e( 'Any Payment Method', 'wcs-import-export' ); ?></option>
