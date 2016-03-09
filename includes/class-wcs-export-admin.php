@@ -305,7 +305,8 @@ class WCS_Export_Admin {
 			'payment_method' => $_POST['payment'],
 		);
 
-		WC_Payment_Gateways::instance();
+		WC()->payment_gateways();
+
 		$subscriptions = $this->get_subscriptions_to_export( $filters );
 
 		if ( ! empty( $subscriptions ) ) {
