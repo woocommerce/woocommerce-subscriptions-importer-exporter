@@ -301,7 +301,11 @@ Before exporting, you have the option to modify the column names which are writt
 
 ## Exporter Usage
 
-1. Locate the exporter by navigation to **WooCommerce > Subscription Exporter**
-2. On the Export Tab, choose a name for the file and use the options to filter which subscriptions are exported
-3. Under the CSV Headers, choose which CSV headers (columns) that will be in the exported CSV by ticking the rows. Edit the text in the textboxes if you want to customise the header text.
-4. Press "Export Subscriptions" and sit back while your CSV is being downloaded. When the page has stopped loading/processing, the download is completed.
+1. Go to **WooCommerce > Subscription Exporter**
+1. On the **Export Tab**:
+    1. Enter a name for the file (or leave as the default)
+    1. Choose the filters to apply to the data which is exported (if any)
+1. Click **CSV Headers**
+1. Click the radio fields under the **Include** column to optionally include or exclude data from the CSV
+1. Change the text use for column headings by editing the **CSV Column Header** column if required
+1. Click **Export Subscriptions**
