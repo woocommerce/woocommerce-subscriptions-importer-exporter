@@ -26,7 +26,7 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	public function add_import_tool() {
-		register_importer( 'woocommerce_subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-importer' ), array( &$this, 'admin_page' ) );
+		register_importer( 'woocommerce_subscription_csv', 'WooCommerce Subscriptions (CSV)', __( 'Import <strong>subscriptions</strong> to your WooCommerce store via a CSV file.', 'wcs-import-export' ), array( &$this, 'admin_page' ) );
 	}
 
 	/**
@@ -35,7 +35,7 @@ class WCS_Admin_Importer {
 	 * @since 1.0
 	 */
 	public function add_sub_menu() {
-		add_submenu_page( 'woocommerce', __( 'Subscription Importer', 'wcs-importer' ),  __( 'Subscription Importer', 'wcs-importer' ), 'manage_options', 'import_subscription', array( &$this, 'admin_page' ) );
+		add_submenu_page( 'woocommerce', __( 'Subscription Importer', 'wcs-import-export' ),  __( 'Subscription Importer', 'wcs-import-export' ), 'manage_options', 'import_subscription', array( &$this, 'admin_page' ) );
 	}
 
 	/**
@@ -46,11 +46,11 @@ class WCS_Admin_Importer {
 
 		if ( isset( $_GET['page'] ) && 'import_subscription' == $_GET['page'] ) {
 
-			wp_enqueue_style( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/wcs-importer.css' );
+			wp_enqueue_style( 'wcs-import-export-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/css/wcs-import-export.css' );
 
 			if ( isset( $_GET['step'] ) && 3 == absint( $_GET['step'] )  ) {
 
-				wp_enqueue_script( 'wcs-importer-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-importer.js' );
+				wp_enqueue_script( 'wcs-import-export-admin', plugin_dir_url( WC_Subscription_Importer::$plugin_file ) . '/js/wcs-import-export.js' );
 
 				$file_id = absint( $_GET['file_id'] );
 				$file    = get_attached_file( $_GET['file_id'] );
@@ -111,21 +111,21 @@ class WCS_Admin_Importer {
 				}
 
 				if ( count( $payment_method_error ) > 0 ) {
-					$error_message = sprintf( __( "You're importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-importer' ), str_replace( '"', ' ', json_encode( array_unique( $payment_method_error ) ) ), str_replace( '"', ' ', json_encode( array_unique( $payment_meta_error ) ) ) );
+					$error_message = sprintf( __( "You're importing subscriptions for %s without specifying %s . This will create subscriptions that use the manual renewal process, not the automatic process. Are you sure you want to do this?", 'wcs-import-export' ), str_replace( '"', ' ', json_encode( array_unique( $payment_method_error ) ) ), str_replace( '"', ' ', json_encode( array_unique( $payment_meta_error ) ) ) );
 				} else {
 					$error_message = '';
 				}
 
 				$script_data = array(
-					'success' 				=> __( 'success', 'wcs-importer' ),
-					'failed' 				=> __( 'failed', 'wcs-importer' ),
-					'error_string'			=> sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-importer' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
-					'finished_importing' 	=> __( 'Finished Importing', 'wcs-importer' ),
-					'edit_order' 			=> __( 'Edit Order', 'wcs-importer' ),
-					'warning'				=> __( 'Warning', 'wcs-importer' ),
-					'warnings'				=> __( 'Warnings', 'wcs-importer' ),
-					'located_at'			=> __( 'Located at rows', 'wcs-importer' ),
-					'error_message'         => $error_message,
+					'success'            => __( 'success', 'wcs-import-export' ),
+					'failed'             => __( 'failed', 'wcs-import-export' ),
+					'error_string'       => sprintf( __( "Row #%s from CSV %sfailed to import%s with error/s: %s", 'wcs-import-export' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ),
+					'finished_importing' => __( 'Finished Importing', 'wcs-import-export' ),
+					'edit_order'         => __( 'Edit Order', 'wcs-import-export' ),
+					'warning'            => __( 'Warning', 'wcs-import-export' ),
+					'warnings'           => __( 'Warnings', 'wcs-import-export' ),
+					'located_at'         => __( 'Located at rows', 'wcs-import-export' ),
+					'error_message'      => $error_message,
 
 					// Data for procesing the file
 					'file_id'          => absint( $_GET['file_id'] ),
@@ -139,7 +139,7 @@ class WCS_Admin_Importer {
 					'total'            => $total,
 				);
 
-				wp_localize_script( 'wcs-importer-admin', 'wcs_script_data', $script_data );
+				wp_localize_script( 'wcs-import-export-admin', 'wcs_script_data', $script_data );
 			}
 		}
 	}
@@ -178,21 +178,21 @@ class WCS_Admin_Importer {
 	public function admin_page() {
 
 		echo '<div class="wrap">';
-		echo '<h2>' . __( 'Subscription CSV Importer', 'wcs-importer' ) . '</h2>';
+		echo '<h2>' . __( 'Subscription CSV Importer', 'wcs-import-export' ) . '</h2>';
 		if ( ! isset( $_GET['step'] ) || isset( $_GET['cancelled'] ) ) :
 		?>
 		<div id="message" class="updated woocommerce-message wc-connect">
 			<?php if ( isset( $_GET['cancelled'] ) ) : ?>
 			<div id="message" class="updated error">
-				<p><?php _e( 'Import cancelled.', 'wcs-importer' ); ?></p>
+				<p><?php _e( 'Import cancelled.', 'wcs-import-export' ); ?></p>
 			</div>
 			<?php endif; ?>
 			<?php if ( ! isset( $_GET['step'] ) ) : ?>
 			<div class="squeezer">
-				<h4><?php _e( '<strong>Before you begin</strong>, please prepare your CSV file.', 'wcs-importer' ); ?></h4>
+				<h4><?php _e( '<strong>Before you begin</strong>, please prepare your CSV file.', 'wcs-import-export' ); ?></h4>
 				<p class="submit">
-					<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-importer' ); ?></a>
-					<a href="<?php echo plugins_url( 'wcs-import-sample.csv', WC_Subscription_Importer::$plugin_file ); ?>" class="button wcs-importer-download"><?php _e( 'Download Example CSV', 'wcs-importer' ); ?></a>
+					<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-import-export' ); ?></a>
+					<a href="<?php echo plugins_url( 'wcs-import-sample.csv', WC_Subscription_Importer::$plugin_file ); ?>" class="button wcs-import-export-download"><?php _e( 'Download Example CSV', 'wcs-import-export' ); ?></a>
 				</p>
 			</div>
 			<?php endif; ?>
@@ -235,18 +235,18 @@ class WCS_Admin_Importer {
 
 		if ( ! empty( $this->upload_error ) ) : ?>
 	<div id="message" class="error">
-		<p><?php printf( __( 'Error uploading file: %s', 'wcs-importer' ), $this->upload_error ); ?></p>
+		<p><?php printf( __( 'Error uploading file: %s', 'wcs-import-export' ), $this->upload_error ); ?></p>
 	</div>
 		<?php endif;
 
-		echo '<h3>' . __( 'Step 1: Upload CSV File', 'wcs-importer' ) . '</h3>';
+		echo '<h3>' . __( 'Step 1: Upload CSV File', 'wcs-import-export' ) . '</h3>';
 		if ( ! empty( $upload_dir['error'] ) ) : ?>
 			<div class="error"><p><?php _e( 'Before you can upload your import file, you will need to fix the following error:' ); ?></p>
 			<p><strong><?php echo $upload_dir['error']; ?></strong></p></div><?php
 		else :
 			?>
-			<p><?php _e( 'Upload a CSV file containing details about your subscriptions to bring across to your store with WooCommerce.', 'wcs-importer' ); ?></p>
-			<p><?php _e( 'Choose a CSV (.csv) file to upload, then click Upload file and import.', 'wcs-importer' ); ?></p>
+			<p><?php _e( 'Upload a CSV file containing details about your subscriptions to bring across to your store with WooCommerce.', 'wcs-import-export' ); ?></p>
+			<p><?php _e( 'Choose a CSV (.csv) file to upload, then click Upload file and import.', 'wcs-import-export' ); ?></p>
 			<form enctype="multipart/form-data" id="import-upload-form" method="post" action="<?php echo esc_attr( $this->admin_url ); ?>">
 				<?php wp_nonce_field( 'import-upload' ); ?>
 				<table class="form-table">
@@ -262,17 +262,17 @@ class WCS_Admin_Importer {
 							</td>
 						</tr>
 						<tr>
-							<th><?php _e( 'Run in Test Mode', 'wcs-importer' ); ?>:</th>
+							<th><?php _e( 'Run in Test Mode', 'wcs-import-export' ); ?>:</th>
 							<td>
 								<input type="checkbox" name="test_mode" value="yes" <?php checked( $test_mode, 'yes' ); ?> />
-								<em><?php _e( 'Check your CSV file for errors and warnings without creating subscriptions, users or orders.', 'wcs-importer' ); ?></em>
+								<em><?php _e( 'Check your CSV file for errors and warnings without creating subscriptions, users or orders.', 'wcs-import-export' ); ?></em>
 							</td>
 						</tr>
 						<tr>
-							<th><?php _e( 'Email passwords?', 'wcs-importer' ); ?></th>
+							<th><?php _e( 'Email passwords?', 'wcs-import-export' ); ?></th>
 							<td>
 								<input type="checkbox" name="email_customer" value="yes" <?php checked( $email_customer, 'yes' ); ?> />
-								<em><?php _e( 'If importing new users, you can email customers their account details.', 'wcs-importer' ); ?></em>
+								<em><?php _e( 'If importing new users, you can email customers their account details.', 'wcs-import-export' ); ?></em>
 							</td>
 						</tr>
 					</tbody>
@@ -330,20 +330,20 @@ class WCS_Admin_Importer {
 		);
 		$action = add_query_arg( $url_params, $this->admin_url );
 
-		$button_text = ( 'yes' == $_GET['test_mode'] ) ? __( 'Test CSV', 'wcs-importer' ) : __( 'Run Import', 'wcs-importer' );
+		$button_text = ( 'yes' == $_GET['test_mode'] ) ? __( 'Test CSV', 'wcs-import-export' ) : __( 'Run Import', 'wcs-import-export' );
 
 		$row_number = 1;
 		?>
-		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs-importer' ); ?></h3>
+		<h3><?php _e( 'Step 2: Map Fields to Column Names', 'wcs-import-export' ); ?></h3>
 		<form method="post" action="<?php echo esc_attr( $action ); ?>">
 			<?php wp_nonce_field( 'import-upload' ); ?>
 			<input type="hidden" name="action" value="field_mapping" />
 			<table class="widefat widefat_importer">
 				<thead>
 					<tr>
-						<th><?php _e( 'Map to', 'wcs-importer' ); ?></th>
-						<th><?php _e( 'Column Header', 'wcs-importer' ); ?></th>
-						<th><?php _e( 'Example Column Value', 'wcs-importer' ); ?></th>
+						<th><?php _e( 'Map to', 'wcs-import-export' ); ?></th>
+						<th><?php _e( 'Column Header', 'wcs-import-export' ); ?></th>
+						<th><?php _e( 'Example Column Value', 'wcs-import-export' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -351,11 +351,11 @@ class WCS_Admin_Importer {
 					<tr <?php echo ( ++$row_number % 2 ) ? '' : 'class="alternate"'; ?>>
 						<td> <!-- Available mapping options -->
 							<select name="mapto[<?php echo $header; ?>]">
-								<option value="0"><?php _e( 'Do not import', 'wcs-importer' ); ?></option>
+								<option value="0"><?php _e( 'Do not import', 'wcs-import-export' ); ?></option>
 								<option value="custom_user_meta">custom_user_meta</option>
 								<option value="custom_order_meta">custom_order_meta</option>
 								<option value='custom_user_order_meta'>custom_user_order_meta</option>
-								<optgroup label="<?php _e( 'Customer Fields', 'wcs-importer'); ?>">
+								<optgroup label="<?php _e( 'Customer Fields', 'wcs-import-export'); ?>">
 									<option value="customer_id" <?php selected( $header, 'customer_id' ); ?>>customer_id</option>
 									<option value="customer_email" <?php selected( $header, 'customer_email' ); ?>>customer_email</option>
 									<option value="customer_username" <?php selected( $header, 'customer_username' ); ?>>customer_username</option>
@@ -380,7 +380,7 @@ class WCS_Admin_Importer {
 									<option value="shipping_postcode" <?php selected( $header, 'shipping_postcode' ); ?>>shipping_postcode</option>
 									<option value="shipping_country" <?php selected( $header, 'shipping_country' ); ?>>shipping_country</option>
 								</optgroup>
-								<optgroup label="<?php _e( 'Order Fields', 'wcs-importer' ); ?>">
+								<optgroup label="<?php _e( 'Order Fields', 'wcs-import-export' ); ?>">
 									<option value="recurring_line_total" <?php selected( $header, 'recurring_line_total' ); ?>>recurring_line_total</option>
 									<option value="recurring_line_tax" <?php selected( $header, 'recurring_line_tax' ); ?>>recurring_line_tax</option>
 									<option value="recurring_line_subtotal" <?php selected( $header, 'recurring_line_subtotal' ); ?>>recurring_line_subtotal</option>
@@ -407,7 +407,7 @@ class WCS_Admin_Importer {
 									<option value="download_permission_granted" <?php selected( $header, 'download_permission_granted' ); ?>>download_permission_granted</option>
 									<option value="quantity" <?php selected( $header, 'quantity' ); ?>>quantity</option>
 								</optgroup>
-								<optgroup label="<?php _e( 'Subscription Status', 'wcs-importer' ); ?>">
+								<optgroup label="<?php _e( 'Subscription Status', 'wcs-import-export' ); ?>">
 									<option value="subscription_status" <?php selected( $header, 'subscription_status' ); ?>>subscription_status</option>
 									<option value="subscription_start_date" <?php selected( $header, 'subscription_start_date' ); ?>>subscription_start_date</option>
 									<option value="subscription_expiry_date" <?php selected( $header, 'subscription_expiry_date' ); ?>>subscription_expiry_date</option>
@@ -447,43 +447,43 @@ class WCS_Admin_Importer {
 
 			$action = add_query_arg( $url_params, $this->admin_url );
 			?>
-			<h3><?php _e( 'Test Run Results', 'wcs-importer' ); ?></h3>
+			<h3><?php _e( 'Test Run Results', 'wcs-import-export' ); ?></h3>
 			<table id="wcs-import-progress" class="widefat_importer widefat">
 				<thead>
 					<tr>
-						<th class="row" colspan="2"><?php _e( 'Importer Test Results', 'wcs-importer' ); ?></th>
+						<th class="row" colspan="2"><?php _e( 'Importer Test Results', 'wcs-import-export' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr class="alternate">
-						<th><strong><?php _e( 'Results', 'wcs-importer' ); ?></strong></th>
-						<td id="wcs-importer_test_results"><strong><?php echo sprintf( __( '%s0%s tests passed, %s0%s tests failed ( %s0%s of the CSV will be imported ).', 'wcs-importer' ), '<span id="wcs-test-passed">', '</span>', '<span id="wcs-test-failed">', '</span>', '<span id="wcs-test-ratio">', '</span>%' ); ?></strong></td>
+						<th><strong><?php _e( 'Results', 'wcs-import-export' ); ?></strong></th>
+						<td id="wcs-import-export_test_results"><strong><?php echo sprintf( __( '%s0%s tests passed, %s0%s tests failed ( %s0%s of the CSV will be imported ).', 'wcs-import-export' ), '<span id="wcs-test-passed">', '</span>', '<span id="wcs-test-failed">', '</span>', '<span id="wcs-test-ratio">', '</span>%' ); ?></strong></td>
 					</tr>
 					<tr>
-						<th><strong><?php _e( 'Details', 'wcs-importer' ); ?></strong></th>
-						<td id="wcs-importer_test_details"><strong><?php echo sprintf( __( '%s0%s fatal errors and %s0%s warnings found.', 'wcs-importer' ), '<span id="wcs-fatal-details">', '</span>', '<span id="wcs-warning-details">', '</span>' ); ?></strong></td>
+						<th><strong><?php _e( 'Details', 'wcs-import-export' ); ?></strong></th>
+						<td id="wcs-import-export_test_details"><strong><?php echo sprintf( __( '%s0%s fatal errors and %s0%s warnings found.', 'wcs-import-export' ), '<span id="wcs-fatal-details">', '</span>', '<span id="wcs-warning-details">', '</span>' ); ?></strong></td>
 					</tr>
-					<tr class="alternate" id="wcs-importer_test_errors"><th><?php _e( 'Error Messages', 'wcs-importer' ); ?>:</th><td></td></tr>
-					<tr id="wcs-importer_test_warnings"><th><?php _e( 'Warnings', 'wcs-importer' ); ?>:</th><td></td></tr>
+					<tr class="alternate" id="wcs-import-export_test_errors"><th><?php _e( 'Error Messages', 'wcs-import-export' ); ?>:</th><td></td></tr>
+					<tr id="wcs-import-export_test_warnings"><th><?php _e( 'Warnings', 'wcs-import-export' ); ?>:</th><td></td></tr>
 				</tbody>
 			</table>
 			<div id="wcs-completed-message" style="display: none;">
-				<p><?php _e( 'Test Finished!', 'wcs-importer' );?></p>
-				<a class="button" href="<?php echo esc_attr( wp_nonce_url( $action, 'import-upload' ) ); ?> "><?php _e( 'Run Import' , 'wcs-importer' ); ?></a>
+				<p><?php _e( 'Test Finished!', 'wcs-import-export' );?></p>
+				<a class="button" href="<?php echo esc_attr( wp_nonce_url( $action, 'import-upload' ) ); ?> "><?php _e( 'Run Import' , 'wcs-import-export' ); ?></a>
 			</div>
 		<?php else : ?>
-			<h3><?php _e( 'Importing Results', 'wcs-importer' ); ?></h3>
-			<p id="wcs-import-timeout" style="display: none;"><?php echo sprintf( __( 'ERROR: The importing process has timed out. Please check the CSV is correct and do a test run before importing by enabling the checkbox on the Importer Home screen. %s Start Over. %s', 'wcs-importer' ), '<a href="' . $this->admin_url . '">', '</a>' ); ?></p>
-			<p id="wcs-import-time-completion"><?php echo sprintf( __( 'Total Estimated Import Time Between:  %s 0%s minutes. ( %s0%s Completed! )', 'wcs-importer'), '<span id="wcs-estimated-time">', '</span>', '<span id="wcs-completed-percent">', '%</span>' ); ?></p>
+			<h3><?php _e( 'Importing Results', 'wcs-import-export' ); ?></h3>
+			<p id="wcs-import-timeout" style="display: none;"><?php echo sprintf( __( 'ERROR: The importing process has timed out. Please check the CSV is correct and do a test run before importing by enabling the checkbox on the Importer Home screen. %s Start Over. %s', 'wcs-import-export' ), '<a href="' . $this->admin_url . '">', '</a>' ); ?></p>
+			<p id="wcs-import-time-completion"><?php echo sprintf( __( 'Total Estimated Import Time Between:  %s 0%s minutes. ( %s0%s Completed! )', 'wcs-import-export'), '<span id="wcs-estimated-time">', '</span>', '<span id="wcs-completed-percent">', '%</span>' ); ?></p>
 			<table id="wcs-import-progress" class="widefat_importer widefat">
 				<thead>
 					<tr>
-						<th class="row"><?php _e( 'Import Status', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Order #', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Subscription', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'User Name', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Subscription Status', 'wcs-importer' ); ?></th>
-						<th class="row"><?php _e( 'Number of Warnings', 'wcs-importer' ); ?></th>
+						<th class="row"><?php _e( 'Import Status', 'wcs-import-export' ); ?></th>
+						<th class="row"><?php _e( 'Order #', 'wcs-import-export' ); ?></th>
+						<th class="row"><?php _e( 'Subscription', 'wcs-import-export' ); ?></th>
+						<th class="row"><?php _e( 'User Name', 'wcs-import-export' ); ?></th>
+						<th class="row"><?php _e( 'Subscription Status', 'wcs-import-export' ); ?></th>
+						<th class="row"><?php _e( 'Number of Warnings', 'wcs-import-export' ); ?></th>
 					</tr>
 				</thead>
 				<tfoot>
@@ -494,7 +494,7 @@ class WCS_Admin_Importer {
 				<tbody></tbody>
 			</table>
 			<p id="wcs-completed-message" style="display: none;">
-				<?php printf( __( 'Import Complete! %sView Subscriptions%s, %sView Orders%s or %sImport another file%s.', 'wcs-importer' ), '<a href="' . admin_url( 'admin.php?page=subscriptions' ) . '">', '</a>', '<a href="' . admin_url( 'edit.php?post_type=shop_order' ) . '">', '</a>', '<a href="' . $this->admin_url . '">', '</a>' ); ?>
+				<?php printf( __( 'Import Complete! %sView Subscriptions%s, %sView Orders%s or %sImport another file%s.', 'wcs-import-export' ), '<a href="' . admin_url( 'admin.php?page=subscriptions' ) . '">', '</a>', '<a href="' . admin_url( 'edit.php?post_type=shop_order' ) . '">', '</a>', '<a href="' . $this->admin_url . '">', '</a>' ); ?>
 			</p>
 		<?php endif;
 	}
