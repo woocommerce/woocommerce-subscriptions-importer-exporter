@@ -1,6 +1,6 @@
 # WooCommerce Subscriptions Importer and Exporter
 
-- [Importer Documentation]($subscriptions-importer)
+- [Importer Documentation](#subscriptions-importer)
 - [Exporter Documentation](#subscriptions-exporter)
 
 ---
