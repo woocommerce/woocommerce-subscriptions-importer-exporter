@@ -285,7 +285,9 @@ The exporter turns all your subscriptions within WooCommerce into a comma delimi
 `download_permissions`    |int|Download permissions granted (1 or 0)|
 
 ## Export Options
+
 ![](https://cldup.com/CBeC8E4ecs-2000x2000.png)
+
 1. **File name**: simply allows you to export a file using a custom name (defaults to `subscriptions.csv`)
 2. **Subscription Status**: filter the subscriptions that are exported by status - untick any statuses you don't want exported (defaults to all statuses)
 3. **Customer**: use the search to export subscriptions that belong to a customer.
