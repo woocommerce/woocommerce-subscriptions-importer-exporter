@@ -252,25 +252,30 @@ class WCS_Export_Admin {
 	 * Query the subscriptions using the users specific filters.
 	 *
 	 * @since 1.0
-	 * @param array $filters
 	 * @return array
 	 */
-	private function get_subscriptions_to_export( $filters ) {
+	private function get_subscriptions_to_export() {
 
 		$args = array(
-			'subscriptions_per_page' => -1,
+			'subscriptions_per_page' => isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : -1,
+			'offset'                 => isset( $_POST['offset'] ) ? $_POST['offset'] : 0,
+			'product'                => isset( $_POST['product'] ) ? $_POST['product'] : '',
 			'subscription_status'    => 'none', // don't default to 'any' status if no statuses were chosen
 		);
 
-		if ( ! empty( $filters['statuses'] ) && is_array( $filters['statuses'] ) ) {
-			$args['subscription_status'] = implode(',', $filters['statuses'] );
+		if ( ! empty( $_POST['status'] ) ) {
+			$statuses = array_keys( $_POST['status'] );
+
+			if ( ! empty( $statuses  ) && is_array( $statuses  ) ) {
+				$args['subscription_status'] = implode(',', $statuses );
+			}
 		}
 
-		if ( ! empty( $filters['customer'] ) && is_numeric( $filters['customer'] ) ) {
-			$args['customer_id'] = $filters['customer'];
+		if ( ! empty( $_POST['customer'] ) && is_numeric( $_POST['customer'] ) ) {
+			$args['customer_id'] = $_POST['customer'];
 		}
 
-		if ( ! empty( $filters['payment_method'] ) ) {
+		if ( ! empty( $_POST['payment'] ) ) {
 			add_filter( 'woocommerce_get_subscriptions_query_args', array( &$this, 'filter_payment_method' ), 10, 2 );
 		}
 
