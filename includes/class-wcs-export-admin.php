@@ -143,8 +143,18 @@ class WCS_Export_Admin {
 						<td><label><?php esc_html_e( 'Payment Method Tokens', 'wcs-import-export' ); ?>:</label></td>
 						<td><input type="checkbox" name="paymentmeta"><?php esc_html_e( 'Export your customers payment and credit cart tokens to the CSV', 'wcs-import-export' ); ?></td>
 					</tr>
+					<tr>
+						<td><label><?php esc_html_e( 'Offset', 'wcs-import-export' ); ?>:</label></td>
+						<td><input type="number" name="offset" min="0" value="0"> <?php esc_html_e( 'Offset export results to export a specific subset of your subscriptions. Defaults to 0.', 'wcs-import-export' ); ?></td>
+					</tr>
+					<tr>
+						<td><label><?php esc_html_e( 'Limit Export', 'wcs-import-export' ); ?>:</label></td>
+						<td><input type="number" name="limit" min="-1"> <?php esc_html_e( 'Leave empty or set to "-1" to export all subscriptions in your store.', 'wcs-import-export' ); ?></td>
+					</tr>
 				</tbody>
+
 		</table>
+		<?php esc_html_e( 'When exporting all subscriptions, your site may experience memory exhaustion and therefore you may need to use the limit and offset to separate your export into multiple CSV files.', 'wcs-import-export' ); ?>
 
 	<?php
 		$this->export_headers();
