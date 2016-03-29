@@ -1,8 +1,14 @@
 <?php
 /**
+<<<<<<< HEAD
  * Plugin Name: WooCommerce Subscriptions CSV Importer
  * Plugin URI:
  * Description: CSV Importer to bring your subscriptions to Woocommerce.
+=======
+ * Plugin Name: WooCommerce Subscriptions CSV Importer and Exporter
+ * Plugin URI: https://github.com/Prospress/woocommerce-subscriptions-importer
+ * Description: Import or export subscriptions in your WooCommerce store via CSV.
+>>>>>>> master
  * Version: 1.0
  * Author: Prospress Inc
  * Author URI: http://prospress.com
@@ -20,14 +26,17 @@ require_once( 'includes/class-wcs-import-admin.php' );
 require_once( 'includes/class-wcs-import-parser.php' );
 require_once( 'includes/class-wcs-import-logger.php' );
 require_once( 'includes/wcsi-functions.php' );
+require_once( 'includes/class-wcs-export-admin.php' );
 
 class WCS_Importer_Exporter {
 
 	public static $wcs_importer;
 
-	public static $plugin_file = __FILE__;
+	public static $wcs_exporter;
 
 	public static $version = '1.0.0';
+
+	public static $plugin_file = __FILE__;
 
 	/**
 	 * Initialise filters for the Subscriptions CSV Importer
@@ -48,8 +57,8 @@ class WCS_Importer_Exporter {
 
 		if ( is_admin() ) {
 			if ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '2.0', '>=' ) ) {
+				self::$wcs_exporter = new WCS_Export_Admin();
 				self::$wcs_importer = new WCS_Import_Admin();
-
 			} else {
 				add_action( 'admin_notices', __CLASS__ . '::plugin_dependency_notice' );
 			}
