@@ -313,16 +313,9 @@ class WCS_Export_Admin {
 	public function process_download( $headers = array() ) {
 		require_once( 'class-wcs-export-writer.php' );
 
-		$filters = array(
-			'statuses'       => array_keys( $_POST['status'] ),
-			'customer'       => isset( $_POST['customer'] ) ? $_POST['customer'] : '',
-			'product'        => isset( $_POST['product'] ) ? $_POST['product'] : '',
-			'payment_method' => $_POST['payment'],
-		);
-
 		WC()->payment_gateways();
 
-		$subscriptions = $this->get_subscriptions_to_export( $filters );
+		$subscriptions = $this->get_subscriptions_to_export();
 
 		if ( ! empty( $subscriptions ) ) {
 			if ( empty( $_POST['paymentmeta'] ) ) {
