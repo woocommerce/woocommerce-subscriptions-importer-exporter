@@ -252,7 +252,8 @@ class WCS_Import_Admin {
 								<em><?php esc_html_e( 'If importing new users, you can email customers their account details.', 'wcs-import-export' ); ?></em>
 							</td>
 						</tr>
-						<?php if ( ! empty( get_option( 'wc_memberships_is_active', false ) ) && class_exists( 'WC_Memberships' ) ) : ?>
+						<?php $is_memberships_active = get_option( 'wc_memberships_is_active', false ); ?>
+						<?php if ( ! empty( $is_memberships_active ) && class_exists( 'WC_Memberships' ) ) : ?>
 							<tr>
 								<th><?php esc_html_e( 'Attach membership plans', 'wcs-import-export' ); ?></th>
 								<td>
