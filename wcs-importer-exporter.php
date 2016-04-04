@@ -1,14 +1,8 @@
 <?php
 /**
-<<<<<<< HEAD
- * Plugin Name: WooCommerce Subscriptions CSV Importer
- * Plugin URI:
- * Description: CSV Importer to bring your subscriptions to Woocommerce.
-=======
  * Plugin Name: WooCommerce Subscriptions CSV Importer and Exporter
  * Plugin URI: https://github.com/Prospress/woocommerce-subscriptions-importer
  * Description: Import or export subscriptions in your WooCommerce store via CSV.
->>>>>>> master
  * Version: 1.0
  * Author: Prospress Inc
  * Author URI: http://prospress.com
