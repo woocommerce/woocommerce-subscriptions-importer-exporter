@@ -200,20 +200,6 @@ class WCS_Import_Parser {
 				case 'shipping_postcode':
 				case 'shipping_state':
 				case 'shipping_country':
-					$value = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : '';
-
-					if ( empty( $value ) ) {
-						$metadata = get_user_meta( $user_id, $column );
-						$value    = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
-					}
-
-					if ( empty( $value ) ) {
-						$missing_shipping_addresses[] = $column;
-					}
-
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
-					break;
-
 				case 'billing_address_1':
 				case 'billing_city':
 				case 'billing_postcode':
@@ -223,11 +209,15 @@ class WCS_Import_Parser {
 
 					if ( empty( $value ) ) {
 						$metadata = get_user_meta( $user_id, $column );
-						$value = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
+						$value    = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
 					}
 
 					if ( empty( $value ) ) {
-						$missing_billing_addresses[] = $column;
+						if ( 0 === strpos( $column, 'billing_' ) ) {
+							$missing_billing_addresses[] = $column;
+						} else {
+							$missing_shipping_addresses[] = $column;
+						}
 					}
 
 					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
