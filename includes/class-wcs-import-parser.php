@@ -206,11 +206,16 @@ class WCS_Import_Parser {
 				case 'billing_state':
 				case 'billing_country':
 				case 'billing_phone':
+				case 'billing_email':
 					$value = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : '';
 
 					if ( empty( $value ) ) {
 						$metadata = get_user_meta( $user_id, $column );
 						$value    = ( ! empty( $metadata[0] ) ) ? $metadata[0] : '';
+					}
+
+					if ( empty( $value ) && 'billing_email' == $column ) {
+						$value = ( ! empty( $data[ self::$fields['customer_email'] ] ) ) ? $data[ self::$fields['customer_email'] ] : get_userdata( $user_id )->user_email;
 					}
 
 					if ( empty( $value ) ) {
