@@ -52,11 +52,11 @@ class WCS_Import_Admin {
 
 		if ( isset( $_GET['page'] ) && 'import_subscription' == $_GET['page'] ) {
 
-			wp_enqueue_style( 'wcs-importer-admin', plugin_dir_url( WCS_Importer_Exporter::$plugin_file ) . '/assets/css/wcs-importer.css' );
+			wp_enqueue_style( 'wcs-importer-admin', WCS_Importer_Exporter::plugin_url() . '/assets/css/wcs-importer.css' );
 
 			if ( isset( $_GET['step'] ) && 3 == absint( $_GET['step'] )  ) {
 
-				wp_enqueue_script( 'wcs-importer-admin', plugin_dir_url( WCS_Importer_Exporter::$plugin_file ) . '/assets/js/wcs-importer.js' );
+				wp_enqueue_script( 'wcs-importer-admin', WCS_Importer_Exporter::plugin_url() . '/assets/js/wcs-importer.js' );
 
 				$file_id = absint( $_GET['file_id'] );
 				$file    = get_attached_file( $_GET['file_id'] );
@@ -169,7 +169,7 @@ class WCS_Import_Admin {
 					<h4><?php printf( esc_html__( '%sBefore you begin%s, please prepare your CSV file.', 'wcs-import-export' ), '<strong>', '</strong>' ); ?></h4>
 					<p class="submit">
 						<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-import-export' ); ?></a>
-						<a href="<?php echo esc_url( plugins_url( 'wcs-import-sample.csv', WCS_Importer_Exporter::$plugin_file ) ); ?>" class="button wcs-importer-download"><?php esc_html_e( 'Download Example CSV', 'wcs-import-export' ); ?></a>
+						<a href="<?php echo esc_url( WCS_Importer_Exporter::plugin_url() . '/wcs-import-sample.csv' ); ?>" class="button wcs-importer-download"><?php esc_html_e( 'Download Example CSV', 'wcs-import-export' ); ?></a>
 					</p>
 				</div>
 			<?php endif; ?>

@@ -44,7 +44,7 @@ class WCS_Export_Admin {
 	 * @since 1.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( 'wcs-exporter-admin', plugin_dir_url( WCS_Importer_Exporter::$plugin_file ) . '/assets/js/wcs-exporter.js' );
+		wp_enqueue_script( 'wcs-exporter-admin', WCS_Importer_Exporter::plugin_url() . '/assets/js/wcs-exporter.js' );
 	}
 
 	/**
