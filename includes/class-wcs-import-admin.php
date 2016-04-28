@@ -239,14 +239,14 @@ class WCS_Import_Admin {
 							</td>
 						</tr>
 						<tr>
-							<th><?php esc_html_e( 'Run in test mode', 'wcs-import-export' ); ?>:</th>
+							<th><?php esc_html_e( 'Run in Test Mode:', 'wcs-import-export' ); ?>:</th>
 							<td>
 								<input type="checkbox" name="test_mode" value="yes" <?php checked( $test_mode, 'yes' ); ?> />
 								<em><?php esc_html_e( 'Check your CSV file for errors and warnings without creating subscriptions, users or orders.', 'wcs-import-export' ); ?></em>
 							</td>
 						</tr>
 						<tr>
-							<th><?php esc_html_e( 'Email passwords?', 'wcs-import-export' ); ?></th>
+							<th><?php esc_html_e( 'Email Passwords:', 'wcs-import-export' ); ?></th>
 							<td>
 								<input type="checkbox" name="email_customer" value="yes" <?php checked( $email_customer, 'yes' ); ?> />
 								<em><?php esc_html_e( 'If importing new users, you can email customers their account details.', 'wcs-import-export' ); ?></em>
@@ -255,7 +255,7 @@ class WCS_Import_Admin {
 						<?php $is_memberships_active = get_option( 'wc_memberships_is_active', false ); ?>
 						<?php if ( ! empty( $is_memberships_active ) && class_exists( 'WC_Memberships' ) ) : ?>
 							<tr>
-								<th><?php esc_html_e( 'Attach membership plans', 'wcs-import-export' ); ?></th>
+								<th><?php esc_html_e( 'Add Memberships:', 'wcs-import-export' ); ?></th>
 								<td>
 									<input type="checkbox" name="add_memberships" value="no" <?php checked( $add_memberships, 'yes' ); ?> />
 									<em><?php printf( esc_html__( 'Automatically add the membership to the new subscription if it contains a product that is part of a membership plan (only works with %sWooCommerce Memberships%s).', 'wcs-import-export' ), '<a href="https://www.woothemes.com/products/woocommerce-memberships/">', '</a>' ); ?></em>
