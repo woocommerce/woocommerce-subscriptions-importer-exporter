@@ -401,9 +401,9 @@ class WCS_Import_Admin {
 				'add_memberships' => $_GET['add_memberships'],
 			),$this->admin_url );
 
-			include( plugin_dir_path( WCS_Importer_Exporter::$plugin_file ) . 'templates/test-mode.php' );
+			include( WCS_Importer_Exporter::plugin_dir() . 'templates/test-mode.php' );
 		} else {
-			include( plugin_dir_path( WCS_Importer_Exporter::$plugin_file ) . 'templates/import-results.php' );
+			include( WCS_Importer_Exporter::plugin_dir() . 'templates/import-results.php' );
 		}
 	}
 
