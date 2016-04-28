@@ -112,6 +112,16 @@ class WCS_Importer_Exporter {
 	public static function plugin_url() {
 		return plugin_dir_url( self::$plugin_file );
 	}
+
+	/**
+	 * Get the plugin's path for loading files
+	 *
+	 * @since 2.0
+	 * @return string
+	 */
+	public static function plugin_dir() {
+		return plugin_dir_path( self::$plugin_file );
+	}
 }
 
 WCS_Importer_Exporter::init();
