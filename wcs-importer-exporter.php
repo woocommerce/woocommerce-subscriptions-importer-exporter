@@ -30,7 +30,7 @@ class WCS_Importer_Exporter {
 
 	public static $version = '1.0.0';
 
-	public static $plugin_file = __FILE__;
+	protected static $plugin_file = __FILE__;
 
 	/**
 	 * Initialise filters for the Subscriptions CSV Importer
@@ -103,6 +103,15 @@ class WCS_Importer_Exporter {
 		<?php endif;
 	}
 
+	/**
+	 * Get the plugin's URL path for loading assets
+	 *
+	 * @since 2.0
+	 * @return string
+	 */
+	public static function plugin_url() {
+		return plugin_dir_url( self::$plugin_file );
+	}
 }
 
 WCS_Importer_Exporter::init();
