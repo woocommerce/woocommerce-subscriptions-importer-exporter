@@ -205,6 +205,7 @@ class WCS_Import_Parser {
 				case 'billing_postcode':
 				case 'billing_state':
 				case 'billing_country':
+				case 'billing_phone':
 					$value = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : '';
 
 					if ( empty( $value ) ) {
