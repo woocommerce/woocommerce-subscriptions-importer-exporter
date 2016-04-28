@@ -176,6 +176,8 @@ class WCS_Import_Parser {
 
 		foreach( array_merge( self::$order_meta_fields, self::$user_meta_fields ) as $column ) {
 			switch( $column ) {
+				case 'cart_discount':
+				case 'cart_discount_tax':
 				case 'order_shipping':
 				case 'order_shipping_tax':
 				case 'order_total':
