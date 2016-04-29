@@ -154,7 +154,7 @@ To view the shutdown logs:
     [coupon_items] => code:recurring_discount|amount:10.00
 )
 
-01-12-2016 @ 05:52:16 - PHP Fatal error Call to undefined method WCS_Import_Parser::add_coupons() in /Users/Matt/Dropbox/Sites/subs2.0/wp-content/plugins/woocommerce-subscriptions-importer/includes/class-wcs-import-parser.php on line 425.
+01-12-2016 @ 05:52:16 - PHP Fatal error Call to undefined method WCS_Importer::add_coupons() in /Users/Matt/Dropbox/Sites/subs2.0/wp-content/plugins/woocommerce-subscriptions-importer/includes/class-wcs-import-parser.php on line 425.
 ```
 
 ## CSV Formatting Guide

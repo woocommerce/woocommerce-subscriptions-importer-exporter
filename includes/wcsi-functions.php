@@ -67,7 +67,7 @@ function wcsi_check_customer( $data, $mapped_fields, $test_mode = false ) {
 				if ( ! is_wp_error( $found_customer ) ) {
 
 					// update user meta data
-					foreach ( WCS_Import_Parser::$user_meta_fields as $key ) {
+					foreach ( WCS_Importer::$user_meta_fields as $key ) {
 						switch ( $key ) {
 							case 'billing_email':
 								// user billing email if set in csv otherwise use the user's account email
