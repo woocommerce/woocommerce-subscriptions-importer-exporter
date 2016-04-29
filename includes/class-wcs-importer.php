@@ -148,7 +148,7 @@ class WCS_Importer {
 		$result     = array(
 			'warning'    => array(),
 			'error'      => array(),
-			'item'       => '',
+			'items'      => '',
 			'row_number' => self::$row_number,
 		);
 
@@ -361,7 +361,7 @@ class WCS_Importer {
 
 				if ( ! empty( $data[ self::$fields['order_items'] ] ) ) {
 					if ( is_numeric( $data[ self::$fields['order_items'] ] ) ) {
-						$result['item'] = self::add_product( $subscription, array( 'product_id' => absint( $data[ self::$fields['order_items'] ] ) ), $chosen_tax_rate_id );
+						$result['items'] = self::add_product( $subscription, array( 'product_id' => absint( $data[ self::$fields['order_items'] ] ) ), $chosen_tax_rate_id );
 					} else {
 						$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
 
@@ -374,7 +374,7 @@ class WCS_Importer {
 									$item_data[ trim( $name ) ] = trim( $value );
 								}
 
-								$result['item'] .= self::add_product( $subscription, $item_data, $chosen_tax_rate_id );
+								$result['items'] .= self::add_product( $subscription, $item_data, $chosen_tax_rate_id ) . '<br/>';
 							}
 						}
 					}

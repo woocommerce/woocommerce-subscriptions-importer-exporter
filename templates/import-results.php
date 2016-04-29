@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<tr>
 			<th class="row"><?php esc_html_e( 'Import Status', 'wcs-import-export' ); ?></th>
 			<th class="row"><?php esc_html_e( 'Subscription', 'wcs-import-export' ); ?></th>
-			<th class="row"><?php esc_html_e( 'Item', 'wcs-import-export' ); ?></th>
+			<th class="row"><?php esc_html_e( 'Items', 'wcs-import-export' ); ?></th>
 			<th class="row"><?php esc_html_e( 'Customer', 'wcs-import-export' ); ?></th>
 			<th class="row"><?php esc_html_e( 'Subscription Status', 'wcs-import-export' ); ?></th>
 			<th class="row"><?php esc_html_e( 'Number of Warnings', 'wcs-import-export' ); ?></th>
