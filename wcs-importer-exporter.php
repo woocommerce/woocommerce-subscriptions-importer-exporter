@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Subscriptions CSV Importer and Exporter
  * Plugin URI: https://github.com/Prospress/woocommerce-subscriptions-importer
  * Description: Import or export subscriptions in your WooCommerce store via CSV.
- * Version: 1.0
+ * Version: 2.0-beta
  * Author: Prospress Inc
  * Author URI: http://prospress.com
  * License: GPLv2
@@ -16,9 +16,7 @@ if ( ! function_exists( 'woothemes_queue_update' ) || ! function_exists( 'is_woo
 	require_once( 'woo-includes/woo-functions.php' );
 }
 
-require_once( 'includes/class-wcs-import-admin.php' );
-require_once( 'includes/class-wcs-import-parser.php' );
-require_once( 'includes/class-wcs-export-admin.php' );
+require_once( 'includes/wcsi-functions.php' );
 
 class WCS_Importer_Exporter {
 
@@ -28,7 +26,7 @@ class WCS_Importer_Exporter {
 
 	public static $version = '1.0.0';
 
-	public static $plugin_file = __FILE__;
+	protected static $plugin_file = __FILE__;
 
 	/**
 	 * Initialise filters for the Subscriptions CSV Importer
@@ -38,6 +36,8 @@ class WCS_Importer_Exporter {
 	public static function init() {
 		add_filter( 'plugins_loaded', __CLASS__ . '::setup_importer' );
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), __CLASS__ . '::action_links' );
+
+		spl_autoload_register( __CLASS__ . '::autoload' );
 	}
 
 	/**
@@ -50,7 +50,6 @@ class WCS_Importer_Exporter {
 		if ( is_admin() ) {
 			if ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '2.0', '>=' ) ) {
 				self::$wcs_exporter = new WCS_Export_Admin();
-			} elseif ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '1.5', '>=' ) ) {
 				self::$wcs_importer = new WCS_Import_Admin();
 			} else {
 				add_action( 'admin_notices', __CLASS__ . '::plugin_dependency_notice' );
@@ -102,6 +101,40 @@ class WCS_Importer_Exporter {
 		<?php endif;
 	}
 
+	/**
+	 * Get the plugin's URL path for loading assets
+	 *
+	 * @since 2.0
+	 * @return string
+	 */
+	public static function plugin_url() {
+		return plugin_dir_url( self::$plugin_file );
+	}
+
+	/**
+	 * Get the plugin's path for loading files
+	 *
+	 * @since 2.0
+	 * @return string
+	 */
+	public static function plugin_dir() {
+		return plugin_dir_path( self::$plugin_file );
+	}
+
+	/**
+	 * Get the plugin's path for loading files
+	 *
+	 * @since 2.0
+	 * @return string
+	 */
+	public static function autoload( $class ) {
+		$class = strtolower( $class );
+		$file  = 'class-' . str_replace( '_', '-', $class ) . '.php';
+
+		if ( 0 === strpos( $class, 'wcs_import' ) || 0 === strpos( $class, 'wcs_export' ) ) {
+			require_once( self::plugin_dir() . '/includes/' . $file );
+		}
+	}
 }
 
 WCS_Importer_Exporter::init();
