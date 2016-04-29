@@ -644,7 +644,8 @@ class WCS_Importer {
 			throw new Exception( sprintf( __( 'No product or variation in your store matches the product ID #%s.', 'wcs-import-export' ), $data['product_id'] ) );
 		}
 
-		$product_string = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product->id ), $_product->get_title() );
+		$line_item_name = ( ! empty( $data['name'] ) ) ? $data['name'] : $_product->get_title();
+		$product_string = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product->id ), $line_item_name );
 
 		foreach ( array( 'total', 'tax', 'subtotal', 'subtotal_tax' ) as $line_item_data ) {
 
@@ -682,6 +683,11 @@ class WCS_Importer {
 
 		if ( ! self::$test_mode ) {
 			$item_id = $subscription->add_product( $_product, $item_args['qty'], $item_args );
+
+			// Set the name used in the CSV if it's different to the product's current title (which is what WC_Abstract_Order::add_product() uses)
+			if ( ! empty( $data['name'] ) && $_product->get_title() != $data['name'] ) {
+				wc_update_order_item( $item_id, array( 'order_item_name' => $data['name'] ) );
+			}
 
 			// Add any meta data for the line item
 			if ( ! empty( $data['meta'] ) ) {

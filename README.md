@@ -289,6 +289,7 @@ The table below provides a full list of line item data that can be used when imp
 | Key | Type | Default | Description |
 |---|---|---|---|
 |`product_id`|`int`|-|**Required**. Must be either a product or variation ID of an existing product in your store. This does not specifically need to be a subscription product.|
+|`name`|`string`|The product's current title.|A custom name to use for the product line item instead of the product's current title on the store.|
 |`quantity`|`int`|`1`|The number of this line item to include on each renewal order.|
 |`subtotal_tax`|`float`|`0`|The line tax total before pre-tax discounts.|
 |`subtotal`|`float`|Value of `total`|The line total before pre-tax discounts.|
