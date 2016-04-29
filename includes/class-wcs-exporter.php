@@ -41,6 +41,7 @@ class WCS_Exporter {
 					'name:' . $fee['name'],
 					'total:' . wc_format_decimal( $fee['line_total'], 2 ),
 					'tax:' . wc_format_decimal( $fee['line_tax'], 2 ),
+					'tax_class:' . $fee['tax_class'],
 				) );
 
 				$fee_total     += $fee['line_total'];
