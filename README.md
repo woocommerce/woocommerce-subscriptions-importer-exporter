@@ -483,9 +483,9 @@ Before exporting, you have the option to modify the column names which are writt
 `fee_total`               |`float`|Total subscription fees|
 `fee_tax_total`           |`float`|Total fees tax|
 `order_tax`               |`float`|Subscription total tax|
-`order_cart_discount`     |`float`|Cart discount|
-`order_discount`          |`float`|Subscription discount|
-`order_total`             |`float`|Subscription total|
+`cart_discount`           |`float`|Cart discount|
+`cart_discount_tax`       |`float`|Total discount|
+`order_total`             |`float`|Total discount tax|
 `order_currency`          |`string`|Subscription currency|
 `payment_method`          |`string`|Payment method id|
 `payment_method_title`    |`string`|Payment method title|
