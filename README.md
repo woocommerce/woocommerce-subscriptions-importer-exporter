@@ -223,7 +223,7 @@ Please follow these general rules when formatting your CSV file:
 |`order_tax`|`float`|The total tax amount to be charged with each renewal payment.|`0`|
 |`order_currency`|`string`|A three character currency code (e.g. `USD`). Represents the currency in which renewal payments should be processed.|[Store's currency](https://docs.woothemes.com/document/shop-currency/).|
 |`shipping_method`|`mixed`|This can be either the shipping method ID as seen in the table at **WooCommerce > Settings > Shipping** page, i.e. `"free_shipping"` or `"flat_rate"`, or this can be an in the format `"shipping_id:flat_rate:|shipping_title:Flat Rate|total:10.00"`.|-|
-|`download_permissions`|`int`|Can be either `true` to grant download permissions for product line items on the subscription, or `false` to not grant download permissions.|`false`|
+|`download_permissions`|`int`|Can be either `true` / `1` to grant download permissions for product line items on the subscription, or `false` / `0` to not grant download permissions.|`false`|
 |`order_notes`|`array`|A string of order notes separated by the `;` symbol. For example `"Payment received.;Subscription activated."` will create two order notes on your subscription.|-|
 |`payment_method`|`string`|Set as the Gateway ID which can be seen in table at **WooCommerce > Settings > Checkout**. Leave blank for [manual renewals](http://docs.woothemes.com/document/subscriptions/renewal-process/).|-|
 |`payment_method_title`|`string`|The name of the payment gateway to display to the customer when viewing the subscription or related orders (e.g. "Credit Card")|The value of `payment_method`, if set, else `''`.|

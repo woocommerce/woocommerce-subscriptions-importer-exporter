@@ -354,6 +354,7 @@ class WCS_Import_Admin {
 									<option value="order_currency" <?php selected( $header, 'order_currency' ); ?>>order_currency</option>
 									<option value="customer_note" <?php selected( $header, 'customer_note' ); ?>>customer_note</option>
 									<option value="order_notes" <?php selected( $header, 'order_notes' ); ?>>order_notes</option>
+									<option value="download_permissions" <?php selected( $header, 'download_permissions' ); ?>>download_permissions</option>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Subscription Billing Schedule', 'wcs-import-export' ); ?>">
 									<?php foreach ( $subscription_fields as $option ) : ?>
@@ -482,7 +483,7 @@ class WCS_Import_Admin {
 			'coupon_items'                => '',
 			'fee_items'                   => '',
 			'tax_items'                   => '',
-			'download_permission_granted' => '',
+			'download_permissions'        => '',
 			'payment_method'              => '',
 			'payment_method_title'        => '',
 			'billing_period'              => '',
