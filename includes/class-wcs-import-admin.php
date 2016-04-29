@@ -154,7 +154,7 @@ class WCS_Import_Admin {
 	public function admin_page() {
 
 		echo '<div class="wrap">';
-		echo '<h2>' . __( 'Subscription CSV Importer', 'wcs-import-export' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Subscription CSV Importer', 'wcs-import-export' ) . '</h2>';
 
 		if ( ! isset( $_GET['step'] ) || isset( $_GET['cancelled'] ) ) : ?>
 
@@ -219,7 +219,7 @@ class WCS_Import_Admin {
 		<h3><?php esc_html_e( 'Step 1: Upload CSV File', 'wcs-import-export' ); ?></h3>
 		<?php if ( ! empty( $upload_dir['error'] ) ) : ?>
 			<div class="error"><p><?php _e( 'Before you can upload your import file, you will need to fix the following error:' ); ?></p>
-			<p><strong><?php echo $upload_dir['error']; ?></strong></p></div>
+			<p><strong><?php echo esc_html( $upload_dir['error'] ); ?></strong></p></div>
 		<?php else : ?>
 			<p><?php esc_html_e( 'Upload a CSV file containing details about your subscriptions to bring across to your store with WooCommerce.', 'wcs-import-export' ); ?></p>
 			<p><?php esc_html_e( 'Choose a CSV (.csv) file to upload, then click Upload file and import.', 'wcs-import-export' ); ?></p>
@@ -341,11 +341,11 @@ class WCS_Import_Admin {
 					<?php foreach( $row as $header => $sample ) : ?>
 					<tr <?php echo ( ++$row_number % 2 ) ? '' : 'class="alternate"'; ?>>
 						<td>
-							<select name="mapto[<?php echo $header; ?>]">
+							<select name="mapto[<?php echo esc_attr( $header ); ?>]">
 								<option value="0"><?php esc_html_e( 'Do not import', 'wcs-import-export' ); ?></option>
 								<optgroup label="<?php esc_attr_e( 'Customer Details', 'wcs-import-export' ); ?>">
 									<?php foreach ( $customer_fields as $option ) : ?>
-										<option value="<?php echo $option; ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
+										<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $header, $option ); ?>><?php echo esc_attr( $option ); ?></option>
 									<?php endforeach; ?>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Subscription Details', 'wcs-import-export' ); ?>">
@@ -357,7 +357,7 @@ class WCS_Import_Admin {
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Subscription Billing Schedule', 'wcs-import-export' ); ?>">
 									<?php foreach ( $subscription_fields as $option ) : ?>
-										<option value="<?php echo $option; ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
+										<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $header, $option ); ?>><?php echo esc_attr( $option ); ?></option>
 									<?php endforeach; ?>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Subscription Line Items', 'wcs-import-export' ); ?>">
@@ -368,7 +368,7 @@ class WCS_Import_Admin {
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Subscription Totals', 'wcs-import-export' ); ?>">
 									<?php foreach ( array_merge( WCS_Importer::$order_totals_fields ) as $option ) : ?>
-										<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
+										<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $header, $option ); ?>><?php echo esc_attr( $option ); ?></option>
 									<?php endforeach; ?>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Payment Method Details', 'wcs-import-export' ); ?>">
@@ -379,7 +379,7 @@ class WCS_Import_Admin {
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Address Details', 'wcs-import-export' ); ?>">
 									<?php foreach ( WCS_Importer::$user_meta_fields as $option ) : ?>
-										<option value="<?php echo $option; ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
+										<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $header, $option ); ?>><?php echo esc_attr( $option ); ?></option>
 									<?php endforeach; ?>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Custom', 'wcs-import-export' ); ?>">

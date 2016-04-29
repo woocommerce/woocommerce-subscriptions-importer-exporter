@@ -77,7 +77,7 @@ class WCS_Export_Admin {
 
 			$class = ( $tab_id == $current_tab ) ? array( 'nav-tab', 'nav-tab-active', 'wcsi-exporter-tabs' ) : array( 'nav-tab', 'wcsi-exporter-tabs' );
 
-			echo '<a href="#" id="' . $tab_id . '" class="' . implode( ' ', array_map( 'sanitize_html_class', $class ) ) . '">' . esc_html( $tab_title ) . '</a>';
+			echo '<a href="#" id="' . esc_attr( $tab_id ) . '" class="' . implode( ' ', array_map( 'sanitize_html_class', $class ) ) . '">' . esc_html( $tab_title ) . '</a>';
 
 		}
 
@@ -112,7 +112,7 @@ class WCS_Export_Admin {
 				<tbody>
 					<tr>
 						<td width="200"><label for="filename"><?php esc_html_e( 'Export File name', 'wcs-import-export' ); ?>:</label></th>
-						<td><input type="text" name="filename" placeholder="export filename" value="<?php echo ! empty( $_POST['filename'] ) ? $_POST['filename'] : 'subscriptions.csv'; ?>" required></td>
+						<td><input type="text" name="filename" placeholder="export filename" value="<?php echo ! empty( $_POST['filename'] ) ? esc_attr( $_POST['filename'] ) : 'subscriptions.csv'; ?>" required></td>
 					</tr>
 					<tr>
 						<td style="text-align:top"><?php esc_html_e( 'Subscription Statuses', 'wcs-import-export' ); ?>:</td>
@@ -226,7 +226,7 @@ class WCS_Export_Admin {
 			<tbody>
 				<?php foreach ( $csv_headers as $data => $title ) : ?>
 					<tr>
-						<td width="15" style="text-align:center"><input type="checkbox" name="mapped[<?php echo $data; ?>]" checked></td>
+						<td width="15" style="text-align:center"><input type="checkbox" name="mapped[<?php echo esc_attr( $data ); ?>]" checked></td>
 						<td><label><?php esc_html_e( $title ); ?></label></td>
 						<td><label><?php esc_html_e( $data ); ?></label></td>
 						<td><input type="text" name="<?php esc_attr_e( $data ); ?>" value="<?php esc_attr_e( $data ); ?>" placeholder="<?php esc_attr_e( $data ); ?>"></td>
