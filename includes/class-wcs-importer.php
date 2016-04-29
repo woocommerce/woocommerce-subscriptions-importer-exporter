@@ -152,7 +152,7 @@ class WCS_Importer {
 			'row_number' => self::$row_number,
 		);
 
-		$user_id = wcsi_check_customer( $data, self::$fields, self::$test_mode );
+		$user_id = wcsi_check_customer( $data, self::$fields, self::$test_mode, self::$email_customer );
 
 		if ( is_wp_error( $user_id ) ) {
 			$result['error'][] = $user_id->get_error_message();
