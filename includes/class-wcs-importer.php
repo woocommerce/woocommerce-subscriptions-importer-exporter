@@ -743,7 +743,7 @@ class WCS_Importer {
 				$fee->tax_class = '';
 
 				if ( ! empty( $fee_data['tax'] ) ) {
-					$fee->tax       = wc_format_refund_total( $fee_data['tax'] );
+					$fee->tax       = wc_format_decimal( $fee_data['tax'] );
 					$fee->tax_class = ( ! empty( $fee_data['tax_class'] ) ) ? $fee_data['tax_class'] : '';
 					$fee->taxable   = true;
 
