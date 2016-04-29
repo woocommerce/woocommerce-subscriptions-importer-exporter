@@ -314,13 +314,13 @@ class WCS_Export_Admin {
 				unset( $headers['payment_method_user_meta'] );
 			}
 
-			WCS_Export_Writer::write_headers( $headers );
+			WCS_Exporter::write_headers( $headers );
 
 			foreach ( $subscriptions as $subscription ) {
-				WCS_Export_Writer::write_subscriptions_csv_row( $subscription );
+				WCS_Exporter::write_subscriptions_csv_row( $subscription );
 			}
 
-			WCS_Export_Writer::process_export( $_POST['filename'] );
+			WCS_Exporter::process_export( $_POST['filename'] );
 		} else {
 			$this->error_message = __( 'No subscriptions to export given the filters you have selected.', 'wcs-import-export' );
 		}
