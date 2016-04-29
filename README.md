@@ -550,3 +550,12 @@ Before exporting, you have the option to modify the column names which are writt
 `tax_items`               |`string`|Taxes|
 `download_permissions`    |`int`|Download permissions granted (1 or 0)|
 
+---
+
+# Support
+
+Please note, due to the complexity of the import process, we (Prospress) can not provide support for your import, including issues with CSV formatting or help after an import which did not set data correctly. Furthermore, issues with subscriptions created via the CSV importer may not be supported via the [WooThemes](http://woothemes.com/) support system for the WooCommerce Subscriptions extension.
+
+We are working to find [WooExperts](https://www.woothemes.com/wooexperts/) to act as migration partners and offer migration services, with ongoing support, for stores which need help. We plan to include contact details of these migration partners when the Importer is officially launched after the beta period.
+
+If you think you have found a bug, problem with the documentation or limitation in the data the can be imported, please [open a new issue to report it](https://github.com/Prospress/woocommerce-subscriptions-importer/issues/new).
