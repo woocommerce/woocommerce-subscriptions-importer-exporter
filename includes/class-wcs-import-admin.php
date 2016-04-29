@@ -321,7 +321,8 @@ class WCS_Import_Admin {
 		$button_text = ( 'yes' == $_GET['test_mode'] ) ? __( 'Test CSV', 'wcs-import-export' ) : __( 'Run Import', 'wcs-import-export' );
 		$row_number  = 1;
 
-		$subscription_fields = array( 'customer_id', 'subscription_status', 'start_date', 'next_payment_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
+		$customer_fields     = array( 'customer_id', 'customer_email', 'customer_username', 'customer_password' );
+		$subscription_fields = array( 'subscription_status', 'start_date', 'next_payment_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
 		?>
 
 		<h3><?php esc_html_e( 'Step 2: Map Fields to Column Names', 'wcs-import-export' ); ?></h3>
@@ -346,6 +347,11 @@ class WCS_Import_Admin {
 									<option value="custom_user_post_meta">custom_user_post_meta</option>
 									<option value="custom_user_meta">custom_user_meta</option>
 									<option value="custom_post_meta">custom_post_meta</option>
+								</optgroup>
+								<optgroup label="<?php esc_attr_e( 'Customer Details', 'wcs-import-export' ); ?>">
+									<?php foreach ( $customer_fields as $option ) : ?>
+										<option value="<?php echo $option; ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
+									<?php endforeach; ?>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Subscription Details', 'wcs-import-export' ); ?>">
 									<?php foreach ( $subscription_fields as $option ) : ?>
@@ -421,15 +427,15 @@ class WCS_Import_Admin {
 			'payment_method_post_meta'    => '',
 			'payment_method_user_meta'    => '',
 			'customer_id'                 => '',
+			'customer_email'              => '',
+			'customer_username'           => '',
+			'customer_password'           => '',
 			'subscription_status'         => '',
 			'start_date'                  => '',
 			'trial_end_date'              => '',
 			'next_payment_date'           => '',
 			'last_payment_date'           => '',
 			'end_date'                    => '',
-			'customer_email'              => '',
-			'customer_username'           => '',
-			'customer_password'           => '',
 			'billing_first_name'          => '',
 			'billing_last_name'           => '',
 			'billing_address_1'           => '',
