@@ -1,10 +1,10 @@
 <?php
 /**
- * Subscription Export CSV Writer Class
+ * Subscription Export CSV Class
  *
  * @since 1.0
  */
-class WCS_Export_Writer {
+class WCS_Exporter {
 
 	private static $file = null;
 
