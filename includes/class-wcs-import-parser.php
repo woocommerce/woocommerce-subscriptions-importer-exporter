@@ -75,11 +75,11 @@ class WCS_Import_Parser {
 		self::$add_memberships = ( $data['add_memberships'] == 'true' ) ? true : false;
 		self::$fields          = $data['mapped_fields'];
 
-		add_action( 'shutdown', 'WCSI_Logger::shutdown_handler' );
+		add_action( 'shutdown', 'WCS_Import_Logger::shutdown_handler' );
 
 		self::import_start( $file_path, $data['file_start'], $data['file_end'] );
 
-		remove_action( 'shutdown', 'WCSI_Logger::shutdown_handler' );
+		remove_action( 'shutdown', 'WCS_Import_Logger::shutdown_handler' );
 
 		return self::$results;
 	}
@@ -166,7 +166,7 @@ class WCS_Import_Parser {
 
 		if ( ! empty( $result['error'] ) ) {
 			$result['status'] = 'failed';
-			WCSI_Logger::log( sprintf( 'Row #%s failed: %s', $result['row_number'], print_r( $result['error'], true ) ) );
+			WCS_Import_Logger::log( sprintf( 'Row #%s failed: %s', $result['row_number'], print_r( $result['error'], true ) ) );
 
 			array_push( self::$results, $result );
 			return;
@@ -420,7 +420,7 @@ class WCS_Import_Parser {
 
 			} else {
 				$result['status']  = 'failed';
-				WCSI_Logger::log( sprintf( 'Row #%s failed: %s', $result['row_number'], print_r( $result['error'], true ) ) );
+				WCS_Import_Logger::log( sprintf( 'Row #%s failed: %s', $result['row_number'], print_r( $result['error'], true ) ) );
 			}
 		}
 

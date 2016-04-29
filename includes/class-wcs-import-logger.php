@@ -4,7 +4,7 @@
  *
  * @since 1.0
  */
-class WCSI_Logger {
+class WCS_Import_Logger {
 
 	public static $logger = null;
 
