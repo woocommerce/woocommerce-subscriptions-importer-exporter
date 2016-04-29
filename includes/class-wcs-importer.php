@@ -27,14 +27,13 @@ class WCS_Importer {
 	public static $row    = array();
 
 	/** Subscription post meta */
-	public static $order_meta_fields = array(
+	public static $order_totals_fields = array(
 		'order_shipping',
 		'order_shipping_tax',
-		'order_tax',
 		'cart_discount',
 		'cart_discount_tax',
 		'order_total',
-		'payment_method',
+		'order_tax',
 	);
 
 	public static $user_meta_fields = array(
@@ -175,7 +174,7 @@ class WCS_Importer {
 
 		$missing_shipping_addresses = $missing_billing_addresses = array();
 
-		foreach( array_merge( self::$order_meta_fields, self::$user_meta_fields ) as $column ) {
+		foreach( array_merge( self::$order_totals_fields, self::$user_meta_fields, array( 'payment_method' ) ) as $column ) {
 			switch( $column ) {
 				case 'cart_discount':
 				case 'cart_discount_tax':

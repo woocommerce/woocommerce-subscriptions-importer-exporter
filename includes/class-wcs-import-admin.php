@@ -322,7 +322,7 @@ class WCS_Import_Admin {
 		$row_number  = 1;
 
 		$customer_fields     = array( 'customer_id', 'customer_email', 'customer_username', 'customer_password' );
-		$subscription_fields = array( 'subscription_status', 'start_date', 'next_payment_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
+		$subscription_fields = array( 'start_date', 'next_payment_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
 		?>
 
 		<h3><?php esc_html_e( 'Step 2: Map Fields to Column Names', 'wcs-import-export' ); ?></h3>
@@ -343,37 +343,49 @@ class WCS_Import_Admin {
 						<td>
 							<select name="mapto[<?php echo $header; ?>]">
 								<option value="0"><?php esc_html_e( 'Do not import', 'wcs-import-export' ); ?></option>
-								<optgroup label="<?php esc_attr_e( 'Custom', 'wcs-import-export' ); ?>">
-									<option value="custom_user_post_meta">custom_user_post_meta</option>
-									<option value="custom_user_meta">custom_user_meta</option>
-									<option value="custom_post_meta">custom_post_meta</option>
-								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Customer Details', 'wcs-import-export' ); ?>">
 									<?php foreach ( $customer_fields as $option ) : ?>
 										<option value="<?php echo $option; ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
 									<?php endforeach; ?>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Subscription Details', 'wcs-import-export' ); ?>">
+									<option value="subscription_status" <?php selected( $header, 'subscription_status' ); ?>>subscription_status</option>
+									<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
+									<option value="order_currency" <?php selected( $header, 'order_currency' ); ?>>order_currency</option>
+									<option value="customer_note" <?php selected( $header, 'customer_note' ); ?>>customer_note</option>
+									<option value="order_notes" <?php selected( $header, 'order_notes' ); ?>>order_notes</option>
+								</optgroup>
+								<optgroup label="<?php esc_attr_e( 'Subscription Billing Schedule', 'wcs-import-export' ); ?>">
 									<?php foreach ( $subscription_fields as $option ) : ?>
 										<option value="<?php echo $option; ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
 									<?php endforeach; ?>
 								</optgroup>
-								<optgroup label="<?php esc_attr_e( 'Subscription Item Meta', 'wcs-import-export' ); ?>">
-									<?php foreach ( array_merge( WCS_Importer::$order_meta_fields, WCS_Importer::$user_meta_fields ) as $option ) : ?>
-										<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
-									<?php endforeach; ?>
-									<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
-									<option value="order_currency" <?php selected( $header, 'order_currency' ); ?>>order_currency</option>
+								<optgroup label="<?php esc_attr_e( 'Subscription Line Items', 'wcs-import-export' ); ?>">
 									<option value="order_items" <?php selected( $header, 'order_items' ); ?>>order_items</option>
-									<option value="order_notes" <?php selected( $header, 'order_notes' ); ?>>order_notes</option>
-									<option value="customer_note" <?php selected( $header, 'customer_note' ); ?>>customer_note</option>
 									<option value="coupon_items" <?php selected( $header, 'coupon_items' ); ?>>coupon_items</option>
 									<option value="fee_items" <?php selected( $header, 'fee_items' ); ?>>fee_items</option>
 									<option value="tax_items" <?php selected( $header, 'tax_items' ); ?>>tax_items</option>
+								</optgroup>
+								<optgroup label="<?php esc_attr_e( 'Subscription Totals', 'wcs-import-export' ); ?>">
+									<?php foreach ( array_merge( WCS_Importer::$order_totals_fields ) as $option ) : ?>
+										<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
+									<?php endforeach; ?>
+								</optgroup>
+								<optgroup label="<?php esc_attr_e( 'Payment Method Details', 'wcs-import-export' ); ?>">
+									<option value="payment_method" <?php selected( $header, 'payment_method' ); ?>>payment_method</option>
 									<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
 									<option value="payment_method_post_meta" <?php selected( $header, 'payment_method_post_meta' ); ?>>payment_method_post_meta</option>
 									<option value="payment_method_user_meta" <?php selected( $header, 'payment_method_user_meta' ); ?>>payment_method_user_meta</option>
-									<option value="download_permission_granted" <?php selected( $header, 'download_permissions' ); ?>>download_permission_granted</option>
+								</optgroup>
+								<optgroup label="<?php esc_attr_e( 'Address Details', 'wcs-import-export' ); ?>">
+									<?php foreach ( WCS_Importer::$user_meta_fields as $option ) : ?>
+										<option value="<?php echo $option; ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
+									<?php endforeach; ?>
+								</optgroup>
+								<optgroup label="<?php esc_attr_e( 'Custom', 'wcs-import-export' ); ?>">
+									<option value="custom_user_post_meta">custom_user_post_meta</option>
+									<option value="custom_user_meta">custom_user_meta</option>
+									<option value="custom_post_meta">custom_post_meta</option>
 								</optgroup>
 							</select>
 						</td>
