@@ -296,7 +296,6 @@ class WCS_Export_Admin {
 	 * @param array $headers
 	 */
 	public function process_download( $headers = array() ) {
-		require_once( 'class-wcs-export-writer.php' );
 
 		$filters = array(
 			'statuses'       => array_keys( $_POST['status'] ),

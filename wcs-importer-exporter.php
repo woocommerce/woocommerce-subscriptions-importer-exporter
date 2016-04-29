@@ -16,11 +16,7 @@ if ( ! function_exists( 'woothemes_queue_update' ) || ! function_exists( 'is_woo
 	require_once( 'woo-includes/woo-functions.php' );
 }
 
-require_once( 'includes/class-wcs-import-admin.php' );
-require_once( 'includes/class-wcs-import-parser.php' );
-require_once( 'includes/class-wcs-import-logger.php' );
 require_once( 'includes/wcsi-functions.php' );
-require_once( 'includes/class-wcs-export-admin.php' );
 
 class WCS_Importer_Exporter {
 
@@ -40,6 +36,8 @@ class WCS_Importer_Exporter {
 	public static function init() {
 		add_filter( 'plugins_loaded', __CLASS__ . '::setup_importer' );
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), __CLASS__ . '::action_links' );
+
+		spl_autoload_register( __CLASS__ . '::autoload' );
 	}
 
 	/**
@@ -121,6 +119,21 @@ class WCS_Importer_Exporter {
 	 */
 	public static function plugin_dir() {
 		return plugin_dir_path( self::$plugin_file );
+	}
+
+	/**
+	 * Get the plugin's path for loading files
+	 *
+	 * @since 2.0
+	 * @return string
+	 */
+	public static function autoload( $class ) {
+		$class = strtolower( $class );
+		$file  = 'class-' . str_replace( '_', '-', $class ) . '.php';
+
+		if ( 0 === strpos( $class, 'wcs_import' ) || 0 === strpos( $class, 'wcs_export' ) ) {
+			require_once( self::plugin_dir() . '/includes/' . $file );
+		}
 	}
 }
 
