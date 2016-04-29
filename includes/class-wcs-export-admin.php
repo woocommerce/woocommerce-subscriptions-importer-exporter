@@ -44,7 +44,7 @@ class WCS_Export_Admin {
 	 * @since 1.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( 'wcs-exporter-admin', plugin_dir_url( WCS_Importer_Exporter::$plugin_file ) . '/assets/js/wcs-exporter.js' );
+		wp_enqueue_script( 'wcs-exporter-admin', WCS_Importer_Exporter::plugin_url() . '/assets/js/wcs-exporter.js' );
 	}
 
 	/**
@@ -77,7 +77,7 @@ class WCS_Export_Admin {
 
 			$class = ( $tab_id == $current_tab ) ? array( 'nav-tab', 'nav-tab-active', 'wcsi-exporter-tabs' ) : array( 'nav-tab', 'wcsi-exporter-tabs' );
 
-			echo '<a href="#" id="' . $tab_id . '" class="' . implode( ' ', array_map( 'sanitize_html_class', $class ) ) . '">' . esc_html( $tab_title ) . '</a>';
+			echo '<a href="#" id="' . esc_attr( $tab_id ) . '" class="' . implode( ' ', array_map( 'sanitize_html_class', $class ) ) . '">' . esc_html( $tab_title ) . '</a>';
 
 		}
 
@@ -112,7 +112,7 @@ class WCS_Export_Admin {
 				<tbody>
 					<tr>
 						<td width="200"><label for="filename"><?php esc_html_e( 'Export File name', 'wcs-import-export' ); ?>:</label></th>
-						<td><input type="text" name="filename" placeholder="export filename" value="<?php echo ! empty( $_POST['filename'] ) ? $_POST['filename'] : 'subscriptions.csv'; ?>" required></td>
+						<td><input type="text" name="filename" placeholder="export filename" value="<?php echo ! empty( $_POST['filename'] ) ? esc_attr( $_POST['filename'] ) : 'subscriptions.csv'; ?>" required></td>
 					</tr>
 					<tr>
 						<td style="text-align:top"><?php esc_html_e( 'Subscription Statuses', 'wcs-import-export' ); ?>:</td>
@@ -175,8 +175,8 @@ class WCS_Export_Admin {
 			'fee_total'                => __( 'Total Subscription Fees', 'wcs-import-export' ),
 			'fee_tax_total'            => __( 'Total Fees Tax', 'wcs-import-export' ),
 			'order_tax'                => __( 'Subscription Total Tax', 'wcs-import-export' ),
-			'order_cart_discount'      => __( 'Cart Discount', 'wcs-import-export' ),
-			'order_discount'           => __( 'Subscription Discount', 'wcs-import-export' ),
+			'cart_discount'            => __( 'Total Discount', 'wcs-import-export' ),
+			'cart_discount_tax'        => __( 'Total Discount Tax', 'wcs-import-export' ),
 			'order_total'              => __( 'Subscription Total', 'wcs-import-export' ),
 			'order_currency'           => __( 'Subscription Currency', 'wcs-import-export' ),
 			'payment_method'           => __( 'Payment Method', 'wcs-import-export' ),
@@ -226,7 +226,7 @@ class WCS_Export_Admin {
 			<tbody>
 				<?php foreach ( $csv_headers as $data => $title ) : ?>
 					<tr>
-						<td width="15" style="text-align:center"><input type="checkbox" name="mapped[<?php echo $data; ?>]" checked></td>
+						<td width="15" style="text-align:center"><input type="checkbox" name="mapped[<?php echo esc_attr( $data ); ?>]" checked></td>
 						<td><label><?php esc_html_e( $title ); ?></label></td>
 						<td><label><?php esc_html_e( $data ); ?></label></td>
 						<td><input type="text" name="<?php esc_attr_e( $data ); ?>" value="<?php esc_attr_e( $data ); ?>" placeholder="<?php esc_attr_e( $data ); ?>"></td>
@@ -296,7 +296,6 @@ class WCS_Export_Admin {
 	 * @param array $headers
 	 */
 	public function process_download( $headers = array() ) {
-		require_once( 'class-wcs-export-writer.php' );
 
 		$filters = array(
 			'statuses'       => array_keys( $_POST['status'] ),
@@ -315,13 +314,13 @@ class WCS_Export_Admin {
 				unset( $headers['payment_method_user_meta'] );
 			}
 
-			WCS_Export_Writer::write_headers( $headers );
+			WCS_Exporter::write_headers( $headers );
 
 			foreach ( $subscriptions as $subscription ) {
-				WCS_Export_Writer::write_subscriptions_csv_row( $subscription );
+				WCS_Exporter::write_subscriptions_csv_row( $subscription );
 			}
 
-			WCS_Export_Writer::process_export( $_POST['filename'] );
+			WCS_Exporter::process_export( $_POST['filename'] );
 		} else {
 			$this->error_message = __( 'No subscriptions to export given the filters you have selected.', 'wcs-import-export' );
 		}

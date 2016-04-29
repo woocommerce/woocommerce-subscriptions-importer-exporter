@@ -1,311 +1,561 @@
 # WooCommerce Subscriptions Importer and Exporter
 
+Import subscriptions to WooCommerce via CSV, or export your subscriptions from WooCommerce to a CSV.
+
 - [Importer Documentation](#subscriptions-importer)
 - [Exporter Documentation](#subscriptions-exporter)
 
 ---
 
 # Subscriptions Importer
-The WooCommerce Subscriptions CSV Import Suite allows you to easily import your subscriptions from a CSV file into your WooCommerce Store. This is particularly useful when migrating stores and importing from a different eCommerce platform - which may or may not use exactly the same fields as WooCommerce. Subscriptions are ordered and mapped to existing or new users. The order item is mapped to existing subscription or variable subscription id’s. A total of 58 fields can set in the CSV giving you the utmost control over the import process.
+With the WooCommerce Subscriptions CSV Importer, you can import subscriptions from a CSV file into your WooCommerce store. This is particularly useful when migrating stores from a different eCommerce platform.
 
-## Before Installing
-Please note that it is not possible to move subscriptions created with PayPal to a store using a different URL to the store where the customer initially signed up for the subscription. This is not a limitation in WooCommerce Subscriptions, it is a limitation with PayPal and it’s IPN system. If you're interested in getting your customers to use a different payment method (we recommend stripe), then try using the Failed Payment approach explained here: http://docs.woothemes.com/document/subscriptions/customers-view/#section-3
+The subscriptions will be setup with the [WooCommerce Subscriptions](https://www.woothemes.com/products/woocommerce-subscriptions/) extension to process future recurring payments.
 
-## Installation
-To install WooCommerce Subscription CSV Import Suite: 
+![](https://cldup.com/r53E41w11p.png)
 
-1. Download the extension from [here](https://github.com/Prospress/woocommerce-subscriptions-importer/archive/master.zip)
-2. Go to plugins > Add New > Upload and select the ZIP file 
-3. Click Install Now, and then Activate
-4. Go to **WooCommerce > Subscription Importer** to start importing your data
+## Before you Begin
+Importing your subscriptions to WooCommerce is a complicated process.
 
-## Must Read
-The following list of points can be taken to maximize success and minimize time and problems that occur while using this plugin:
+To maximize your changes of success with an import, please read through this documentation in its entirety.
 
-1.	Read through this entire documentation so you know how the import process operates and its requirements. There is no substitution for this step; yes reading documentation is a pain and takes time, but it will actually save you time in the end.
-2.	Make sure the product_id in the CSV exists as a regular subscription or variable subscription.
-3.	Set the column names and data formats for the files as described below in this documentation. This is not a requirement however if the columns in your CSV are named the same as described below, they will automatically be selected - saving you time.
-4.	Before importing, run the importer in test mode first to avoid unexpected outcomes, test mode can be enabled by checking the box displayed on the home page. Enabling this option puts the plugin in a test mode where all the errors and warnings will the caught and displayed to you before any orders with the subscriptions are created. Any rows with errors will not be imported however, rows with warnings will be. 
-5.	Fix any errors and unnecessary warnings with your import file and repeat until the test-mode run completes cleanly or continue the import from here, regardless of errors. 
-6.  Don't exit the import process or refresh the page mid-way through importing. Above the final import results table is a progress percentage indicator along with the expected time for the entire import to complete. We recommend leaving the importer running until you receive the timeout error which happens after 6 minutes of no requests coming through.
-7.	Disable any order and subscription related emails you do not want to send under "WooCommerce > Settings > Emails". When a subscription is imported, an order is created to record the subscription's details and that order is marked as completed. If you have the "Order Complete" email enabled, this email will be sent to the customer.
+There is no substitution for this step. Fully understanding the details of the import process will save you time by avoiding mistakes that may become serious issues in the future.
 
-# Formatting your CSV file
-The Subscriptions CSV Import suite makes it possible to bulk import subscriptions, but only if data is formatted correctly.
+## Importer Usage Guide
 
-These are the general formatting rules which your CSV data must adhere to:
+To import your subscriptions to WooCommerce via CSV, you need to:
+
+1. Create a CSV file with all your subscription data formatted for import (this is by far the most complicated step). The [CSV Formatting Guide](#csv-formatting-guide) details the options and requirements for your CSV's content.
+1. Go to **WooCommerce > Subscription Importer**
+1. Upload your CSV file
+1. Select [Import Options](#import-options):
+	1. Check **Run in test mode** to validate your CSV file without creating corrupted data
+	1. Check **Email Passwords** to email customers that are newly created their account details
+	1. Check **Add memberships** to grant subscribers any membership/s plan corresponding to subscription products
+1. Click **Upload and file and import**
+1. Review each column of data in your file to make sure the Importer has mapped it to the correct column header. 
+1. Click **Test CSV**
+1. If there are errors, fix up the CSV file and return to step 1.
+1. If there are no errors, click **Run Import**
+1. Review the [Import Completion Table](#import-completion-table) and [Import Logs](#import-error-logs) for uncover any issues with the import
+
+While these steps may sound simple, the devil is in the details, especially in creating your CSV. The rest of this guide will provide you with the details. Please be sure to **read this in its entirety**.
+
+### Import Options
+
+When uploading your CSV file, the Importer also provides you with a few options to customise the behaviour during the import process.
+
+Import options:
+* **Run in Test Mode**
+* **Email Passwords**
+* **Add Memberships**
+
+![](https://cldup.com/YFwi6NIp-L.png)
+
+#### Run in Test Mode
+Running the import in test mode will analyse each row of your CSV and notify you of any [warnings or errors](#list-of-warnings-and-errors) with that data. 
+
+It will not import any subscription data in your store's database, like users or subscriptions.
+
+After running test mode, the Importer will provide you with an **Importer Test Results** table. This displays the issues with your CSV. If there are issues, you can safely abort the import process to fix up the CSV. If there are no issues, you can continue the Import.
+
+We strongly recommend you continue to run the importer in test mode until you have correct all warnings and errors. Unfortunately it's not possible to catch *all* errors that will occur when actually importing your subscriptions. The good news though is that even during an actual import, exceptions and other errors that can only be discovered at the time of import will be logged and the corresponding subscription will not be created.
+
+![**Example Importer Test Results**](https://cldup.com/gfJUvR7WIe-2000x2000.png)
+
+#### Email Passwords
+
+When a CSV files includes a username or email address, and the Importer can not find an existing user with either of those details, it will create a new [WordPress user](https://codex.wordpress.org/Users_Screen).
+
+You can also specify a password to use on the user's account in the CSV, otherwise, the account is created with the secure password generated by WordPress.
+
+When the **Email Passwords** option is enabled, if the Importer creates a new user account, it will also email that user a registration email with their login details and a temporary password.
+
+If left unticked, the new users created  will need to go through the "forgot your password" process which will let them reset their details via email.
+
+Please note: the minimum requirement for creating a new user is an email address. If no username is given, the importer will to create a username from the email. Say you you need to create a new user and have only given the email address, janedoe@example.com, the importer will try a new user with username janedoe. If this username is already taken, we then try the username janedoe1, janedoe2 and so on; until it finds a free username (i.e janedoe102). 
+
+#### Add Memberships
+
+If you have [WooCommerce Memberships](https://www.woothemes.com/products/woocommerce-memberships/) active on your site, you will also be presented with the option to **Add Memberships**.
+
+When this option is enabled, subscriptions imported with product line items linked to a [membership plan](https://docs.woothemes.com/document/woocommerce-memberships-plans/) will also grant the subscriber's user account with corresponding membership access.
+
+### Column Mapping
+
+During step 2 of the import process, each column header found in the CSV will be listed as a row in the table on the *Map Fields to Column Names* page.
+
+You can use the dropdown menu to find and match each piece of data to a value known by the importer. **You must not have the same fields mapped more than once unless it's found under the custom group.**
+
+The full list of fields, with an explanation of each, are available in the [CSV Columns](#csv-columns) section of this guide.
+
+### Import Completion Table
+After an import has been completed, you will be provided with a table displaying the result of each row's import.
+
+This table will display the success of failure of the import for each row, as well as any [warnings or errors](#list-of-warnings-and-errors) that occurred when importing that row.
+
+Review this table carefully after running your import to identify any potential issues with each subscription.
+
+![Import Completion Table Screenshot](https://cldup.com/ALx-5YbHHB-2000x2000.png)
+
+### Import Error Logs
+In addition to the output displayed in the [Import Completion Table](#import-completion-table), the Subscriptions CSV Importer will also log issues into a special log file.
+
+These log entries can be reviewed to see what when wrong during the import and therefore, what needs to be fixed up after the import (if anything).
+
+These logs may contain issues not identified during [test mode](#run-in-test-mode) which relate to plugin conflicts, database issues or other errors that only occur during the live import. Becuase of this, we strongly encourage you to review the log files even if your CSV had no issues during test mode.
+
+#### Exception Logger
+The importer will catch all [PHP exceptions](http://php.net/manual/en/language.exceptions.php) thrown during the import and log them along with with the line in the CSV that was being processed when the exception occurred.
+
+To view the exception logs:
+
+1. Go to the **WooCommerce > System Status** administraction screen
+1. Click the **Logs** tab
+1. Click the select box for log files
+1. Click file prefixed with: _wcs-importer-_
+1. Click _View_
+
+![Import Logs](https://cldup.com/uyUAB1Ssuq.png)
+
+##### Example Exception Log Entry
+
+```
+01-15-2016 @ 05:30:26 - Row #2 failed: Array (
+    [0] => Could not create subscription: Invalid Subscription billing period given.
+)
+```
+
+#### Fatal Error Logger
+When a fatal error occurs during the import process, the importer will log the row of data from the CSV that caused the issue and a stack trace of where the error occurred.
+
+To view the shutdown logs:
+
+1. Go to the **WooCommerce > System Status** administraction screen
+1. Click the **Logs** tab
+1. Click the select box for log files
+1. Click file prefixed with: _wcs-importer-shutdown-_
+1. Click _View_
+
+![Import Shutdown Logs](https://cldup.com/rz7dwYivWN-2000x2000.png)
+
+##### Example Fatal Error Log Entry
+
+```
+01-12-2016 @ 05:52:16 - CSV Row: Array
+(
+    [product_id] => 5078
+    [status] => cancelled
+    [customer_id] => 1
+    [start_date] =>
+    [next_payment_date] =>
+    [end_date] =>
+    [shipping_method] => free_shipping
+    [coupon_items] => code:recurring_discount|amount:10.00
+)
+
+01-12-2016 @ 05:52:16 - PHP Fatal error Call to undefined method WCS_Importer::add_coupons() in /Users/Matt/Dropbox/Sites/subs2.0/wp-content/plugins/woocommerce-subscriptions-importer/includes/class-wcs-import-parser.php on line 425.
+```
+
+## CSV Formatting Guide
+By far the most difficult aspect of migrating your subscriptions using the CSV Importer is formatting a valid CSV with all required data.
+
+A subscription is created from a variety of different pieces of data, from customer details like billing and shipping address, to product details, like quantity, taxes and totals, shipping details, like shipping method, tax and cost, as well as billing schedule details, like recurring billing period, next payment date and end date. To import your subscriptions, you must create a CSV with all of this data in a valid form.
+
+This section provides you with an overview of all the fields your CSV can contain (and in some cases, must contain).
+
+### CSV Requirements
+
+Please follow these general rules when formatting your CSV file:
 * The first row must include column headers - this is so the plugin knows where to map the fields.
-* All values should be surrounded with double-quotes "" to ensure proper parsing.
-* Each subscription should have its own row. Not all columns need to be completed for all rows.
-* Locality fields: two-letter country and state/county abbreviations should be used when possible.
-* Date fields should be in the format YYYY-MM-DD HH:MM:SS (MySQL format). You can use the simplified form of YYYY-MM-DD to specify just a day or YYYY-MM-DD HH:MM:SS to specify a day and time. If specifying a time, use 24hour time and GMT/UTC as the timezone. For example, a valid value to set a date to the 12th of April 2014: '2014-04-12'. To set the date to 1:00pm on that day, the value should be: 2014-04-12 13:00:00.
+* Each subscription needs to have its own row.
+* Not all columns need to be filled in for each row, unless the field is labelled _required_ in the [CSV Columns](#csv-columns) section.
+* Most fields are not required. However, to avoid creating subscriptions with unintended default data applied, specify as many fields as possible in your CSV.
+* Two-letter country and state/county abbreviations should be used for all country, state or county data.
+* Date values should always be in UTC/GMT timezone.
+* Date fields can be in any string format handled by PHP's `strtotime()` function. However, `strtotime()` is a strange beast that on occasion creates unexpected date strings. It also doesn't always handle timezones as expected. Becuase of this, we encourage you to always use MySQL format for dates, e.g. `YYYY-MM-DD HH:MM:SS` or in [PHP's date formatting terms](http://php.net/manual/en/function.date.php) `y-m-d H:i:s`). For example, `1984-01-22 17:45:13`.
+* All dollar amounts can be either an integer or decima/float value. For example, `5.65`, `3` and `127.2` are all valid.
+* Arrays are formated as `key:value|key:value|key:value`.
 
-## Importing Subscriptions
-Importing subscriptions involves setting up a CSV file containing various column headers. The currently supported headers fall under one of the three groups: Customers, Subscription, Orders. If any of the following values are used in the CSV as column headers, they will automatically be selected upon entering the mapping process.
+### CSV Columns
 
-### Customer Fields
-*	customer_id
-* customer_email
-*	customer_username
-*	customer_password
-*	billing_first_name
-*	billing_last_name
-*	billing_address_1
-*	billing_address_2
-*	billing_city
-*	billing_state
-*	billing_postcode
-*	billing_country
-*	billing_email
-*	billing_phone
-*	billing_company
-*	shipping_first_name
-*	shipping_last_name
-*	shipping_address_1
-*	shipping_address_2
-*	shipping_city
-*	shipping_state
-*	shipping_postcode
-*	shipping_country
+|Column Name|Format|Description|Default|
+|---|---|---|---|---|
+|`customer_id`|`int`|Can be left blank to creating a new user or if username and/or email of an existing user is present.|-|
+|`customer_email`|`string`|The email of the user to assign this subscription to. If no `customer_id` or `customer_username` is specified, a new user will be created with this email.|-|
+|`customer_username`|`string`|The username of the user to assign this subscription to, if any.|-|
+|`customer_password`|`string`|A password to set on the user's account, if creating a new user.|If left blank and creating a new user, a password will be automatically generated.|
+|`billing_first_name`|`string`|The first name to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`billing_last_name`|`string`|The last name to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`billing_address_1`|`string`|The street address to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`billing_address_2`|`string`|The street address to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`billing_city`|`string`|The city to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`billing_state`|`string`|The state or county to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`billing_postcode`|`string`|The postal or zip code to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`billing_country|`string`|The 2 letter country code to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`billing_email`|`string`|The email address to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set. If that is not set, the `'customer_email'` value of the CSV will be used, if set. Finally, if `'customer_email'` is not set in the CSV, the `'user_email'` set on the user's account will be used.|
+|`billing_phone`|`string`|The phone number to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`billing_company`|`string`|The name of the company to use on the billing address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`shipping_first_name`|`string`|The first name to use on the shipping address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`shipping_last_name`|`string`|The last name to use on the shipping address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`shipping_address_1`|`string`|The street address to use on the shipping address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`shipping_address_2`|`string`|The street address to use on the shipping address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`shipping_city`|`string`|The city to use on the shipping address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`shipping_state`|`string`|The state or county to use on the shipping address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`shipping_postcode`|`string`|The postal or zip code to use on the shipping address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`shipping_country|`string`|The 2 letter country code to use on the shipping address for the subscription and renewal orders.|The value stored on the user's account (in user meta) will be used, if the user exists and this is set, otherwise, it will be set as an empty string (i.e. `''`).|
+|`subscription_status`|`string`|The status to apply to the subscription after it is created. Can be one of: `wc-active`, `wc-expired`, `wc-pending`, `wc-on-hold`, `wc-pending-cancel` or `wc-cancelled`. Although the `wc-` prefix is recommended, it is not required.|`wc-pending`|
+|`start_date`|`Y-m-d H:i:s`|The start time to set on the subscription. Must be in the past.|The current time.|
+|`trial_end_date`|`Y-m-d H:i:s`|A date in the past or future on which a the subscriptions trial period will end. If set, the trial end date must come after the start date.|-|
+|`next_payment_date`|`Y-m-d H:i:s`|The date to process the next renewal payment. If set, the next payment date must come after the start date and trial end date and be in the future. If left empty, when the status is next updated to `wc-active` the next payment date will be calculated based on the start or trial end date and billing period/interval.|-|
+|`end_date`|`Y-m-d H:i:s`|The date on which the subscription will expire, if in the future, or was cancelled or expired, if in the past. Leave empty to have the subscription continue to renew until manually cancelled.|-|
+|`billing_period`|`string`|The time period used for calculating renewal payment dates. Must be either: `day`, `week`, `month`, `year`. An invalid or empty billing period will cause an error during the import and the subscription will not be imported.|-|
+|`billing_interval`|`int`|The interval used for calculating renewal payment dates. Must be an integer value to represent how many subscription periods between each payment. For example, a `2` here and `week` for the `billing_period` will create a subscription processes a renewal payment every two weeks.|`1`|
+|`order_items`|`mixed`|The product line items on the subscription used to set the line items on renewal orders. Can be a product or variation ID or a more advanced set of data as detailed in the [Importing Order Items](#importing-order-items-product-line-items) section.|-|
+|`coupon_items`|`array`|Add coupon line items to the subscription and renewal orders. Refer to the guide on [Importing Subscriptions with Coupons](#importing-subscriptions-with-coupons) for details.|-|
+|`fee_items`|`array`|Add fee line items to the subscription and renewal orders. Refer to the guide on [Importing Subscriptions with Fee Line Items](#importing-subscriptions-with-fee-line-items) for details.|-|
+|`tax_items`|`mixed`|Add tax line items to the subscription and renewal orders. Refer to the guide on [Importing Subscriptions with Tax Line Items](#importing-subscriptions-with-tax-line-items) for details.|-|
+|`cart_discount`|`float`|The total discount amount to set on the subscription. Displayed on the subscription and each renewal order.|`0`|
+|`cart_discount_tax`|`float`|The total tax amount included in the total discount amount.|`0`|
+|`order_shipping`|`float`|The total shipping amount to set on the subscription. Displayed on the subscription and each renewal order.|`0`|
+|`order_shipping_tax`|`float`|The total tax amount included in the total shipping amount.|`0`|
+|`order_total`|`float`|The total amount to charge for each renewal payment. Displayed on the subscription and each renewal order.|`0`|
+|`order_tax`|`float`|The total tax amount to be charged with each renewal payment.|`0`|
+|`order_currency`|`string`|A three character currency code (e.g. `USD`). Represents the currency in which renewal payments should be processed.|[Store's currency](https://docs.woothemes.com/document/shop-currency/).|
+|`shipping_method`|`mixed`|This can be either the shipping method ID as seen in the table at **WooCommerce > Settings > Shipping** page, i.e. `"free_shipping"` or `"flat_rate"`, or this can be an in the format `"shipping_id:flat_rate:|shipping_title:Flat Rate|total:10.00"`.|-|
+|`download_permissions`|`int`|Can be either `true` / `1` to grant download permissions for product line items on the subscription, or `false` / `0` to not grant download permissions.|`false`|
+|`order_notes`|`array`|A string of order notes separated by the `;` symbol. For example `"Payment received.;Subscription activated."` will create two order notes on your subscription.|-|
+|`payment_method`|`string`|Set as the Gateway ID which can be seen in table at **WooCommerce > Settings > Checkout**. Leave blank for [manual renewals](http://docs.woothemes.com/document/subscriptions/renewal-process/).|-|
+|`payment_method_title`|`string`|The name of the payment gateway to display to the customer when viewing the subscription or related orders (e.g. "Credit Card")|The value of `payment_method`, if set, else `''`.|
+|`payment_method_post_meta`|`array`|Payment gateway meta data required to process automatic recurring payments. See [Importing Payment Gateway Meta Data](#importing-payment-gateway-meta-data) for more information.|-|
+|`payment_method_user_meta`|`array`|Payment gateway meta data required to process automatic recurring payments. See [Importing Payment Gateway Meta Data](#importing-payment-gateway-meta-data) for more information.|-|
+|`customer_note`|`string`|An optional to include on the subscription from the customer that is shared with for store managers.|-|
+|`custom_user_meta`|`mixed`|A column to specify arbitrary data to store against on the subscriber in the user meta table. Multiple columns can be mapped to this header. The value of the column header in the CSV will be used as the meta key. For example, if you want to add `'_my_meta_key' => true` as user meta. You will need to have a column in your CSV with header `_my_meta_key` and map it to `custom_user_meta`. Custom user meta is added to the user _before_ the subscription is created.|-|
+|`custom_post_meta`|`mixed`|A column to specify arbitrary data to store against on the subscription in the post meta table. Multiple columns can be mapped to this header. The value of the column header in the CSV will be used as the meta key. For example, if you want to add `'_my_meta_key' => true` as post meta. You will need to have a column in your CSV with header `_my_meta_key` and map it to `custom_post_meta`. Custom post meta is added after the subscription is created.|-|
+|`custom_user_post_meta`|`mixed`|Use this column if you wish to add custom data to both user and post meta using the same `meta_key` and value. Like previously stated, the value of the column header in the CSV will be used as the meta_key value.|-|
 
-##### Accepted Customer Column Fields
-The following columns have some requirements for acceptable values or formats. 
-* Billing/Shipping information – If this information is not provided in the CSV, the importer will attempt to get the information from the users account information
-* customer_id - this needs to be the integer value which represents the WP User. Can be left blank when creating a new user or if username and/or email of an existing user is present.
+If any of the above columns contains invalid data, the importer will display these during in the test run. If you choose to ignore the errors and continue to import with invalid data, no subscription will be imported for that row.
 
-### Order Fields
-*	recurring_line_total
-*	recurring_line_tax
-*	recurring_line_subtoal
-*	recurring_line_subtotal_tax
-*	line_total
-*	line_tax
-*	line_subtotal
-*	line_subtotal_tax
-*	order_discount
-*	cart_discount
-*	order_shipping_tax
-*	order_shipping
-*	order_tax
-*	order_total
-*	payment_method
-*	payment_method_title
-*	stripe_customer_id
-*	paypal_subscriber_id
-*	shipping_method
-*	shipping_method_title
-*	download_permission_granted
+### Importing Payment Gateway Meta Data
+You can use import payment gateway meta data, like customer or credit card tokens, in your CSV file to link a subscription with a payment method for processing [recurring payments automatically](https://docs.woothemes.com/document/subscriptions/renewal-process/).
 
-##### Accepted Order Column Values
-The following columns have some requirements for acceptable values or formats.
-*	payment_method – the currently supported payment methods are PayPal, Stripe and Authorize.net. If anything other than paypal, stripe or authorize_net_cim is used, the import will default to manual renewal.
-*	shipping_method - This should be the shipping method id as seen in the table at WooCommerce > Settings > Shipping page, i.e. "free_shipping" or "flat_rate", defaults to an empty shipping method.
-*	download_permission_granted - value can be either yes or true; anything else will not grant download permissions for the subscription product in the order.
-*	All dollar amounts need to be either integer or decimal value for instance, “5.65”, “3”, “127.2” are all valid entries.
+Properly importing payment gateway meta data is a difficult, yet crucial part of the import. It's important to take the time and get this right otherwise your subscription may not renew properly. It is also much faster to set this data in bulk on import than to set it on each individual subscription after the import.
 
-### Subscription Fields
-*	product_id - this must contain either the id of a regular or variable subscription product within your store.  
-* subscription_status - can be one of: active, expired, pending, on-hold or cancelled.
-*	subscription_start_date - if provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the current date will be used.
-*	subscription_expiry_date - if provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the subscription expiration date will be calculated based on the length set on the subscription product and the subscription's start date.
-*	subscription_end_date - if provided this must be in the format YYYY-MM-DD (for example: "2014-07-21"). If not set, the subscription end date will be left empty - this date is simply a record of a day in the past the subscription ended, either due to expiraiton or cancellation.
+#### Supported Payment Gateways
 
+The Importer can support any payment gateway that supports the new  `woocommerce_subscription_payment_meta` filter introduced in WooCommerce Subscriptions v2.0.
 
-### Importing Custom Fields
-* custom_user_meta
-* custom_order_meta
-Use these columns to add custom information on order meta or user meta. The value of the column header in the CSV used as the meta key. For example, you want to add `_terms => true` as order meta for a row in the CSV. Map the column in the CSV with the header `_terms` to `custom_order_meta`.
+Each payment method requires different pieces of information in order to renew properly, therefore here's a short list of the information needed and column headers for three popular payment methods:
+ * __PayPal Reference Transactions__: `_paypal_subscription_id` must be mapped to `payment_method_post_meta` column. This value needs to be the customers billing agreement (will start with `I-**************`).
+ * __Authorize.net CIM__: `wc_authorize_net_cim_customer_profile_id` and `wc_authorize_net_cim_payment_profile_id` mapped to `payment_method_post_meta` column.
+ * __Stripe__: `_stripe_customer_id` mapped to `payment_method_post_meta` column and optionally, `_stripe_card_id` also mapped to `payment_method_post_meta` column if you want to charge recurring payments against a specific payment method on the customer's account. Only values beginning with `cus_` and `card_` will be considered valid tokens.
 
-* custom_user_order_meta
-Use this column if you wish to add custom data to both user and order meta using the same `meta_key` value. The value of the column header in the CSV will be used as the meta_key value.
+As long as the payment gateway extension for your payment gateway is active, the Subscriptions CSV Importer will validate that you have included the necessary payment gateway meta data.
 
+For example, if you try to import a subscription with `stripe` set as the `payment_method`, but are missing the `_stripe_customer_id`, the subscription will not be created and the import will fail with a message explaining that a valid `_stripe_customer_id` is required.
 
-### Supported Payment Gateways
+If you need to import subscriptions using a payment gateway other than those above, please ask the gateway's extension developer for details of the post or user meta data required to process automatic payments. If you also let us know which meta data is required, we will include it in this documentation to help others in future.
 
-The importer currently supports three payment gateways, each requiring different pieces of information in order to successfully transfer active subscriptions.
-  - __Paypal__: paypal_subscriber_id 
-  - __Stripe__: stripe_customer_id
-  - __Authorize.net__: wc_authorize_net_cim_customer_profile_id and wc_authorize_net_cim_payment_profile_id
+### Importing Order Items
 
-The importer will detect missing information and provide a pop up before you import. For instance, if you have 'paypal' listed as the payment_method and have not specifed a paypal_subscriber_id field or that field is empty, you will receive a pop up message detailing what information is missing with an option to cancel or continue. If you wish to continue, those subscriptions will default to using manual recurring payments.
+In WooCommerce, orders can have a number of different line items, including:
 
-If your store uses two payment gateways (ie. PayPal and Stripe) both the paypal_subscriber_id and stripe_customer_id fields will need to mapped and for those rows where the payment_method is set to 'paypal' the paypal_subscriber_id needs to be set while stripe_customer_id can be left empty and vica versa.
+* product line items
+* shipping line items
+* fee line items
 
-### List of Warnings
+A subscription is a custom order type, and therefore, can also have each of these line items added to it.
 
-- Shipping method and/or title for the order has been set to empty.
-- No recognisable payment method has been specified. Default payment method being used.
+#### Importing Product Line Items
+
+The `order_items` column can be either:
+
+* a **Single Product ID** for the product you want the set as the product line item on the subscription; or
+* an array of **Line Item Data**, including line item totals and tax amounts.
+
+##### Single Product ID
+
+When using just a single product ID in the `order_items` column, all line item totals and subtotals will default to the product's price at the time of import.
+
+No amount will be added for tax, regardless of the store's tax settings.
+
+**Note:** to import a variation of a variable prodcut, you must use the variation's ID, not the parent variable product's ID.
+
+##### Line Item Data
+To add tax or other custom information to your product line items you need to follow strict formatting for it to properly import. Each product line item needs to follow the following format: `product_id:5179|quantity:1|total:9.09|tax:0.91`.
+
+The table below provides a full list of line item data that can be used when importing line items.
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+|`product_id`|`int`|-|**Required**. Must be either a product or variation ID of an existing product in your store. This does not specifically need to be a subscription product.|
+|`name`|`string`|The product's current title.|A custom name to use for the product line item instead of the product's current title on the store.|
+|`quantity`|`int`|`1`|The number of this line item to include on each renewal order.|
+|`subtotal_tax`|`float`|`0`|The line tax total before pre-tax discounts.|
+|`subtotal`|`float`|Value of `total`|The line total before pre-tax discounts.|
+|`tax`|`float`|`0`|The line tax total after pre-tax discounts.|
+|`total`|`float`|Product's price|The line total after pre-tax discounts.|
+|`meta`|`string`|Product's variation data, if any.|Line item meta data to store against this product line item, see the section below on [Line Item Meta Data](#line-item-meta-data) for detals.|
+
+An example `order_items` column content to import a product line item would look something like this:
+
+```
+product_id:123|name:Product to Import|quantity:3|subtotal_tax:3.00|subtotal:30.00|tax:3.00|total:30.00|meta:size=Large+shirt-colour=Midnight Black
+```
+
+###### Line Item Meta Data
+When importing a product line item, by default, the Importer will set the variation attributes (if any) of the product with a matching ID for the imported line item as line item meta data.
+
+If you would prefer to set different attributes, or need to import meta data that does not originate from the variation attributes, you can use the `meta` field in the `order_items` colum.
+
+The `meta` field can include one or more piece of meta data and must be formatted using `=` to delimit the meta key and value, and `+` to delimit each piece of meta data.
+
+For example, to import a product line item with an _Size_ and _Shirt Colour_ meta with _Large_ and _Midnight Black_ values respectivately, the meta field would look like: `meta:size=Large+shirt-colour=Midnight Black`.
+
+Notice the _Shirt Colour_ meta key is in lowercase and uses a `-` instead of a space (i.e. `' '`) while the _Midnight Black_ is capitalised with a space. The meta keys in your `meta` field should be raw values to store in the database, not the formatted value returned by `WC_Order_Item_Meta::display()` or `WC_Order_Item_Meta::get_formatted()`.
+
+##### Multiple Product Line Items
+To import a subscription with multiple product line items, separate each line item data with a `;`. You can use a combination of the single product ID method and full line item data array method.
+
+For example, an `order_items` column value for two products could look like: `"product_id:5179|quantity:2|total:9.09|tax:0.91;product_id:2156|total:30"`. See the [Sample CSV](https://raw.githubusercontent.com/Prospress/woocommerce-subscriptions-importer/master/wcs-import-sample.csv) for an example of importing multiple product line items using the importer.
+
+#### Importing Subscriptions with Coupons
+The importer provides the `coupon_items` column header to apply coupons to your imported subscriptions.
+
+You can only apply valid coupon codes that exist in your store at the time of the import. If you attempt to use a coupon code that doesn't exist, you will see the error `Could not find coupon with code "<your_code>" in your store.` and that row in your CSV will not be imported.
+
+When formatting your `coupon_items` row, use the array syntax, for example: `"code:summerdiscount2016|amount:15.00"`. You can attach multiple coupons/discounts to your imported subscription by separating each coupon item by the `;` character. For example: `"code:summerdiscount2016|amount:15.00;code:earlybird|amount:5.00"`.
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+|`code`|`string`|-|(**Required**) A coupon code which exists in your store at time of import.|
+|`amount`|`float`|Discount amount set on the coupon.|The discount amount to apply to the subscription.|
+
+#### Importing Subscriptions with Fee Line Items
+The importer provides the `fee_items` column header to add fee line items to your imported subscriptions.
+
+To attach fees to your imported subscriptions, the minimum requirement is the fee `name` field.
+
+An example of the `fee_items` column could look like: `"name:Handling|total:7.00|tax:0.70"`.
+
+You can attach multiple fees to an imported subscription by separating the fee items with the `;` symbol.
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+|`name`|`string`|-|(**Required**) The name to use on the fee line item. If this is empty, the subscription will not be imported and you will receive an error.|
+|`total`|`float`|`0`|The amount to charge for the fee.|
+|`tax`|`float`|`0`|The tax to charge for the fee.|
+
+#### Importing Subscriptions with Tax Line Items
+The importer provides the `tax_items` column header to add tax line items to your imported subscriptions.
+
+If you're importing one tax rate, you can use a valid tax ID (`int`) or tax code (e.g. `VAT`) from your WooCommerce store in the `tax_items` column. If need to include more than one tax line item, you can use the more complicated array format.
+
+The minimum requirement for attaching tax items is to have either the ID or the tax code field. An example `tax_items` column would look like: `code:VAT` or `id:3`.
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+|id|`int`|-|The unique tax rate ID found in DB.|
+|code|`string`|-|The tax rate label|
+
+There's a few simplifications when it comes to how the importer manages taxes. If you only provide the tax code in your CSV, the importer will query your available taxes and choose the tax with that code with the highest priority (i.e. if you have multiple taxes codes with VAT then it's possible the incorrect tax rate may be attached to your subscription). The alternative and more accurate workaround is to import tax items using the unique tax rate ID (found in `{$wpdb->prefix}woocommerce_tax_rates` table under column `tax_rate_id`).
+
+When the tax rate is successfully added to your subscription, this rate is then used as the tax class for all tax values for things like line items, shipping lines, fees etc.
+
+## List of Warnings and Errors
+
+#### Warnings
+
+- Shipping method and title for the subscription have been left as empty.
 - The following shipping address fields have been left empty: [ LIST_OF_FIELDS ].
 - The following billing address fields have been left empty: [ LIST_OF_FIELDS ].
-- Used default subscription status as none was given.
+- No subscriptions status was specified. The subscription will be created with the status "pending"
 - Download permissions cannot be granted because your current WooCommerce settings have disabled this feature.
+- Tax line item could not properly be added to this subscription. Please review this subscription.
+- Missing tax code or ID from column: [row from CSV]
+- The tax code "<tax_code>" could not be found in your store.
 
-A link to edit the order is given at the end of the list of warnings.
+When a warning is included in the [Import Completion Table](#import-completion-table), a link to [edit the subscription](https://docs.woothemes.com/document/subscriptions/add-or-modify-a-subscription/) administration screen is provided alongside the subscription.
 
-### List of Fatal Errors
+#### Errors
+- The product_id is missing from CSV.
+- No product or variation in your store matcges the product ID #.
+- An execpected error occurred when trying to add product "<item_name>" to your subscription.
+- An error occurred with the customer information provided. Occurs when the user_id provided doesn't exist, the email doesn't exist, the username is invalid.
+- The <date_type> date must occur after the <date_type>.
+- Coudl not create subscription
+- Invalid payment method meta data
+- An error occurred when trying to add the shipping item to the subscription
+- Fee name is missing from your CSV
+- Could not add the fee to your subscription
 
-- The product_id is not a subscription product in your store.
-- An error occurred with the customer information provided.
-  - Occurs when the user_id provided doesn't exist, the email doesn't exist, the username is invalid and there's not enough information to create a new user.
+Any exceptions thrown during the import process will be caught and appear as a fatal error and the subscription will not be imported.
 
-## Subscription Import Options
+## Importer FAQ
+#### Is it possible to make sure the active subscriptions will still process automatic payments?
+Yes. If your subscriptions payment gateway supports [automatic recurring payments](http://docs.woothemes.com/document/subscriptions/payment-gateways/), it may also be able to have its [payment method meta data](#importing-payment-gateway-meta-data) imported to link the subscription to the payment gateway to process future automatic recurring payments.
 
-* Delimiter - this allows you to specific any other character as the delimiter of the imported CSV; defaulted to the comma character.
-* Test Mode - Enabling this option places the import process in a 'Dry Run" mode where no orders are created, but if sufficient information is given, a new will be created. This is very useful for running test imports prior to the live import.
-* Send off registration email - Having this option ticked means that when the importer creates a new customer, the customer will receive a registration email containing their login details along with their temporary password.
-* AJAX Request Limit - the amount of CSV rows handled at once per AJAX call can be modified by defining the WCS_REQ_LIMIT constant in wp_config.php; defaults to 15.
+When importing active subscriptions, it's important that the correct [payment method meta data](#importing-payment-gateway-meta-data) is provided in the CSV. Depending on the payment gateway being used, the information required varies. For details, see the section on [Importing Payment Gateway Meta Data](#importing-payment-gateway-meta-data).
 
-### New Customers and Passwords
+#### Can subscriptions using PayPal Standard be imported?
+No. Due to [PayPal Standard limitations](https://docs.woothemes.com/document/subscriptions/payment-gateways/#paypal-limitations), the importer can not migrate subscriptions using PayPal Standard as the payment method.
 
-When the importer doesn't recognise the given customer by the username or email (in the CSV), it will create a new user with those values. 
-The minimum requirements for creating a new user is simply an email address. If no username is given when creating a new user, the importer will to create a username from the email. Say you you need to create a new user and have only given the email address, janedoe@example.com, the importer will try a new user with username janedoe. If this username is already taken we then try the username janedoe1, janedoe2 and so on; until it finds a free username (i.e janedoe102). You can specify a password to give the user in the CSV otherwise the customer's account is created with the password being securely generated by WordPress. This password can be emailed to the customer by selecting the 'Email Password' option at the first step of importing (not selected by default). If left unticked, all your new customers will need to go through the forgot-your-password process which will let them reset their details via email.
+Note that the same limitations do not apply to [PayPal Reference Transactions](https://docs.woothemes.com/document/subscriptions/faq/paypal-reference-transactions/). Therefore the CSV importer can migrate subscriptions which use a PayPal Billing Agreement to process recurring payments via Reference Transactions.
 
+If you have subscriptions with PayPal Standard and you're interested in getting your customers to use a different payment method, you can import the subscriptions and request that your customers [change the payment method](https://docs.woothemes.com/document/subscriptions/customers-view/#section-5) on those subscriptions.
 
-### Subscription Importer Simplifications
-* product_id/variation_id – variable subscription ids can also be placed in the product_id column as well as regular subscriptions
-* Billing/shipping Information - If the shipping/billing information is not provided in the CSV, the importer will try gather the information from the user's settings before leaving the values empty.
-* Recurring Order meta Data - The values for recurring_shipping_method/title, order_recurring_shipping_total, order_recurring_shipping_tax_total, recurring
-* Billing First name - to avoid the billing name being left null, the customers_username has been used if no billing_first_name is set by the user or the CSV.
-* payment_method/payment_method_title – the values used in these columns are also used for the recurring_payment_method and recurring_payment_method_title
-* If the following values are not specified in the CSV they will be set to $0 on the order (i.e. taxes will not be calculated):
-  * recurring_line_subtotal_tax
-  * recurring_line_tax
-  * line_subtotal_tax
-  * line_tax
-* If the following values are not specified in the CSV they will be set to the subscription product's recurring price (regardless of whether a tax value is specified or not):
-  * recurring_line_subtotal
-  * recurring_line_total
-* If the following values are not specified in the CSV, they will be set to the subscription product's sign-up fee (if any) plus recurring price, if there is no free trial (regardless of whether a tax value is specified or not):
-  * line_subtotal
-  * line_total
-  * order_total
-  * order_recurring_total
+#### Can subscriptions still be imported with a payment gateway that doesn't support migrating automatic payment meta data?
+Yes. There are two possible options:
 
-## Importer Usage
+* switch the subscriptions to use [manual renewals](http://docs.woothemes.com/document/subscriptions/renewal-process/); or
+* force the first payment to fail and allow the customer to [pay for renewal](https://docs.woothemes.com/document/subscriptions/customers-view/#section-3), which will update their payment details for future payments
 
-### Step 0: Make Sure Products Exist
-  - The WooCommerce Subscriptions Importer requires an existing subscription product to exist before you can create subscriptions to that product. You can either [create a subscription](http://docs.woothemes.com/document/subscriptions/store-manager-guide/#section-1) manually if you only have a small number of different products, or use the [Product CSV Import Suite](http://www.woothemes.com/products/product-csv-import-suite/) if you need to create a large number of different subscription products.
+To switch the subscriptions to use manual renewal, you can leave the `payment_method` column empty.
 
-### Step 1: Upload your CSV File.
-  - Locate the CSV file by searching for the file on disk.
-  - Specify the delimiting character that separates each column; defaults to comma character `,`
-  - Tick/Untick whether you want to run in test mode before importing to see warnings or fatal errors, and also if want to email new customers their login credentials
+![Empty Payment Method Field](https://cldup.com/RsNfaSQY8q.png)
 
-### Step 2: Map the CSV Fields
-- Each column header found in the CSV will be listed as a row in the table on this page, along with a dropdown menu. Use the dropdown menu to find and match the information to a value known by the importer. <strong>Must not have the same fields mapped more than once unless it's either `custom_user_meta`, `custom_order_meta` or `custom_user_order_meta`.</strong>
-- List of possible fields to map to are [above](https://github.com/Prospress/woocommerce-subscriptions-importer#importing-subscriptions)
-- Press Import or Test CSV depending on whether you are running the import in test mode first
+To import the subscription in a way that the first automatic payment fails, you need to:
 
-### Step 3a: Test Mode
-If you chose to run the import test mode beforehand, you should see something that looks similar to this.
-![Test mode results](http://oi57.tinypic.com/hv88k7.jpg)
- This table shows all the errors and warnings that occurred while importing without actually creating the new customers and subscription orders. The beauty of running the importer firstly in test mode is that, from here, you can either exit the import process to fix up the CSV or continue importing the file.
+1. import using a temporary, valid payment method (e.g. `stripe`)
+1. set a valid column value for the [payment method meta data](#importing-payment-gateway-meta-data) (e.g. set `_stripe_customer_id` to `cus_12345`)
 
-### Step 3b: Import Completion Table
-![Completion Table Screenshot](https://i.cloudup.com/VVsB5aBCHf-2000x2000.png)
+When Subscriptions attempts to process the next renewal payment, the transaction will fail and Subscriptions [failed payment handling](https://docs.woothemes.com/document/subscriptions/renewal-process/#section-6) process will begin.
 
-##FAQ
-#### 1. Is it possible to make sure the active subscriptions will still work?
-It sure is! When importing active subscriptions, it's important that the subscription id's are provided in the CSV. Depending on the payment gateway being used, the information required varies (see below).
-  - With __PayPal__, make sure you have set the paypal_subscriber_id field in the CSV ( PayPal sometimes call this the recurring payment profile ID).
-  - When using __Stripe__, ensure the stripe_customer_id field is set in the CSV.
-  - For those using __Authorize.net__, you will need to provide both the wc_authorize_net_cim_customer_profile_id and the wc_authorize_net_cim_payment_profile_id fields in the CSV. Both pieces of information are required!
+If the later approach is taken, we strongly recommend that you notify customers about the change to avoid confusion.
 
-#### 2. Can subscriptions still be imported with an unsupported payment gateway?
-Yes but first, it should be understood that they are two possible solutions to consider:
+#### How can I check if a payment method can be imported with automatic payments?
+WooCommerce Subscriptions v2.0 introduced a new way for payment gateways to register the payment meta data they require for processing automatic recurring payments. 
 
-  - defaulting to manual renewals;
-  - allow the customer to change their payment option after the first payment fails.
+To support this method, the payment gateway extension must use the filter: `'woocommerce_subscription_payment_meta'`.
 
-Firstly, if you are using a payment gateway that is not supported by the CSV Importer, the subscriptions will still successfully import however they will be set to require manual renewal payments and will have the following warning on the import completion table, as shown in the image below.
-![Unsupported Payment Method](https://i.cloudup.com/Ktkeu1FoVS-2000x2000.png)
+The importer also uses this filter in order to support a number of payment gateways with no extra code required in the gateway.
 
-If Subscriptions are set to manual renewals, it is very difficult (often impossible) to change them to an automatic renewal payment method, however it is relatively simple to change a payment method from automatic to manual renewals. Beforehand, you can [submit a request](http://support.woothemes.com/) for the payment method that you wish to use to be supported, or the other alternative is to import the subscription with another and use random text as the `stripe_customer_id` (a different payment method can be used as long as it is supported by the CSV Importer and supports the changing payment methods feature, see more info on this [here](http://docs.woothemes.com/document/subscriptions/payment-gateways/#section-1)). The stripe payment gateway with random text method is used to force the first payment to fail, allowing your customers to login and setup their preferred payment method by clicking the 'Change Payment Method' button on their My Account page and going through the checkout.
+To check if subscriptions using a specific payment gateway can be imported with automatic recurring payments, you can search the payment gateway extension's codebase for the `'woocommerce_subscription_payment_meta'` filter.
 
-If the later approach is taken, we strongly recommend that you notify all affected customers about the change to avoid any confusion in the future.
+If that filter is being used correctly by the payment gateway then it should also work with the importer.
+
+An alternative method to checking for importer support is to purchase a test subscription in your store using that payment gateway. Visit the **WooCommerce > Edit Subscription** page of the subscription you just created, and check if you can view and edit the payment method meta (see image below). If you can see these fields, the importer can import subscriptions using that payment gateway and process automatic recurring payments.
+
+![Admin Change Payment Method](https://docs.woothemes.com/wp-content/uploads/2015/09/change-recurring-payment-method-screenshot.png?w=2260)
+
+#### Why aren't my product line item attribute keys capitalised?
+WooCommerce displays product line item attribute keys based on either:
+
+* the attribute label in the store, if set; or
+* the string key, if no matching attribute can be found.
+
+If you have imported subscriptions with line items that have product attributes, you should also create matching [product attributes](https://docs.woothemes.com/document/managing-product-taxonomies/#section-3) in the new store.
+
+#### Why aren't taxes showing on my fee line items?
+Although the Importer provides a way to import tax data about fee line item, unfortunately, WooCommerce only displays tax line item data based on an array of tax data linked to the tax rate IDs. Becuase these are not imported, fee taxes will not be displayed on the on the **WooCommerce > Edit Subscription** and **WooCommerce > Edit Order** screens.
 
 ---
 
 # Subscriptions Exporter
-The exporter turns all your subscriptions within WooCommerce into a comma delimited CSV file at the click of a button. It's important to take note that this extension will not export any related orders for your subscriptions (this includes parent and renewal orders, etc); to export renewal orders, you will need the [WooCommerce Order CSV Exporter](https://www.woothemes.com/products/ordercustomer-csv-export/) to do that.
+With the Subscriptions CSV Exporter, you can download a comma delimited (CSV) file that contains all the details of the subscriptions in your WooCommerce store.
 
-## Exported Columns
+You can optionally filter the exported data to export only subscriptions with a specific:
+
+* status, like _active_ or _on-hold_
+* recurring payment method, like PayPal or Stripe
+* customer set as the subscriber
+
+You can also choose which data to include in the CSV file.
+
+![](https://cldup.com/WK-9aRHQ7r.png)
+
+Please note: this extension will not export any related orders for your subscriptions (this includes parent and renewal orders, etc); to export orders, you will need the [WooCommerce Order CSV Exporter](https://www.woothemes.com/products/ordercustomer-csv-export/).
+
+## Exporter Usage Guide
+
+1. Go to the **WooCommerce > Subscription Exporter** administration screen
+1. On the **Export Tab**:
+	1. Enter a name for the file (or leave as the default)
+	1. Choose the status to filter exported subscriptions by, or leave all status checked to export subscriptions with any status
+	1. Click the *Export for Customer* select box and use the search to find a customer via name, username, email or ID and then export only subscriptions for that customer
+	1. Click the *Payment Method* select box and choose a specific payment method to export only subscriptions using a certain payment method
+	1. Click the *Payment Method Tokens* checkbox if you want to include payment meta data, like customer or credit card tokens, in your CSV file
+1. Click the **CSV Headers** tab
+1. Click the radio fields under the **Include** column if you wish to exclude any subscription data from the CSV
+1. Change the text in the **CSV Column Header** column to change the string used to identify each piece of subscription data
+1. Click **Export Subscriptions**
+
+### Export Options
+
+1. **File name**: the name used for the CSV file (defaults to `subscriptions.csv`).
+2. **Subscription Status**: the subscriptions that are exported by status - untick any statuses you don't want exported (defaults to all statuses).
+3. **Customer**: filter subscriptions that belong to a speific customer.
+4. **Payment Method**: Use the dropdown to export subscriptions that were purchased with the chosen gateway (defaults to any gateway)
+5. **Payment Method Tokens**: Select whether you want payment method tokens, like a customer or credit card token, to be exported in the CSV (defaults to false)
+
+![](https://cldup.com/P9e5V-xjGM.png)
+
+### Custom CSV Headers
+Before exporting, you have the option to modify the column names which are written to the CSV along with choosen which column headers are exported. For instance, you can choose to just export the customer's billing first and last name, along with the subscriptions order total.
+
+![](https://cldup.com/o2aw3IBCsa.png)
+
+## Exported CSV Columns
 |column|type|description|
 |---|---|---|
-|`subscription_id`        |int|Subscription ID|
-|`subscription_status`    |string|Subscription Status (i.e. `wc-active`, `wc-on-hold`)|
-`customer_id`             |int|Customer ID|
+|`subscription_id`        |`int`|Subscription ID|
+|`subscription_status`    |`string`|Subscription Status (i.e. `wc-active`, `wc-on-hold`)|
+`customer_id`             |`int`|Customer ID|
 `start_date`              |Y-m-d H:i:s|Subscription start date|
 `trial_end_date`          |Y-m-d H:i:s|Subscription trial end date (defaults to 0 when the subscription has no trial period|
 `next_payment_date`       |Y-m-d H:i:s|Subscription next payment date|
 `last_payment_date`       |Y-m-d H:i:s|Subscription last payment date|
 `end_date`                |Y-m-d H:i:s|Subscription end date (defaults to 0 when the subscription has no end)|
-`billing_period`          |string|Billing period|
-`billing_interval`        |int|Billing interval|
-`order_shipping`          |float|Total shipping|
-`order_shipping_tax`      |float|Total shipping tax|
-`fee_total`               |float|Total subscription fees|
-`fee_tax_total`           |float|Total fees tax|
-`order_tax`               |float|Subscription total tax|
-`order_cart_discount`     |float|Cart discount|
-`order_discount`          |float|Subscription discount|
-`order_total`             |float|Subscription total|
-`order_currency`          |string|Subscription currency|
-`payment_method`          |string|Payment method id|
-`payment_method_title`    |string|Payment method title|
-`payment_method_post_meta`|string|Payment method post meta|
-`payment_method_user_meta`|string|Payment method user meta|
-`shipping_method`         |string|Shipping method|
-`billing_first_name`      |string|Billing first name|
-`billing_last_name`       |string|Billing last name|
-`billing_email`           |string|Billing email|
-`billing_phone`           |string|Billing phone|
-`billing_address_1`       |string|Billing address 1|
-`billing_address_2`       |string|Billing address 2|
-`billing_postcode`        |string|Billing postcode|
-`billing_city`            |string|Billing city|
-`billing_state`           |string|Billing state|
-`billing_country`         |string|Billing country|
-`billing_company`         |string|Billing company|
-`shipping_first_name`     |string|Shipping first name|
-`shipping_last_name`      |string|Shipping last name|
-`shipping_address_1`      |string|Shipping address 1|
-`shipping_address_2`      |string|Shipping address 2|
-`shipping_postcode`       |string|Shipping post code|
-`shipping_city`           |string|Shipping city|
-`shipping_state`          |string|Shipping state|
-`shipping_country`        |string|Shipping country|
-`shipping_company`        |string|Shipping company|
-`customer_note`           |string|Customer note|
-`order_items`             |string|Subscription Items|
-`order_notes`             |string|Subscription order notes|
-`coupon_items`            |string|Coupons|
-`fee_items`               |string|Fees|
-`tax_items`               |string|Taxes|
-`download_permissions`    |int|Download permissions granted (1 or 0)|
+`billing_period`          |`string`|Billing period|
+`billing_interval`        |`int`|Billing interval|
+`order_shipping`          |`float`|Total shipping|
+`order_shipping_tax`      |`float`|Total shipping tax|
+`fee_total`               |`float`|Total subscription fees|
+`fee_tax_total`           |`float`|Total fees tax|
+`order_tax`               |`float`|Subscription total tax|
+`cart_discount`           |`float`|Cart discount|
+`cart_discount_tax`       |`float`|Total discount|
+`order_total`             |`float`|Total discount tax|
+`order_currency`          |`string`|Subscription currency|
+`payment_method`          |`string`|Payment method id|
+`payment_method_title`    |`string`|Payment method title|
+`payment_method_post_meta`|`string`|Payment method post meta|
+`payment_method_user_meta`|`string`|Payment method user meta|
+`shipping_method`         |`string`|Shipping method|
+`billing_first_name`      |`string`|Billing first name|
+`billing_last_name`       |`string`|Billing last name|
+`billing_email`           |`string`|Billing email|
+`billing_phone`           |`string`|Billing phone|
+`billing_address_1`       |`string`|Billing address 1|
+`billing_address_2`       |`string`|Billing address 2|
+`billing_postcode`        |`string`|Billing postcode|
+`billing_city`            |`string`|Billing city|
+`billing_state`           |`string`|Billing state|
+`billing_country`         |`string`|Billing country|
+`billing_company`         |`string`|Billing company|
+`shipping_first_name`     |`string`|Shipping first name|
+`shipping_last_name`      |`string`|Shipping last name|
+`shipping_address_1`      |`string`|Shipping address 1|
+`shipping_address_2`      |`string`|Shipping address 2|
+`shipping_postcode`       |`string`|Shipping post code|
+`shipping_city`           |`string`|Shipping city|
+`shipping_state`          |`string`|Shipping state|
+`shipping_country`        |`string`|Shipping country|
+`shipping_company`        |`string`|Shipping company|
+`customer_note`           |`string`|Customer note|
+`order_items`             |`string`|Subscription Items|
+`order_notes`             |`string`|Subscription order notes|
+`coupon_items`            |`string`|Coupons|
+`fee_items`               |`string`|Fees|
+`tax_items`               |`string`|Taxes|
+`download_permissions`    |`int`|Download permissions granted (1 or 0)|
 
-## Export Options
+---
 
-![](https://cldup.com/P9e5V-xjGM.png)
+# Support
 
-1. **File name**: simply allows you to export a file using a custom name (defaults to `subscriptions.csv`)
-2. **Subscription Status**: filter the subscriptions that are exported by status - untick any statuses you don't want exported (defaults to all statuses)
-3. **Customer**: use the search to export subscriptions that belong to a customer.
-4. **Payment Method**: Use the dropdown to export subscriptions that were purchased with the chosen gateway (defaults to any gateway)
-5. **Payment Method Tokens**: Select whether you want payment method tokens, like a customer or credit card token, to be exported in the CSV (defaults to false)
+Please note, due to the complexity of the import process, we (Prospress) can not provide support for your import, including issues with CSV formatting or help after an import which did not set data correctly. Furthermore, issues with subscriptions created via the CSV importer may not be supported via the [WooThemes](http://woothemes.com/) support system for the WooCommerce Subscriptions extension.
 
-## Custom CSV Headers
-Before exporting, you have the option to modify the column names which are written to the CSV along with choosen which column headers are exported. For instance, you can choose to just export the customer's billing first and last name, along with the subscriptions order total.
+We are working to find [WooExperts](https://www.woothemes.com/wooexperts/) to act as migration partners and offer migration services, with ongoing support, for stores which need help. We plan to include contact details of these migration partners when the Importer is officially launched after the beta period.
 
-![](https://cldup.com/o2aw3IBCsa.png)
-
-## Exporter Usage
-
-1. Go to **WooCommerce > Subscription Exporter**
-1. On the **Export Tab**:
-    1. Enter a name for the file (or leave as the default)
-    1. Choose the filters to apply to the data which is exported (if any)
-1. Click **CSV Headers**
-1. Click the radio fields under the **Include** column to optionally include or exclude data from the CSV
-1. Change the text use for column headings by editing the **CSV Column Header** column if required
-1. Click **Export Subscriptions**
+If you think you have found a bug, problem with the documentation or limitation in the data the can be imported, please [open a new issue to report it](https://github.com/Prospress/woocommerce-subscriptions-importer/issues/new).
