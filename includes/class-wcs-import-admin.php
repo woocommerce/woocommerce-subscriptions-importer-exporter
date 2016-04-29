@@ -353,7 +353,7 @@ class WCS_Import_Admin {
 									<?php endforeach; ?>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Subscription Item Meta', 'wcs-import-export' ); ?>">
-									<?php foreach ( array_merge( WCS_Import_Parser::$order_meta_fields, WCS_Import_Parser::$user_meta_fields ) as $option ) : ?>
+									<?php foreach ( array_merge( WCS_Importer::$order_meta_fields, WCS_Importer::$user_meta_fields ) as $option ) : ?>
 										<option value="<?php echo esc_attr( $option ); ?>" <?php selected( $header, $option ); ?>><?php echo $option; ?></option>
 									<?php endforeach; ?>
 									<option value="shipping_method" <?php selected( $header, 'shipping_method' ); ?>>shipping_method</option>
@@ -553,7 +553,7 @@ class WCS_Import_Admin {
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 
 		if ( isset( $_POST['file_id'] ) && isset( $_POST['row_num'] ) ) {
-			$results = WCS_Import_Parser::import_data( array(
+			$results = WCS_Importer::import_data( array(
 					'file_path'       => get_attached_file( absint( $_POST['file_id'] ) ),
 					'mapped_fields'   => get_post_meta( absint( $_POST['file_id'] ), '_mapped_rules', true ),
 					'file_start'      => ( isset( $_POST['start'] ) ) ? absint( $_POST['start'] ) : 0,

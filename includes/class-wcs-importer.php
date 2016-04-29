@@ -1,12 +1,13 @@
 <?php
 /**
- * The parser class for the Subscriptions CSV Importer.
- * This class reads a number of lines (can vary) from the CSV and imports the subscriptions into your store.
- * All errors and unexpected PHP shutdowns will be logged to assist in debugging.
+ * The main importer class.
+ *
+ * This class reads a number of lines from the CSV file and imports the subscriptions based on the data
+ * in those rows. All errors and unexpected PHP shutdowns will be logged to assist in debugging.
  *
  * @since 1.0
  */
-class WCS_Import_Parser {
+class WCS_Importer {
 
 	public static $results = array();
 
