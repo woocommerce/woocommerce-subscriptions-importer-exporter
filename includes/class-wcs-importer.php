@@ -528,7 +528,7 @@ class WCS_Importer {
 				if ( 'paypal' == $payment_method ) {
 					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal, defaulted to manual renewals. Either PayPal was not enabled or your PayPal account does not have Reference Transaction setup. Learn more about enabling Reference Transactions %shere%s.', 'wcs-import-export' ), '<a href="https://support.woothemes.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
 				} else {
-					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewals. Please contact support if you believe this is not correct.', 'wcs-import-export' ), $payment_method );
+					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewals.', 'wcs-import-export' ), $payment_method );
 				}
 				$subscription->update_manual();
 			}
