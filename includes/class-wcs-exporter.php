@@ -92,8 +92,8 @@ class WCS_Exporter {
 				case 'order_shipping':
 				case 'order_shipping_tax':
 				case 'order_tax':
-				case 'order_cart_discount':
-				case 'order_discount':
+				case 'cart_discount':
+				case 'cart_discount_tax':
 				case 'order_total':
 					$value = empty( $subscription->{$header_key} ) ? 0 : $subscription->{$header_key};
 					break;
