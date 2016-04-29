@@ -686,7 +686,7 @@ class WCS_Importer {
 				throw new Exception( __( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix up the data from your CSV and try again.', 'wcs-import-export' ) );
 			}
 
-			if ( ! empty( self::$row[ self::$fields['download_permission_granted'] ] ) && ( 'true' == self::$row[ self::$fields['download_permission_granted'] ] || '1' == self::$row[ self::$fields['download_permission_granted'] ] ) ) {
+			if ( ! empty( self::$row[ self::$fields['download_permissions'] ] ) && ( 'true' == self::$row[ self::$fields['download_permissions'] ] || 1 == (int)self::$row[ self::$fields['download_permissions'] ] ) ) {
 				self::save_download_permissions( $subscription, $_product, $item_args['qty'] );
 			}
 		}
