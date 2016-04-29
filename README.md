@@ -317,7 +317,7 @@ Notice the _Shirt Colour_ meta key is in lowercase and uses a `-` instead of a s
 ##### Multiple Product Line Items
 To import a subscription with multiple product line items, separate each line item data with a `;`. You can use a combination of the single product ID method and full line item data array method.
 
-For example, an `order_items` column value for two products could look like: `"product_id:5179|quantity:2|total:9.09|tax:0.91;product_id:2156|total:30"`. See the [Sample CSV](https://raw.githubusercontent.com/Prospress/woocommerce-subscriptions-importer/master/wcs-import-sample.csv?token=AAOYA_4S9kt3Ia3JbecgD5VqCDMOVkvqks5XK7cUwA%3D%3D) for an example of importing multiple product line items using the importer.
+For example, an `order_items` column value for two products could look like: `"product_id:5179|quantity:2|total:9.09|tax:0.91;product_id:2156|total:30"`. See the [Sample CSV](https://raw.githubusercontent.com/Prospress/woocommerce-subscriptions-importer/master/wcs-import-sample.csv) for an example of importing multiple product line items using the importer.
 
 #### Importing Subscriptions with Coupons
 The importer provides the `coupon_items` column header to apply coupons to your imported subscriptions.
