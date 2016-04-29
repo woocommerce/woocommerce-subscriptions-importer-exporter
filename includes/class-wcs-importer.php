@@ -416,7 +416,7 @@ class WCS_Importer {
 			if ( empty( $result['error'] ) ) {
 				$result['status']              = 'success';
 				$result['subscription']        = sprintf( '<a href="%s">#%s</a>', esc_url( admin_url( 'post.php?post=' . absint( $subscription->id ) . '&action=edit' ) ), $subscription->get_order_number() );
-				$result['subscription_status'] = $status;
+				$result['subscription_status'] = $subscription->get_status();
 
 			} else {
 				$result['status']  = 'failed';
