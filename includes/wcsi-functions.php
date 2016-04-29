@@ -36,9 +36,9 @@ function wcsi_check_customer( $data, $mapped_fields, $test_mode = false ) {
 
 	if ( empty( $customer_id ) ) {
 
-		if ( is_email( $customer_email ) ) {
+		if ( is_email( $customer_email ) && false !== email_exists( $customer_email ) ) {
 			$found_customer = email_exists( $customer_email );
-		} elseif ( ! empty( $username ) ) {
+		} elseif ( ! empty( $username ) && false !== username_exists( $username ) ) {
 			$found_customer = username_exists( $username );
 		} elseif( is_email( $customer_email ) ) {
 
