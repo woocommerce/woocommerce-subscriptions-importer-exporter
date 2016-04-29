@@ -160,12 +160,31 @@ class WCS_Exporter {
 
 					foreach ( $subscription->get_items() as $item_id => $item ) {
 
-						$item_meta = new WC_Order_Item_Meta( $item );
-						$meta = $item_meta->display( true, true );
+						$meta_string = '';
 
-						if ( $meta ) {
-							$meta = str_replace( array( "\r", "\r\n", "\n" ), '', $meta );
-							$meta = str_replace( array( ': ', ':', ';', '|' ), '=', $meta );
+						foreach ( $subscription->has_meta( $item_id ) as $meta_id => $meta_data ) {
+
+							// Skip hidden core fields
+							if ( in_array( $meta_data['meta_key'], apply_filters( 'woocommerce_hidden_order_itemmeta', array(
+								'_qty',
+								'_tax_class',
+								'_product_id',
+								'_variation_id',
+								'_line_subtotal',
+								'_line_subtotal_tax',
+								'_line_total',
+								'_line_tax',
+								'_line_tax_data',
+							) ) ) ) {
+								continue;
+							}
+
+							// Add a custom delimeter to separate meta (we're running out of special characters to use!)
+							if ( ! empty( $meta_string ) ) {
+								$meta_string .= '+';
+							}
+
+							$meta_string .= sprintf( '%s=%s', $meta_data['meta_key'], $meta_data['meta_value'] );
 						}
 
 						$line_item = array(
@@ -173,7 +192,7 @@ class WCS_Exporter {
 							'name'       => html_entity_decode( $item['name'], ENT_NOQUOTES, 'UTF-8' ),
 							'quantity'   => $item['qty'],
 							'total'      => wc_format_decimal( $subscription->get_line_total( $item ), 2 ),
-							'meta'       => html_entity_decode( $meta, ENT_NOQUOTES, 'UTF-8' ),
+							'meta'       => html_entity_decode( str_replace( array( "\r", "\r\n", "\n", ': ', ':', ';', '|' ), '', $meta_string ), ENT_NOQUOTES, 'UTF-8' ),
 						);
 
 						// add line item tax
