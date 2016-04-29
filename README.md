@@ -438,6 +438,17 @@ An alternative method to checking for importer support is to purchase a test sub
 
 ![Admin Change Payment Method](https://docs.woothemes.com/wp-content/uploads/2015/09/change-recurring-payment-method-screenshot.png?w=2260)
 
+#### Why aren't my product line item attribute keys capitalised?
+WooCommerce displays product line item attribute keys based on either:
+
+* the attribute label in the store, if set; or
+* the string key, if no matching attribute can be found.
+
+If you have imported subscriptions with line items that have product attributes, you should also create matching [product attributes](https://docs.woothemes.com/document/managing-product-taxonomies/#section-3) in the new store.
+
+#### Why aren't taxes showing on my fee line items?
+Although the Importer provides a way to import tax data about fee line item, unfortunately, WooCommerce only displays tax line item data based on an array of tax data linked to the tax rate IDs. Becuase these are not imported, fee taxes will not be displayed on the on the **WooCommerce > Edit Subscription** and **WooCommerce > Edit Order** screens.
+
 ---
 
 # Subscriptions Exporter
