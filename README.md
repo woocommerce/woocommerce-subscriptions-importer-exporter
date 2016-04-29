@@ -294,6 +294,24 @@ The table below provides a full list of line item data that can be used when imp
 |`subtotal`|`float`|Value of `total`|The line total before pre-tax discounts.|
 |`tax`|`float`|`0`|The line tax total after pre-tax discounts.|
 |`total`|`float`|Product's price|The line total after pre-tax discounts.|
+|`meta`|`string`|Product's variation data, if any.|Line item meta data to store against this product line item, see the section below on [Line Item Meta Data](#line-item-meta-data) for detals.|
+
+An example `order_items` column content to import a product line item would look something like this:
+
+```
+product_id:123|name:Product to Import|quantity:3|subtotal_tax:3.00|subtotal:30.00|tax:3.00|total:30.00|meta:size=Large+shirt-colour=Midnight Black
+```
+
+###### Line Item Meta Data
+When importing a product line item, by default, the Importer will set the variation attributes (if any) of the product with a matching ID for the imported line item as line item meta data.
+
+If you would prefer to set different attributes, or need to import meta data that does not originate from the variation attributes, you can use the `meta` field in the `order_items` colum.
+
+The `meta` field can include one or more piece of meta data and must be formatted using `=` to delimit the meta key and value, and `+` to delimit each piece of meta data.
+
+For example, to import a product line item with an _Size_ and _Shirt Colour_ meta with _Large_ and _Midnight Black_ values respectivately, the meta field would look like: `meta:size=Large+shirt-colour=Midnight Black`.
+
+Notice the _Shirt Colour_ meta key is in lowercase and uses a `-` instead of a space (i.e. `' '`) while the _Midnight Black_ is capitalised with a space. The meta keys in your `meta` field should be raw values to store in the database, not the formatted value returned by `WC_Order_Item_Meta::display()` or `WC_Order_Item_Meta::get_formatted()`.
 
 ##### Multiple Product Line Items
 To import a subscription with multiple product line items, separate each line item data with a `;`. You can use a combination of the single product ID method and full line item data array method.

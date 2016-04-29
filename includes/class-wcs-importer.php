@@ -661,7 +661,8 @@ class WCS_Importer {
 			$item_args['totals'][ $line_item_data ] = ( ! empty( $data[ $line_item_data ] ) ) ? $data[ $line_item_data ] : $default;
 		}
 
-		if ( $_product->variation_data ) {
+		// Add this site's variation meta data if no line item meta data was specified in the CSV
+		if ( empty( $data['meta'] ) && $_product->variation_data ) {
 			$item_args['variation'] = array();
 
 			foreach ( $_product->variation_data as $attribute => $variation ) {
@@ -681,6 +682,14 @@ class WCS_Importer {
 
 		if ( ! self::$test_mode ) {
 			$item_id = $subscription->add_product( $_product, $item_args['qty'], $item_args );
+
+			// Add any meta data for the line item
+			if ( ! empty( $data['meta'] ) ) {
+				foreach( explode( '+', $data['meta'] ) as $meta ) {
+					$meta = explode( '=', $meta );
+					wc_update_order_item_meta( $item_id, $meta[0], $meta[1] );
+				}
+			}
 
 			if ( ! $item_id ) {
 				throw new Exception( __( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix up the data from your CSV and try again.', 'wcs-import-export' ) );
