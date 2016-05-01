@@ -143,8 +143,18 @@ class WCS_Export_Admin {
 						<td><label><?php esc_html_e( 'Payment Method Tokens', 'wcs-import-export' ); ?>:</label></td>
 						<td><input type="checkbox" name="paymentmeta"><?php esc_html_e( 'Export your customers payment and credit cart tokens to the CSV', 'wcs-import-export' ); ?></td>
 					</tr>
+					<tr>
+						<td><label><?php esc_html_e( 'Offset', 'wcs-import-export' ); ?>:</label></td>
+						<td><input type="number" name="offset" min="0" value="0"> <?php esc_html_e( 'Offset export results to export a specific subset of your subscriptions. Defaults to 0.', 'wcs-import-export' ); ?></td>
+					</tr>
+					<tr>
+						<td><label><?php esc_html_e( 'Limit Export', 'wcs-import-export' ); ?>:</label></td>
+						<td><input type="number" name="limit" min="-1"> <?php esc_html_e( 'Leave empty or set to "-1" to export all subscriptions in your store.', 'wcs-import-export' ); ?></td>
+					</tr>
 				</tbody>
+
 		</table>
+		<?php esc_html_e( 'When exporting all subscriptions, your site may experience memory exhaustion and therefore you may need to use the limit and offset to separate your export into multiple CSV files.', 'wcs-import-export' ); ?>
 
 	<?php
 		$this->export_headers();
@@ -242,25 +252,30 @@ class WCS_Export_Admin {
 	 * Query the subscriptions using the users specific filters.
 	 *
 	 * @since 1.0
-	 * @param array $filters
 	 * @return array
 	 */
-	private function get_subscriptions_to_export( $filters ) {
+	private function get_subscriptions_to_export() {
 
 		$args = array(
-			'subscriptions_per_page' => -1,
+			'subscriptions_per_page' => isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : -1,
+			'offset'                 => isset( $_POST['offset'] ) ? $_POST['offset'] : 0,
+			'product'                => isset( $_POST['product'] ) ? $_POST['product'] : '',
 			'subscription_status'    => 'none', // don't default to 'any' status if no statuses were chosen
 		);
 
-		if ( ! empty( $filters['statuses'] ) && is_array( $filters['statuses'] ) ) {
-			$args['subscription_status'] = implode(',', $filters['statuses'] );
+		if ( ! empty( $_POST['status'] ) ) {
+			$statuses = array_keys( $_POST['status'] );
+
+			if ( ! empty( $statuses  ) && is_array( $statuses  ) ) {
+				$args['subscription_status'] = implode(',', $statuses );
+			}
 		}
 
-		if ( ! empty( $filters['customer'] ) && is_numeric( $filters['customer'] ) ) {
-			$args['customer_id'] = $filters['customer'];
+		if ( ! empty( $_POST['customer'] ) && is_numeric( $_POST['customer'] ) ) {
+			$args['customer_id'] = $_POST['customer'];
 		}
 
-		if ( ! empty( $filters['payment_method'] ) ) {
+		if ( ! empty( $_POST['payment'] ) ) {
 			add_filter( 'woocommerce_get_subscriptions_query_args', array( &$this, 'filter_payment_method' ), 10, 2 );
 		}
 
@@ -297,16 +312,9 @@ class WCS_Export_Admin {
 	 */
 	public function process_download( $headers = array() ) {
 
-		$filters = array(
-			'statuses'       => array_keys( $_POST['status'] ),
-			'customer'       => isset( $_POST['customer'] ) ? $_POST['customer'] : '',
-			'product'        => isset( $_POST['product'] ) ? $_POST['product'] : '',
-			'payment_method' => $_POST['payment'],
-		);
-
 		WC()->payment_gateways();
 
-		$subscriptions = $this->get_subscriptions_to_export( $filters );
+		$subscriptions = $this->get_subscriptions_to_export();
 
 		if ( ! empty( $subscriptions ) ) {
 			if ( empty( $_POST['paymentmeta'] ) ) {
