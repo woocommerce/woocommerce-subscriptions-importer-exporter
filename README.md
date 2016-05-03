@@ -317,7 +317,7 @@ Notice the _Shirt Colour_ meta key is in lowercase and uses a `-` instead of a s
 ##### Multiple Product Line Items
 To import a subscription with multiple product line items, separate each line item data with a `;`. You can use a combination of the single product ID method and full line item data array method.
 
-For example, an `order_items` column value for two products could look like: `"product_id:5179|quantity:2|total:9.09|tax:0.91;product_id:2156|total:30"`. See the [Sample CSV](https://raw.githubusercontent.com/Prospress/woocommerce-subscriptions-importer/master/wcs-import-sample.csv) for an example of importing multiple product line items using the importer.
+For example, an `order_items` column value for two products could look like: `"product_id:5179|quantity:2|total:9.09|tax:0.91;product_id:2156|total:30"`. See the [Sample CSV](https://github.com/Prospress/woocommerce-subscriptions-importer/blob/master/wcs-import-sample.csv) for an example of importing multiple product line items using the importer.
 
 #### Importing Subscriptions with Coupons
 The importer provides the `coupon_items` column header to apply coupons to your imported subscriptions.
@@ -361,6 +361,21 @@ The minimum requirement for attaching tax items is to have either the ID or the 
 There's a few simplifications when it comes to how the importer manages taxes. If you only provide the tax code in your CSV, the importer will query your available taxes and choose the tax with that code with the highest priority (i.e. if you have multiple taxes codes with VAT then it's possible the incorrect tax rate may be attached to your subscription). The alternative and more accurate workaround is to import tax items using the unique tax rate ID (found in `{$wpdb->prefix}woocommerce_tax_rates` table under column `tax_rate_id`).
 
 When the tax rate is successfully added to your subscription, this rate is then used as the tax class for all tax values for things like line items, shipping lines, fees etc.
+
+### Sample CSV
+
+A [Sample CSV](https://github.com/Prospress/woocommerce-subscriptions-importer/blob/master/wcs-import-sample.csv) file is included in the Importer's folder with the file name `wcs-import-sample.csv`.
+
+This CSV includes a number of rows to provide examples for the many different acceptable values for CSV column content. It uses almost all the available CSV column headers (though not all rows fill in all columns).
+
+The CSV file also includes a column headed `Row Description (Do not import)` which provides a brief description of the example that row provides. However, in addition to the specific feature mentioned in that column, each row also provides examples of many different types of column values, like `order_notes`, `customer_notes`, totals, line items and download permissions. It also provides a good demonstrate of how to format complex data, like multiple `order_items` with custom meta data associated with them.
+
+You can use the CSV on a test site to see the Importer in action. To use the CSV you need to first:
+
+* make sure a customer exists with user ID `1` (for the first row of the CSV which creates a subscription based on user ID)
+* update the `product_id:1` and `product_id:2` values in the `order_items` column to link to use the post IDs of real products
+
+Because the Sample CSV file uses almost all the available CSV columns, it is a great place to start in creating your own CSV file.
 
 ## List of Warnings and Errors
 
