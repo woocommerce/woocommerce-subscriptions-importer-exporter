@@ -330,10 +330,6 @@ class WCS_Importer {
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
 					}
 
-					if ( self::$add_memberships ) {
-						self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
-					}
-
 					if ( ! empty( $data[ self::$fields['order_notes'] ] ) ) {
 						$order_notes = explode( ';', $data[ self::$fields['order_notes'] ] );
 
@@ -361,7 +357,7 @@ class WCS_Importer {
 
 				if ( ! empty( $data[ self::$fields['order_items'] ] ) ) {
 					if ( is_numeric( $data[ self::$fields['order_items'] ] ) ) {
-						$result['items'] = self::add_product( $subscription, array( 'product_id' => absint( $data[ self::$fields['order_items'] ] ) ), $chosen_tax_rate_id );
+						$result['items'] = self::add_product( $subscription, array( 'product_id' => absint( $data[ self::$fields['order_items'] ] ) ), $chosen_tax_rate_id, $user_id );
 					} else {
 						$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
 
@@ -374,7 +370,7 @@ class WCS_Importer {
 									$item_data[ trim( $name ) ] = trim( $value );
 								}
 
-								$result['items'] .= self::add_product( $subscription, $item_data, $chosen_tax_rate_id ) . '<br/>';
+								$result['items'] .= self::add_product( $subscription, $item_data, $chosen_tax_rate_id, $user_id ) . '<br/>';
 							}
 						}
 					}
@@ -628,9 +624,11 @@ class WCS_Importer {
 	 * @since 1.0
 	 * @param WC_Subscription $subscription
 	 * @param array $data
+	 * @param int $chosen_tax_rate_id
+	 * @param int $user
 	 * @return string
 	 */
-	public static function add_product( $subscription, $data, $chosen_tax_rate_id ) {
+	public static function add_product( $subscription, $data, $chosen_tax_rate_id, $user_id ) {
 		$item_args        = array();
 		$item_args['qty'] = isset( $data['quantity'] ) ? $data['quantity'] : 1;
 
@@ -703,6 +701,10 @@ class WCS_Importer {
 
 			if ( ! empty( self::$row[ self::$fields['download_permissions'] ] ) && ( 'true' == self::$row[ self::$fields['download_permissions'] ] || 1 == (int)self::$row[ self::$fields['download_permissions'] ] ) ) {
 				self::save_download_permissions( $subscription, $_product, $item_args['qty'] );
+			}
+
+			if ( self::$add_memberships ) {
+				self::maybe_add_memberships( $user_id, $subscription->id, $data['product_id'] );
 			}
 		}
 
