@@ -257,7 +257,7 @@ class WCS_Import_Admin {
 							<tr>
 								<th><?php esc_html_e( 'Add Memberships:', 'wcs-import-export' ); ?></th>
 								<td>
-									<input type="checkbox" name="add_memberships" value="no" <?php checked( $add_memberships, 'yes' ); ?> />
+									<input type="checkbox" name="add_memberships" value="yes" <?php checked( $add_memberships, 'yes' ); ?> />
 									<em><?php printf( esc_html__( 'Automatically add the membership to the new subscription if it contains a product that is part of a membership plan (only works with %sWooCommerce Memberships%s).', 'wcs-import-export' ), '<a href="https://www.woothemes.com/products/woocommerce-memberships/">', '</a>' ); ?></em>
 								</td>
 							</tr>

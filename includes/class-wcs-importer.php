@@ -330,10 +330,6 @@ class WCS_Importer {
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
 					}
 
-					if ( self::$add_memberships ) {
-						self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
-					}
-
 					if ( ! empty( $data[ self::$fields['order_notes'] ] ) ) {
 						$order_notes = explode( ';', $data[ self::$fields['order_notes'] ] );
 
@@ -361,7 +357,12 @@ class WCS_Importer {
 
 				if ( ! empty( $data[ self::$fields['order_items'] ] ) ) {
 					if ( is_numeric( $data[ self::$fields['order_items'] ] ) ) {
-						$result['items'] = self::add_product( $subscription, array( 'product_id' => absint( $data[ self::$fields['order_items'] ] ) ), $chosen_tax_rate_id );
+						$product_id      = absint( $data[ self::$fields['order_items'] ] );
+						$result['items'] = self::add_product( $subscription, array( 'product_id' => $product_id ), $chosen_tax_rate_id );
+
+						if ( ! self::$test_mode && self::$add_memberships ) {
+							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
+						}
 					} else {
 						$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
 
@@ -375,6 +376,10 @@ class WCS_Importer {
 								}
 
 								$result['items'] .= self::add_product( $subscription, $item_data, $chosen_tax_rate_id ) . '<br/>';
+
+								if ( ! self::$test_mode && self::$add_memberships ) {
+									self::maybe_add_memberships( $user_id, $subscription->id, $item_data['product_id'] );
+								}
 							}
 						}
 					}
@@ -628,6 +633,7 @@ class WCS_Importer {
 	 * @since 1.0
 	 * @param WC_Subscription $subscription
 	 * @param array $data
+	 * @param int $chosen_tax_rate_id
 	 * @return string
 	 */
 	public static function add_product( $subscription, $data, $chosen_tax_rate_id ) {
