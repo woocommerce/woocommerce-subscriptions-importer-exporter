@@ -145,11 +145,11 @@ class WCS_Export_Admin {
 					</tr>
 					<tr>
 						<td><label><?php esc_html_e( 'Offset', 'wcs-import-export' ); ?>:</label></td>
-						<td><input type="number" name="offset" min="0" value="0"> <?php esc_html_e( 'Offset export results to export a specific subset of your subscriptions. Defaults to 0.', 'wcs-import-export' ); ?></td>
+						<td><input type="number" name="offset" min="0" value="0"> <?php esc_html_e( 'Offset export results to export a specific subset of your subscriptions. Defaults to 0. Subscriptions are chosen based on start date from newest to oldest.', 'wcs-import-export' ); ?></td>
 					</tr>
 					<tr>
 						<td><label><?php esc_html_e( 'Limit Export', 'wcs-import-export' ); ?>:</label></td>
-						<td><input type="number" name="limit" min="-1"> <?php esc_html_e( 'Leave empty or set to "-1" to export all subscriptions in your store.', 'wcs-import-export' ); ?></td>
+						<td><input type="number" name="limit" min="-1"> <?php esc_html_e( 'Export only a certain number of subscriptions. Leave empty or set to "-1" to export all subscriptions.', 'wcs-import-export' ); ?></td>
 					</tr>
 				</tbody>
 
