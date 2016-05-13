@@ -47,7 +47,7 @@ Sample usage:
 
     $ tests/bin/install.sh wcsie_tests root root 127.0.0.1
     
-This will install WordPress, the WP Unit Test library, PHP_CodeSniffer and the WordPress Coding Standards components to a `tmp` directory within the WCSG plugin root directory. 
+This will install WordPress, the WP Unit Test library, PHP_CodeSniffer and the WordPress Coding Standards components to a `tmp` directory within the WCSIE plugin root directory. 
 
 **Important**: The `<db-name>` database will be created if it doesn't exist and all data will be removed during testing.
 
@@ -55,11 +55,11 @@ This will install WordPress, the WP Unit Test library, PHP_CodeSniffer and the W
 
 If the database exists, an error will be displayed but the installation will still have completed successfully. The error will look something like:
 
-	mysqladmin: CREATE DATABASE failed; error: 'Can't create database 'woo-test'; database exists'
+	mysqladmin: CREATE DATABASE failed; error: 'Can't create database 'wcsie_tests'; database exists'
 	
 ## Running PHPUnit Tests
 
-Simply change to the WCSG plugin root directory and type:
+Simply change to the WCSIE plugin root directory and type:
 
     $ phpunit
 
@@ -71,7 +71,7 @@ You can run specific tests by providing the path and filename to the test class:
     
 ## Running PHP_CodeSniffer
 
-Simply change to the WCSG plugin root directory and type:
+Simply change to the WCSIE plugin root directory and type:
 
 	tmp/php-codesniffer/scripts/phpcs -p -s -v -n . --standard=Prospress --extensions=php --ignore=*/tmp/*,*/tests/*,*/node_modules/*,*/libraries/*,*/woo-includes/*
 	
@@ -94,7 +94,7 @@ You can choose the following other rule sets to test against by adjusting the st
 * WordPress-Extra
 * WordPress-VIP
 
-**Updating Rule Sets:** The rule sets are occassionally updated. The easiests way to update your local rule sets is to simply run the `install.sh` script again listed under  *Initial Setup* above.
+**Updating Rule Sets:** The rule sets are occasionally updated. The easiest way to update your local rule sets is to simply run the `install.sh` script again listed under  *Initial Setup* above.
 
 
 ## Search for PHP Syntax Errors
@@ -136,7 +136,7 @@ If you've install Grunt correctly, this should display the version:
 
 	$ grunt --version
 	
-2) Change to the WCSG plugin root directory. 
+2) Change to the WCSIE plugin root directory. 
 
 Install the WCS grunt dependencies by running the npm installer with the following command:
 
