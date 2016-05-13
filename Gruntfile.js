@@ -56,14 +56,14 @@ module.exports = function(grunt) {
 				type: 'wp-plugin',
 				domainPath: 'languages',
 				potHeaders: {
-					'report-msgid-bugs-to': 'https://github.com/Prospress/woocommerce-subscriptions-gifting/issues',
+					'report-msgid-bugs-to': 'https://github.com/Prospress/woocommerce-subscriptions-importer/issues',
 					'language-team': 'Gabor Javorszky <translations@prospress.com>',
 					'language': 'en_US'
 				}
 			},
 			frontend: {
 				options: {
-					potFilename: 'woocommerce-subscriptions-gifting.pot',
+					potFilename: 'woocommerce-subscriptions-importer.pot',
 					exclude: [
 						'.tx/.*',
 						'tests/.*',
@@ -77,7 +77,7 @@ module.exports = function(grunt) {
 		},
 		checktextdomain: {
 			options:{
-				text_domain: 'woocommerce-subscriptions-gifting',
+				text_domain: 'woocommerce-subscriptions-importer',
 				keywords: [
 					'__:1,2d',
 					'_e:1,2d',

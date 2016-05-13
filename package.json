@@ -1,18 +1,18 @@
 {
-	"name": "woocommerce-subscriptions-gifting",
-	"title": "WooCommerce Subscriptions Gifting",
+	"name": "woocommerce-subscriptions-importer",
+	"title": "WooCommerce Subscriptions CSV Importer and Exporter",
 	"author": "Prospress",
 	"license": "ISC",
 	"version": "1.0.0",
 	"description": "",
-	"homepage": "https://github.com/Prospress/woocommerce-subscriptions-gifting",
+	"homepage": "https://github.com/Prospress/woocommerce-subscriptions-importer",
 	"main": "Gruntfile.js",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Prospress/woocommerce-subscriptions-gifting.git"
+		"url": "https://github.com/Prospress/woocommerce-subscriptions-importe.git"
 	},
 	"bugs": {
-		"url": "https://github.com/Prospress/woocommerce-subscriptions-gifting/issues"
+		"url": "https://github.com/Prospress/woocommerce-subscriptions-importer/issues"
 	},
 	"directories": {
 		"test": "tests"
