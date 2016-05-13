@@ -299,7 +299,10 @@ class WCS_Import_Admin {
 
 					foreach ( $column_headers as $key => $column_header ) {
 
-						if ( ! $column_header ) continue;
+						if ( ! $column_header ) {
+							continue;
+						}
+
 						$row[ $column_header ] = ( isset( $postmeta[ $key ] ) ) ? wcsi_format_data( $postmeta[ $key ], $enc ) : '';
 					}
 
