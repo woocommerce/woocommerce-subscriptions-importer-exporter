@@ -70,9 +70,9 @@ class WCS_Importer {
 		$file_path = addslashes( $data['file_path'] );
 
 		self::$row_number      = $data['starting_row'];
-		self::$test_mode       = ( $data['test_mode'] == 'true' ) ? true : false;
-		self::$email_customer  = ( $data['email_customer'] == 'true' ) ? true : false;
-		self::$add_memberships = ( $data['add_memberships'] == 'true' ) ? true : false;
+		self::$test_mode       = ( 'true' == $data['test_mode'] ) ? true : false;
+		self::$email_customer  = ( 'true' == $data['email_customer'] ) ? true : false;
+		self::$add_memberships = ( 'true' == $data['add_memberships'] ) ? true : false;
 		self::$fields          = $data['mapped_fields'];
 
 		add_action( 'shutdown', 'WCS_Import_Logger::shutdown_handler' );
@@ -107,7 +107,7 @@ class WCS_Importer {
 				$data = array();
 				$column_headers = fgetcsv( $file_handle, 0 );
 
-				if ( $start_position != 0 ) {
+				if ( 0 != $start_position ) {
 					fseek( $file_handle, $start_position );
 				}
 
