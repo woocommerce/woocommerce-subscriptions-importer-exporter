@@ -8,7 +8,7 @@
  * @param string $file_encoding
  */
 function wcsi_format_data( $data, $file_encoding = 'UTF-8' ) {
-	return ( $file_encoding == 'UTF-8' ) ? $data : utf8_encode( $data );
+	return ( 'UTF-8' == $file_encoding ) ? $data : utf8_encode( $data );
 }
 
 /**
