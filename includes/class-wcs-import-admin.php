@@ -90,7 +90,7 @@ class WCS_Import_Admin {
 							}
 
 							$s_heading         = strtolower( $heading );
-							$row[ $s_heading ] = ( isset( $postmeta[ $key ] ) ) ? wcsi_format_data( $postmeta[$key], $enc ) : '';
+							$row[$s_heading] = ( isset( $postmeta[$key] ) ) ? wcsi_format_data( $postmeta[$key], $enc ) : '';
 						}
 
 						if ( $count >= $this->rows_per_request ) {
