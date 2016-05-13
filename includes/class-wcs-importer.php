@@ -103,7 +103,7 @@ class WCS_Importer {
 		@ini_set( 'auto_detect_line_endings', true );
 
 		if ( $file_path ) {
-			if ( ( $file_handle = fopen( $file_path, 'r' ) ) !== FALSE ) {
+			if ( ( $file_handle = fopen( $file_path, 'r' ) ) !== false ) {
 				$data = array();
 				$column_headers = fgetcsv( $file_handle, 0 );
 
