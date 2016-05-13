@@ -76,11 +76,11 @@ class WCS_Import_Admin {
 				$position     = 0;
 				$row_start[]  = 1;
 
-				if ( ( $handle = fopen( $file, 'r' ) ) !== FALSE ) {
+				if ( ( $handle = fopen( $file, 'r' ) ) !== false ) {
 					$row       = $raw_headers = array();
 
 					$header = fgetcsv( $handle, 0 );
-					while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== FALSE ) {
+					while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== false ) {
 						$count++;
 
 						foreach ( $header as $key => $heading ) {
@@ -290,7 +290,7 @@ class WCS_Import_Admin {
 
 			@ini_set( 'auto_detect_line_endings', true );
 
-			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
+			if ( ( $handle = fopen( $file, "r" ) ) !== false ) {
 
 				$row            = array();
 				$column_headers = fgetcsv( $handle, 0 );
