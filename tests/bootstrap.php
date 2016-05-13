@@ -71,7 +71,7 @@ class WCS_Unit_Tests_Bootstrap {
 		update_option( WC_Subscriptions_Admin::$option_prefix . '_active_version', WC_Subscriptions::$version );
 
 		// load WooCommerce Subcriptions Importer Exporter
-		require_once( $this->plugin_dir . '/woocommerce-subscriptions-importer-exporter.php' );
+		require_once( $this->plugin_dir . '/wcs-importer-exporter.php' );
 
 		// set active and inactive subscriber roles
 		update_option( WC_Subscriptions_Admin::$option_prefix . '_subscriber_role', 'subscriber' );
