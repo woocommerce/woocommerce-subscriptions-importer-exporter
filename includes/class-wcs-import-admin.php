@@ -76,7 +76,7 @@ class WCS_Import_Admin {
 				$position     = 0;
 				$row_start[]  = 1;
 
-				if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
+				if ( ( $handle = fopen( $file, 'r' ) ) !== FALSE ) {
 					$row       = $raw_headers = array();
 
 					$header = fgetcsv( $handle, 0 );
