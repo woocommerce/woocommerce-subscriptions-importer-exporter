@@ -341,7 +341,7 @@ class WCS_Import_Admin {
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach( $row as $header => $sample ) : ?>
+					<?php foreach ( $row as $header => $sample ) : ?>
 					<tr <?php echo ( ++$row_number % 2 ) ? '' : 'class="alternate"'; ?>>
 						<td>
 							<select name="mapto[<?php echo esc_attr( $header ); ?>]">
@@ -547,7 +547,6 @@ class WCS_Import_Admin {
 					wp_safe_redirect( add_query_arg( $next_step_url_params, $this->admin_url ) );
 					exit;
 				}
-
 			} elseif ( 'field_mapping' == $_POST['action'] ) {
 
 				$this->save_mapping();
@@ -566,10 +565,10 @@ class WCS_Import_Admin {
 	 */
 	public function ajax_request_handler() {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( "Cheatin' huh?");
+			wp_die( "Cheatin' huh?" );
 		}
 
-		@set_time_limit(0);
+		@set_time_limit( 0 );
 
 		// Requests to admin-ajax.php use the front-end memory limit, we want to use the admin (i.e. max) memory limit
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
