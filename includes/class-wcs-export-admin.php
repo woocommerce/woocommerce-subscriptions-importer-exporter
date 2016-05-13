@@ -292,7 +292,7 @@ class WCS_Export_Admin {
 	 */
 	public function filter_payment_method( $query_args, $args ) {
 
-		if ( isset( $_POST['payment'] ) && $_POST['payment'] != 'any' ) {
+		if ( isset( $_POST['payment'] ) && 'any' != $_POST['payment'] ) {
 			$payment_payment = ( 'none' == $_POST['payment'] ) ? '' : $_POST['payment'];
 
 			$query_args['meta_query'][] = array(
