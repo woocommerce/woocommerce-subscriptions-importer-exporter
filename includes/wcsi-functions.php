@@ -20,9 +20,9 @@ function wcsi_format_data( $data, $file_encoding = 'UTF-8' ) {
  * @param bool $test_mode
  */
 function wcsi_check_customer( $data, $mapped_fields, $test_mode = false, $email_customer = false ) {
-	$customer_email = ( ! empty ( $data[ $mapped_fields['customer_email'] ] ) ) ? $data[ $mapped_fields['customer_email'] ] : '';
-	$username       = ( ! empty ( $data[ $mapped_fields['customer_username'] ] ) ) ? $data[ $mapped_fields['customer_username'] ] : '';
-	$customer_id    = ( ! empty ( $data[ $mapped_fields['customer_id'] ] ) ) ? $data[ $mapped_fields['customer_id'] ] : '';
+	$customer_email = ( ! empty( $data[ $mapped_fields['customer_email'] ] ) ) ? $data[ $mapped_fields['customer_email'] ] : '';
+	$username       = ( ! empty( $data[ $mapped_fields['customer_username'] ] ) ) ? $data[ $mapped_fields['customer_username'] ] : '';
+	$customer_id    = ( ! empty( $data[ $mapped_fields['customer_id'] ] ) ) ? $data[ $mapped_fields['customer_id'] ] : '';
 
 	if ( ! empty( $data[ $mapped_fields['customer_password'] ] ) ) {
 		$password           = $data[ $mapped_fields['customer_password'] ];
@@ -40,7 +40,7 @@ function wcsi_check_customer( $data, $mapped_fields, $test_mode = false, $email_
 			$found_customer = email_exists( $customer_email );
 		} elseif ( ! empty( $username ) && false !== username_exists( $username ) ) {
 			$found_customer = username_exists( $username );
-		} elseif( is_email( $customer_email ) ) {
+		} elseif ( is_email( $customer_email ) ) {
 
 			// In test mode, we just want to know if a user account can be created - as we have a valid email address, it can be.
 			if ( $test_mode ) {
@@ -99,7 +99,7 @@ function wcsi_check_customer( $data, $mapped_fields, $test_mode = false, $email_
 								// Set the shipping address fields to match the billing fields if not specified in CSV
 								$meta_value = ( ! empty( $data[ $mapped_fields[ $key ] ] ) ) ? $data[ $mapped_fields[ $key ] ] : '';
 
-								if ( empty ( $meta_value ) ) {
+								if ( empty( $meta_value ) ) {
 									$n_key      = str_replace( 'shipping', 'billing', $key );
 									$meta_value = ( ! empty( $data[ $mapped_fields[ $n_key ] ] ) ) ? $data[ $mapped_fields[ $n_key ] ] : '';
 								}
@@ -130,7 +130,6 @@ function wcsi_check_customer( $data, $mapped_fields, $test_mode = false, $email_
 				}
 			}
 		}
-
 	} else {
 		$user = get_user_by( 'id', $customer_id );
 
