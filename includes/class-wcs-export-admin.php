@@ -71,7 +71,7 @@ class WCS_Export_Admin {
 			'wcsi-headers' => __( 'CSV Headers', 'wcs-import-export' ),
 		);
 
-		$current_tab = ( empty( $_GET[ 'tab' ] ) ) ? 'wcsi-export' : urldecode( $_GET[ 'tab' ] );
+		$current_tab = ( empty( $_GET['tab'] ) ) ? 'wcsi-export' : urldecode( $_GET['tab'] );
 
 		foreach ( $tabs as $tab_id => $tab_title ) {
 
@@ -117,7 +117,7 @@ class WCS_Export_Admin {
 					<tr>
 						<td style="text-align:top"><?php esc_html_e( 'Subscription Statuses', 'wcs-import-export' ); ?>:</td>
 						<td>
-							<?php foreach( $statuses as $status => $status_display ) : ?>
+							<?php foreach ( $statuses as $status => $status_display ) : ?>
 								<input type="checkbox" name="status[<?php echo esc_attr( $status ); ?>]" checked><?php echo esc_html( $status_display ); ?>  [<?php echo esc_html( ! empty( $status_counts[ $status ] ) ? $status_counts[ $status ] : 0 ); ?>]<br>
 							<?php endforeach; ?>
 						</td>
@@ -266,8 +266,8 @@ class WCS_Export_Admin {
 		if ( ! empty( $_POST['status'] ) ) {
 			$statuses = array_keys( $_POST['status'] );
 
-			if ( ! empty( $statuses  ) && is_array( $statuses  ) ) {
-				$args['subscription_status'] = implode(',', $statuses );
+			if ( ! empty( $statuses ) && is_array( $statuses ) ) {
+				$args['subscription_status'] = implode( ',', $statuses );
 			}
 		}
 
