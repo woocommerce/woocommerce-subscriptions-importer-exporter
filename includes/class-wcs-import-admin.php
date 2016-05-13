@@ -290,7 +290,7 @@ class WCS_Import_Admin {
 
 			@ini_set( 'auto_detect_line_endings', true );
 
-			if ( ( $handle = fopen( $file, "r" ) ) !== false ) {
+			if ( ( $handle = fopen( $file, 'r' ) ) !== false ) {
 
 				$row            = array();
 				$column_headers = fgetcsv( $handle, 0 );
