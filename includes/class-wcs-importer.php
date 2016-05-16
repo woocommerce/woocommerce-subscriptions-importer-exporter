@@ -70,9 +70,9 @@ class WCS_Importer {
 		$file_path = addslashes( $data['file_path'] );
 
 		self::$row_number      = $data['starting_row'];
-		self::$test_mode       = ( $data['test_mode'] == 'true' ) ? true : false;
-		self::$email_customer  = ( $data['email_customer'] == 'true' ) ? true : false;
-		self::$add_memberships = ( $data['add_memberships'] == 'true' ) ? true : false;
+		self::$test_mode       = ( 'true' == $data['test_mode'] ) ? true : false;
+		self::$email_customer  = ( 'true' == $data['email_customer'] ) ? true : false;
+		self::$add_memberships = ( 'true' == $data['add_memberships'] ) ? true : false;
 		self::$fields          = $data['mapped_fields'];
 
 		add_action( 'shutdown', 'WCS_Import_Logger::shutdown_handler' );
@@ -103,11 +103,11 @@ class WCS_Importer {
 		@ini_set( 'auto_detect_line_endings', true );
 
 		if ( $file_path ) {
-			if ( ( $file_handle = fopen( $file_path, 'r' ) ) !== FALSE ) {
+			if ( ( $file_handle = fopen( $file_path, 'r' ) ) !== false ) {
 				$data = array();
 				$column_headers = fgetcsv( $file_handle, 0 );
 
-				if ( $start_position != 0 ) {
+				if ( 0 != $start_position ) {
 					fseek( $file_handle, $start_position );
 				}
 
@@ -123,7 +123,7 @@ class WCS_Importer {
 					self::$row_number++;
 					self::import_subscription( $data );
 
-					if( ftell( $file_handle ) >= $end_position ) {
+					if ( ftell( $file_handle ) >= $end_position ) {
 						break;
 					}
 				}
@@ -174,8 +174,8 @@ class WCS_Importer {
 
 		$missing_shipping_addresses = $missing_billing_addresses = array();
 
-		foreach( array_merge( self::$order_totals_fields, self::$user_meta_fields, array( 'payment_method' ) ) as $column ) {
-			switch( $column ) {
+		foreach ( array_merge( self::$order_totals_fields, self::$user_meta_fields, array( 'payment_method' ) ) as $column ) {
+			switch ( $column ) {
 				case 'cart_discount':
 				case 'cart_discount_tax':
 				case 'order_shipping':
@@ -296,7 +296,7 @@ class WCS_Importer {
 							'billing_period'   => ( ! empty( $data[ self::$fields['billing_period'] ] ) ) ? $data[ self::$fields['billing_period'] ] : '',
 							'created_via'      => 'importer',
 							'customer_note'    => ( ! empty( $data[ self::$fields['customer_note'] ] ) ) ? $data[ self::$fields['customer_note'] ] : '',
-							'currency'         => ( ! empty( $data[ self::$fields['order_currency'] ] ) ) ? $data[ self::$fields['order_currency'] ] : ''
+							'currency'         => ( ! empty( $data[ self::$fields['order_currency'] ] ) ) ? $data[ self::$fields['order_currency'] ] : '',
 						)
 					);
 
@@ -337,7 +337,6 @@ class WCS_Importer {
 							$subscription->add_order_note( $order_note );
 						}
 					}
-
 				} else {
 					$subscription = null;
 				}
@@ -367,7 +366,7 @@ class WCS_Importer {
 						$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
 
 						if ( ! empty( $order_items ) ) {
-							foreach( $order_items as $order_item ) {
+							foreach ( $order_items as $order_item ) {
 								$item_data = array();
 
 								foreach ( explode( '|', $order_item ) as $item ) {
@@ -480,14 +479,14 @@ class WCS_Importer {
 			if ( ! empty( $payment_gateway ) && isset( $payment_method_table[ $payment_gateway->id ] ) ) {
 				$payment_post_meta = $payment_user_meta = array();
 
-				if ( ! empty ( $data[ self::$fields['payment_method_post_meta'] ] ) ) {
+				if ( ! empty( $data[ self::$fields['payment_method_post_meta'] ] ) ) {
 					foreach ( explode( '|', $data[ self::$fields['payment_method_post_meta'] ] ) as $meta ) {
 						list( $name, $value ) = explode( ':', $meta );
 						$payment_post_meta[ trim( $name ) ] = trim( $value );
 					}
 				}
 
-				if ( ! empty ( $data[ self::$fields['payment_method_user_meta'] ] ) ) {
+				if ( ! empty( $data[ self::$fields['payment_method_user_meta'] ] ) ) {
 					foreach ( explode( '|', $data[ self::$fields['payment_method_user_meta'] ] ) as $meta ) {
 						list( $name, $value ) = explode( ':', $meta );
 						$payment_user_meta[ trim( $name ) ] = trim( $value );
@@ -528,7 +527,6 @@ class WCS_Importer {
 				} else {
 					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %s subscription (%s). The next renewal is going to fail if you leave this.', 'wcs-import-export' ), $payment_method, $subscription->id );
 				}
-
 			} else {
 				if ( 'paypal' == $payment_method ) {
 					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal, defaulted to manual renewals. Either PayPal was not enabled or your PayPal account does not have Reference Transaction setup. Learn more about enabling Reference Transactions %shere%s.', 'wcs-import-export' ), '<a href="https://support.woothemes.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
@@ -597,7 +595,7 @@ class WCS_Importer {
 		$coupon_items = explode( ';', $data[ self::$fields['coupon_items'] ] );
 
 		if ( ! empty( $coupon_items ) ) {
-			foreach( $coupon_items as $coupon_item ) {
+			foreach ( $coupon_items as $coupon_item ) {
 				$coupon_data = array();
 
 				foreach ( explode( '|', $coupon_item ) as $item ) {
@@ -697,7 +695,7 @@ class WCS_Importer {
 
 			// Add any meta data for the line item
 			if ( ! empty( $data['meta'] ) ) {
-				foreach( explode( '+', $data['meta'] ) as $meta ) {
+				foreach ( explode( '+', $data['meta'] ) as $meta ) {
 					$meta = explode( '=', $meta );
 					wc_update_order_item_meta( $item_id, $meta[0], $meta[1] );
 				}
@@ -707,7 +705,7 @@ class WCS_Importer {
 				throw new Exception( __( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix up the data from your CSV and try again.', 'wcs-import-export' ) );
 			}
 
-			if ( ! empty( self::$row[ self::$fields['download_permissions'] ] ) && ( 'true' == self::$row[ self::$fields['download_permissions'] ] || 1 == (int)self::$row[ self::$fields['download_permissions'] ] ) ) {
+			if ( ! empty( self::$row[ self::$fields['download_permissions'] ] ) && ( 'true' == self::$row[ self::$fields['download_permissions'] ] || 1 == (int) self::$row[ self::$fields['download_permissions'] ] ) ) {
 				self::save_download_permissions( $subscription, $_product, $item_args['qty'] );
 			}
 		}
@@ -727,7 +725,7 @@ class WCS_Importer {
 		$fee_items = explode( ';', $data[ self::$fields['fee_items'] ] );
 
 		if ( ! empty( $fee_items ) ) {
-			foreach( $fee_items as $fee_item ) {
+			foreach ( $fee_items as $fee_item ) {
 				$fee_data = array();
 
 				foreach ( explode( '|', $fee_item ) as $item ) {
@@ -784,7 +782,7 @@ class WCS_Importer {
 		$default_total    = ( ! empty( $data[ self::$fields['order_shipping'] ] ) ) ? $data[ self::$fields['order_shipping'] ] : 0;
 
 		if ( ! empty( $shipping_items ) ) {
-			foreach( $shipping_items as $shipping_item ) {
+			foreach ( $shipping_items as $shipping_item ) {
 				$shipping_line = array();
 
 				if ( false !== strpos( $shipping_item, ':' ) ) {
@@ -834,7 +832,7 @@ class WCS_Importer {
 		$chosen_tax_rate_id = 0;
 
 		if ( ! empty( $tax_items ) ) {
-			foreach( $tax_items as $tax_item ) {
+			foreach ( $tax_items as $tax_item ) {
 				$tax_data = array();
 
 				if ( false !== strpos( $tax_item, ':' ) ) {

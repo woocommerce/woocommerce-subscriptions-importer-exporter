@@ -76,11 +76,11 @@ class WCS_Import_Admin {
 				$position     = 0;
 				$row_start[]  = 1;
 
-				if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
+				if ( ( $handle = fopen( $file, 'r' ) ) !== false ) {
 					$row       = $raw_headers = array();
 
 					$header = fgetcsv( $handle, 0 );
-					while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== FALSE ) {
+					while ( ( $postmeta = fgetcsv( $handle, 0 ) ) !== false ) {
 						$count++;
 
 						foreach ( $header as $key => $heading ) {
@@ -90,7 +90,7 @@ class WCS_Import_Admin {
 							}
 
 							$s_heading         = strtolower( $heading );
-							$row[ $s_heading ] = ( isset( $postmeta[ $key ] ) ) ? wcsi_format_data( $postmeta[$key], $enc ) : '';
+							$row[ $s_heading ] = ( isset( $postmeta[ $key ] ) ) ? wcsi_format_data( $postmeta[ $key ], $enc ) : '';
 						}
 
 						if ( $count >= $this->rows_per_request ) {
@@ -290,7 +290,7 @@ class WCS_Import_Admin {
 
 			@ini_set( 'auto_detect_line_endings', true );
 
-			if ( ( $handle = fopen( $file, "r" ) ) !== FALSE ) {
+			if ( ( $handle = fopen( $file, 'r' ) ) !== false ) {
 
 				$row            = array();
 				$column_headers = fgetcsv( $handle, 0 );
@@ -299,7 +299,10 @@ class WCS_Import_Admin {
 
 					foreach ( $column_headers as $key => $column_header ) {
 
-						if ( ! $column_header ) continue;
+						if ( ! $column_header ) {
+							continue;
+						}
+
 						$row[ $column_header ] = ( isset( $postmeta[ $key ] ) ) ? wcsi_format_data( $postmeta[ $key ], $enc ) : '';
 					}
 
@@ -338,7 +341,7 @@ class WCS_Import_Admin {
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach( $row as $header => $sample ) : ?>
+					<?php foreach ( $row as $header => $sample ) : ?>
 					<tr <?php echo ( ++$row_number % 2 ) ? '' : 'class="alternate"'; ?>>
 						<td>
 							<select name="mapto[<?php echo esc_attr( $header ); ?>]">
@@ -544,7 +547,6 @@ class WCS_Import_Admin {
 					wp_safe_redirect( add_query_arg( $next_step_url_params, $this->admin_url ) );
 					exit;
 				}
-
 			} elseif ( 'field_mapping' == $_POST['action'] ) {
 
 				$this->save_mapping();
@@ -563,10 +565,10 @@ class WCS_Import_Admin {
 	 */
 	public function ajax_request_handler() {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( "Cheatin' huh?");
+			wp_die( "Cheatin' huh?" );
 		}
 
-		@set_time_limit(0);
+		@set_time_limit( 0 );
 
 		// Requests to admin-ajax.php use the front-end memory limit, we want to use the admin (i.e. max) memory limit
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
