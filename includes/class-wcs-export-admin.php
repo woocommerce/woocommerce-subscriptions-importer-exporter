@@ -77,7 +77,7 @@ class WCS_Export_Admin {
 
 			$class = ( $tab_id == $current_tab ) ? array( 'nav-tab', 'nav-tab-active', 'wcsi-exporter-tabs' ) : array( 'nav-tab', 'wcsi-exporter-tabs' );
 
-			echo '<a href="#" id="' . esc_attr( $tab_id ) . '" class="' . implode( ' ', array_map( 'sanitize_html_class', $class ) ) . '">' . esc_html( $tab_title ) . '</a>';
+			echo '<a href="#" id="' . esc_attr( $tab_id ) . '" class="' . esc_attr( implode( ' ', array_map( 'sanitize_html_class', $class ) ) ) . '">' . esc_html( $tab_title ) . '</a>';
 
 		}
 

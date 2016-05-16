@@ -168,7 +168,7 @@ class WCS_Import_Admin {
 				<div class="squeezer">
 					<h4><?php printf( esc_html__( '%sBefore you begin%s, please prepare your CSV file.', 'wcs-import-export' ), '<strong>', '</strong>' ); ?></h4>
 					<p class="submit">
-						<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php _e( 'Documentation', 'wcs-import-export' ); ?></a>
+						<a href="http://docs.woothemes.com/document/subscriptions-importer/" class="button-primary"><?php esc_html_e( 'Documentation', 'wcs-import-export' ); ?></a>
 						<a href="<?php echo esc_url( WCS_Importer_Exporter::plugin_url() . 'wcs-import-sample.csv' ); ?>" class="button wcs-importer-download"><?php esc_html_e( 'Download Example CSV', 'wcs-import-export' ); ?></a>
 					</p>
 				</div>
@@ -212,13 +212,13 @@ class WCS_Import_Admin {
 
 		if ( ! empty( $this->upload_error ) ) : ?>
 			<div id="message" class="error">
-				<p><?php printf( esc_html__( 'Error uploading file: %s', 'wcs-import-export' ), $this->upload_error ); ?></p>
+				<p><?php printf( esc_html__( 'Error uploading file: %s', 'wcs-import-export' ), wp_kses_post( $this->upload_error ) ); ?></p>
 			</div>
 		<?php endif; ?>
 
 		<h3><?php esc_html_e( 'Step 1: Upload CSV File', 'wcs-import-export' ); ?></h3>
 		<?php if ( ! empty( $upload_dir['error'] ) ) : ?>
-			<div class="error"><p><?php _e( 'Before you can upload your import file, you will need to fix the following error:' ); ?></p>
+			<div class="error"><p><?php esc_html_e( 'Before you can upload your import file, you will need to fix the following error:', 'wcs-import-export' ); ?></p>
 			<p><strong><?php echo esc_html( $upload_dir['error'] ); ?></strong></p></div>
 		<?php else : ?>
 			<p><?php esc_html_e( 'Upload a CSV file containing details about your subscriptions to bring across to your store with WooCommerce.', 'wcs-import-export' ); ?></p>
@@ -235,7 +235,7 @@ class WCS_Import_Admin {
 							<td>
 								<input type="file" id="upload" name="import" size="25" />
 								<input type="hidden" name="action" value="upload_file" />
-								<small><?php printf( esc_html__( 'Maximum size: %s' ), size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) ) ); ?></small>
+								<small><?php printf( esc_html__( 'Maximum size: %s' ), wp_kses_post( size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) ) ) ); ?></small>
 							</td>
 						</tr>
 						<tr>
