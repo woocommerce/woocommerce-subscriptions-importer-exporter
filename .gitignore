@@ -1,4 +1,3 @@
-*.sh
 sql-dumps
 *.sql
 clean-slate.sh
