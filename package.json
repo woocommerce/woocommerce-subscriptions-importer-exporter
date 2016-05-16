@@ -9,7 +9,7 @@
 	"main": "Gruntfile.js",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Prospress/woocommerce-subscriptions-importe.git"
+		"url": "https://github.com/Prospress/woocommerce-subscriptions-importer.git"
 	},
 	"bugs": {
 		"url": "https://github.com/Prospress/woocommerce-subscriptions-importer/issues"
