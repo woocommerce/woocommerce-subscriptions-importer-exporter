@@ -1,0 +1,11 @@
+coverage:
+  ignore:
+  - tests/.*
+  - apigen/.*
+  - tmp/.*
+  status:
+    project: false
+    patch: false
+    changes: false
+
+comment: false

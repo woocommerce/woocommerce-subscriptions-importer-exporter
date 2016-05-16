@@ -1,0 +1,45 @@
+language: php
+
+sudo: false
+ 
+notifications:
+  email: false
+
+php:
+  - 5.2
+  - 5.3
+  - 5.4
+  - 5.5
+  - 5.6
+
+env:
+  - WP_VERSION=4.5 WC_VERSION=2.5.5 WCS_VERSION=2.0.13 CODECOV=1
+  - WP_VERSION=4.4 WC_VERSION=2.5.5 WCS_VERSION=2.0.13 CODECOV=0
+  - WP_VERSION=4.3 WC_VERSION=2.5.5 WCS_VERSION=2.0.13 CODECOV=0
+
+branches:
+  only:
+    - master
+
+before_script:
+  - bash tests/bin/install.sh wcsie_test root '' localhost $WP_VERSION
+  - bash tests/bin/travis.sh before
+
+script: 
+  - if [[ "$TRAVIS_PHP_VERSION" == "5.6" ]] && [[ "$CODECOV" == "1" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then phpunit -c phpunit.xml.dist --coverage-clover clover.xml; else phpunit -c phpunit.xml.dist; fi
+  # Search for PHP syntax errors.
+  - find . \( -path ./tmp -o -path ./tests \) -prune -o \( -name '*.php' \) -exec php -lf {} \; 
+  # Prospress/WordPress Coding Standards
+  # @link https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards
+  # @link http://pear.php.net/package/PHP_CodeSniffer/
+  # -p flag: Show progress of the run.
+  # -s flag: Show sniff codes in all reports.
+  # -v flag: Print verbose output.
+  # -n flag: Do not print warnings. (shortcut for --warning-severity=0)
+  # --standard: Use WordPress as the standard.
+  # --extensions: Only sniff PHP files.
+  - tmp/php-codesniffer/scripts/phpcs -p -s -v -n . --standard=Prospress --extensions=php --ignore=*/tmp/*,*/tests/*,*/node_modules/*,*/libraries/*,*/woo-includes/*
+
+after_script:
+#  - bash tests/bin/travis.sh after
+  - bash <(curl -s https://codecov.io/bash)
