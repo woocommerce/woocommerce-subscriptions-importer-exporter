@@ -87,6 +87,7 @@ class WCS_Export_Admin {
 		echo '<p class="submit">';
 		echo '<input type="submit" class="button" value="' . esc_html__( 'Export Subscriptions', 'wcs-import-export' ) . '" />';
 		echo '</p>';
+		wp_nonce_field( 'wcsie-exporter-home', 'wcsie_wpnonce' );
 		echo '</form>';
 	}
 
@@ -107,7 +108,7 @@ class WCS_Export_Admin {
 			}
 		}
 
-		?>
+		if ( ! isset( $POST['wcsie_wpnonce'] ) || check_admin_referer( 'wcsie-exporter-home', 'wcsie_wpnonce' ) ) { ?>
 			<table class="widefat striped" id="wcsi-export-table">
 				<tbody>
 					<tr>
@@ -152,12 +153,11 @@ class WCS_Export_Admin {
 						<td><input type="number" name="limit" min="-1"> <?php esc_html_e( 'Export only a certain number of subscriptions. Leave empty or set to "-1" to export all subscriptions.', 'wcs-import-export' ); ?></td>
 					</tr>
 				</tbody>
+			</table>
+			<?php esc_html_e( 'When exporting all subscriptions, your site may experience memory exhaustion and therefore you may need to use the limit and offset to separate your export into multiple CSV files.', 'wcs-import-export' ); ?>
 
-		</table>
-		<?php esc_html_e( 'When exporting all subscriptions, your site may experience memory exhaustion and therefore you may need to use the limit and offset to separate your export into multiple CSV files.', 'wcs-import-export' ); ?>
-
-	<?php
-		$this->export_headers();
+			<?php $this->export_headers();
+		}
 	}
 
 	/**
@@ -256,6 +256,8 @@ class WCS_Export_Admin {
 	 */
 	private function get_subscriptions_to_export() {
 
+		check_admin_referer( 'wcsie-exporter-home', 'wcsie_wpnonce' );
+
 		$args = array(
 			'subscriptions_per_page' => isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : -1,
 			'offset'                 => isset( $_POST['offset'] ) ? $_POST['offset'] : 0,
@@ -292,6 +294,8 @@ class WCS_Export_Admin {
 	 */
 	public function filter_payment_method( $query_args, $args ) {
 
+		check_admin_referer( 'wcsie-exporter-home', 'wcsie_wpnonce' );
+
 		if ( isset( $_POST['payment'] ) && 'any' != $_POST['payment'] ) {
 			$payment_payment = ( 'none' == $_POST['payment'] ) ? '' : $_POST['payment'];
 
@@ -311,6 +315,8 @@ class WCS_Export_Admin {
 	 * @param array $headers
 	 */
 	public function process_download( $headers = array() ) {
+
+		check_admin_referer( 'wcsie-exporter-home', 'wcsie_wpnonce' );
 
 		WC()->payment_gateways();
 
@@ -344,6 +350,9 @@ class WCS_Export_Admin {
 
 		if ( isset( $_GET['page'] ) && 'export_subscriptions' == $_GET['page'] ) {
 			if ( isset( $_GET['step'] ) && 'download' == $_GET['step'] ) {
+
+				check_admin_referer( 'wcsie-exporter-home', 'wcsie_wpnonce' );
+
 				if ( ! empty( $_POST['mapped'] ) ) {
 					$csv_headers = array();
 

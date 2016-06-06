@@ -139,6 +139,7 @@ class WCS_Import_Admin {
 					'email_customer'   => ( 'yes' == $_GET['email_customer'] ) ? 'true' : 'false',
 					'add_memberships'  => ( 'yes' == $_GET['add_memberships'] ) ? 'true' : 'false',
 					'total'            => $total,
+					'import_wpnonce'   => wp_create_nonce( 'process-import' ),
 				);
 
 				wp_localize_script( 'wcs-importer-admin', 'wcsi_data', $script_data );
@@ -205,6 +206,10 @@ class WCS_Import_Admin {
 
 		$upload_dir = wp_upload_dir();
 
+		if ( isset( $POST['wcsi_wpnonce'] ) ) {
+			check_admin_referer( 'import-upload', 'wcsi_wpnonce' );
+		}
+
 		// Set defaults for admin flags
 		$test_mode       = ( isset( $_POST['test_mode'] ) ) ? $_POST['test_mode'] : 'yes';
 		$email_customer  = ( isset( $_POST['email_customer'] ) ) ? $_POST['email_customer'] : 'no';
@@ -225,7 +230,7 @@ class WCS_Import_Admin {
 			<p><?php esc_html_e( 'Choose a CSV (.csv) file to upload, then click Upload file and import.', 'wcs-import-export' ); ?></p>
 
 			<form enctype="multipart/form-data" id="import-upload-form" method="post" action="<?php echo esc_attr( $this->admin_url ); ?>">
-				<?php wp_nonce_field( 'import-upload' ); ?>
+				<?php wp_nonce_field( 'import-upload', 'wcsi_wpnonce' ); ?>
 				<table class="form-table">
 					<tbody>
 						<tr>
@@ -330,7 +335,7 @@ class WCS_Import_Admin {
 
 		<h3><?php esc_html_e( 'Step 2: Map Fields to Column Names', 'wcs-import-export' ); ?></h3>
 		<form method="post" action="<?php echo esc_attr( $action ); ?>">
-			<?php wp_nonce_field( 'import-upload' ); ?>
+			<?php wp_nonce_field( 'import-upload', 'wcsi_wpnonce' ); ?>
 			<input type="hidden" name="action" value="field_mapping" />
 			<table class="widefat widefat_importer">
 				<thead>
@@ -436,6 +441,8 @@ class WCS_Import_Admin {
 	 */
 	public function save_mapping() {
 
+		check_admin_referer( 'import-upload', 'wcsi_wpnonce' );
+
 		$mapped_fields = array(
 			'custom_user_meta'         => array(),
 			'custom_post_meta'         => array(),
@@ -523,7 +530,7 @@ class WCS_Import_Admin {
 
 		if ( isset( $_GET['page'] ) && 'import_subscription' == $_GET['page'] && isset( $_POST['action'] ) ) {
 
-			check_admin_referer( 'import-upload' );
+			check_admin_referer( 'import-upload', 'wcsi_wpnonce' );
 
 			$next_step_url_params = array(
 				'file_id'         => isset( $_GET['file_id'] ) ? $_GET['file_id'] : 0,
@@ -567,6 +574,8 @@ class WCS_Import_Admin {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( "Cheatin' huh?" );
 		}
+
+		check_ajax_referer( 'process-import', 'wcsie_wpnonce' );
 
 		@set_time_limit( 0 );
 
