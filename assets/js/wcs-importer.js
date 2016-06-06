@@ -35,7 +35,8 @@ jQuery(document).ready(function ($) {
 				row_num:			row_start,
 				test_mode:			wcsi_data.test_mode,
 				email_customer:		wcsi_data.email_customer,
-				add_memberships:	wcsi_data.add_memberships
+				add_memberships:	wcsi_data.add_memberships,
+				wcsie_wpnonce:		wcsi_data.import_wpnonce
 			};
 
 			$.ajax({
