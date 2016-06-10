@@ -240,7 +240,7 @@ Please follow these general rules when formatting your CSV file:
 If any of the above columns contains invalid data, the importer will display these during in the test run. If you choose to ignore the errors and continue to import with invalid data, no subscription will be imported for that row.
 
 ### Importing Payment Gateway Meta Data
-You can use import payment gateway meta data, like customer or credit card tokens, in your CSV file to link a subscription with a payment method for processing [recurring payments automatically](https://docs.woothemes.com/document/subscriptions/renewal-process/).
+You can import payment gateway meta data, like customer or credit card tokens, in your CSV file to link a subscription with a payment method for processing [recurring payments automatically](https://docs.woothemes.com/document/subscriptions/renewal-process/).
 
 Properly importing payment gateway meta data is a difficult, yet crucial part of the import. It's important to take the time and get this right otherwise your subscription may not renew properly. It is also much faster to set this data in bulk on import than to set it on each individual subscription after the import.
 
