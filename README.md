@@ -252,7 +252,7 @@ Each payment method requires different meta data to process automatic payments. 
 
 However, here is a list of the column headers and meta data description for three popular payment methods:
  * __PayPal Reference Transactions__: `_paypal_subscription_id` must be mapped to `payment_method_post_meta` column. This value needs to be the customers billing agreement (will start with `I-**************`).
- * __Authorize.net CIM__: `wc_authorize_net_cim_customer_profile_id` and `wc_authorize_net_cim_payment_profile_id` mapped to `payment_method_post_meta` column.
+ * __Authorize.net CIM__: `_wc_authorize_net_cim_credit_card_customer_id` and `_wc_authorize_net_cim_credit_card_payment_token` mapped to `payment_method_post_meta` column.
  * __Stripe__: `_stripe_customer_id` mapped to `payment_method_post_meta` column and optionally, `_stripe_card_id` also mapped to `payment_method_post_meta` column if you want to charge recurring payments against a specific payment method on the customer's account. Only values beginning with `cus_` and `card_` will be considered valid tokens.
 
 > Note: the above information relates to the official [Stripe](https://www.woothemes.com/products/stripe/) and [Authorize.net CIM](https://www.woothemes.com/products/authorize-net-cim/) extensions. It will not work with other extensions for those payment gateways.
