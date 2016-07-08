@@ -475,16 +475,20 @@ class WCS_Importer {
 		if ( ! empty( $payment_method ) ) {
 			$payment_method_table = apply_filters( 'woocommerce_subscription_payment_meta', array(), $subscription );
 			$payment_gateway      = ( isset( $payment_gateways[ $payment_method ] ) ) ? $payment_gateways[ $payment_method ] : '';
+			$payment_post_meta    = $payment_user_meta = array();
 
-			if ( ! empty( $payment_gateway ) && isset( $payment_method_table[ $payment_gateway->id ] ) ) {
-				$payment_post_meta = $payment_user_meta = array();
-
-				if ( ! empty( $data[ self::$fields['payment_method_post_meta'] ] ) ) {
-					foreach ( explode( '|', $data[ self::$fields['payment_method_post_meta'] ] ) as $meta ) {
-						list( $name, $value ) = explode( ':', $meta );
-						$payment_post_meta[ trim( $name ) ] = trim( $value );
-					}
+			if ( ! empty( $data[ self::$fields['payment_method_post_meta'] ] ) ) {
+				foreach ( explode( '|', $data[ self::$fields['payment_method_post_meta'] ] ) as $meta ) {
+					list( $name, $value ) = explode( ':', $meta );
+					$payment_post_meta[ trim( $name ) ] = trim( $value );
 				}
+			}
+
+			if ( 'paypal' == $payment_method && ! empty( $payment_post_meta['_paypal_subscription_id'] ) && 'I-' == substr( $payment_post_meta['_paypal_subscription_id'], 0, 2 ) ) { // Check if they are trying to import a PP Standard subscription (WC Subscriptions doesn't support this, but lets make it possible during an import)
+				update_post_meta( $subscription->id, '_paypal_subscription_id', $payment_post_meta['_paypal_subscription_id'] );
+				$warnings[] = esc_html__( 'This subscription was successfully imported with PayPal Standard as the payment method. Make sure the IPN URL on your PayPal account has been updated to point to this site URL. If not, the renewals will not come through properly and your customers will continue to be charged.', 'wcs-import-export' );
+
+			} elseif ( ! empty( $payment_gateway ) && ( isset( $payment_method_table[ $payment_gateway->id ] ) ) ) {
 
 				if ( ! empty( $data[ self::$fields['payment_method_user_meta'] ] ) ) {
 					foreach ( explode( '|', $data[ self::$fields['payment_method_user_meta'] ] ) as $meta ) {
