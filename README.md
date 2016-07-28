@@ -1,4 +1,4 @@
-# WooCommerce Subscriptions Importer and Exporter
+# WooCommerce Subscriptions Import and Export
 
 [![Build Status](https://travis-ci.com/Prospress/woocommerce-subscriptions-importer.svg?token=MvEcpd6A5eyiZsFyh9LU&branch=master)](https://travis-ci.com/Prospress/woocommerce-subscriptions-importer)
 [![codecov](https://codecov.io/gh/Prospress/woocommerce-subscriptions-importer/branch/master/graph/badge.svg?token=hpApzOecBY)](https://codecov.io/gh/Prospress/woocommerce-subscriptions-importer)
@@ -578,6 +578,7 @@ Before exporting, you have the option to modify the column names which are writt
 
 Please note, due to the complexity of the import process, we (Prospress) can not provide support for your import, including issues with CSV formatting or help after an import which did not set data correctly. Furthermore, issues with subscriptions created via the CSV importer may not be supported via the [WooThemes](http://woothemes.com/) support system for the WooCommerce Subscriptions extension.
 
-We are working to find [WooExperts](https://www.woothemes.com/wooexperts/) to act as migration partners and offer migration services, with ongoing support, for stores which need help. We plan to include contact details of these migration partners when the Importer is officially launched after the beta period.
+If you're looking to get help with your migrations, please get in contact with one of our migration partners:
+ - [WisdmLabs](https://wisdmlabs.com/woocommerce-subscriptions-migration-partner/) - "We offer end-to-end technology solutions to help niche-to-enterprise Ecommerce brands grow and evolve. Our experience with open source software and WooCommerce provides businesses with sustainable growth today, and also a firm foundation to scale tomorrow. At the core of all this lies our highly professional process backed technology team, business strategy function and very human centric support vertical."
 
-If you think you have found a bug, problem with the documentation or limitation in the data the can be imported, please [open a new issue to report it](https://github.com/Prospress/woocommerce-subscriptions-importer/issues/new).
+If you think you have found a bug, problem with the documentation or limitation in the data the can be imported, please [open a new issue to report it](https://github.com/Prospress/woocommerce-subscriptions-import-export/issues/new).
