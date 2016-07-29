@@ -235,12 +235,12 @@ class WCS_Import_Admin {
 					<tbody>
 						<tr>
 							<th>
-								<label for="upload"><?php esc_html_e( 'Choose a file:' ); ?></label>
+								<label for="upload"><?php esc_html_e( 'Choose a file:', 'wcs-import-export' ); ?></label>
 							</th>
 							<td>
 								<input type="file" id="upload" name="import" size="25" />
 								<input type="hidden" name="action" value="upload_file" />
-								<small><?php printf( esc_html__( 'Maximum size: %s' ), wp_kses_post( size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) ) ) ); ?></small>
+								<small><?php printf( esc_html__( 'Maximum size: %s', 'wcs-import-export' ), wp_kses_post( size_format( apply_filters( 'import_upload_size_limit', wp_max_upload_size() ) ) ) ); ?></small>
 							</td>
 						</tr>
 						<tr>
