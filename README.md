@@ -20,7 +20,7 @@ You can learn more about the migration service WisdmLabs offer and contact them 
 
 Prospress do not provide support for migration issues. This means Prospress can not help with CSV formatting, fixing broken renewals or other issues with subscriptions imported incorrectly. Similarly, issues with subscriptions created with this plugin are not supported via the WooCommerce support system.
 
-If you think you have found a bug in the extension, problem with the documentation or limitation in the data the can be imported, please [open a new issue to report it](https://github.com/Prospress/woocommerce-subscriptions-importer-exporter/issues/new).
+If you think you have found a bug in the extension, problem with the documentation or limitation in the data that can be imported, please [open a new issue to report it](https://github.com/Prospress/woocommerce-subscriptions-importer-exporter/issues/new).
 
 ---
 
