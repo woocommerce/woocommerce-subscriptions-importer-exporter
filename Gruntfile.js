@@ -77,7 +77,7 @@ module.exports = function(grunt) {
 		},
 		checktextdomain: {
 			options:{
-				text_domain: 'woocommerce-subscriptions-importer-exporter',
+				text_domain: 'wcs-import-export',
 				keywords: [
 					'__:1,2d',
 					'_e:1,2d',
