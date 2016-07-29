@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name: WooCommerce Subscriptions CSV Importer and Exporter
- * Plugin URI: https://github.com/Prospress/woocommerce-subscriptions-importer
+ * Plugin URI: https://github.com/Prospress/woocommerce-subscriptions-import-export
  * Description: Import or export subscriptions in your WooCommerce store via CSV.
  * Version: 2.0-beta
  * Author: Prospress Inc
  * Author URI: http://prospress.com
  * License: GPLv2
  *
- * GitHub Plugin URI: Prospress/woocommerce-subscriptions-importer
+ * GitHub Plugin URI: Prospress/woocommerce-subscriptions-import-export
  * GitHub Branch: master
  */
 if ( ! defined( 'ABSPATH' ) ) {
@@ -70,8 +70,8 @@ class WCS_Importer_Exporter {
 
 		$plugin_links = array(
 			'<a href="' . esc_url( admin_url( 'admin.php?page=import_subscription' ) ) . '">' . esc_html__( 'Import', 'wcs-import-export' ) . '</a>',
-			'<a href="https://github.com/Prospress/woocommerce-subscriptions-importer/blob/master/README.md">' . esc_html__( 'Docs', 'wcs-import-export' ) . '</a>',
-			'<a href="https://github.com/Prospress/woocommerce-subscriptions-importer/issues/new">' . esc_html__( 'Support', 'wcs-import-export' ) . '</a>',
+			'<a href="https://github.com/Prospress/woocommerce-subscriptions-import-export/blob/master/README.md">' . esc_html__( 'Docs', 'wcs-import-export' ) . '</a>',
+			'<a href="https://github.com/Prospress/woocommerce-subscriptions-import-export/issues/new">' . esc_html__( 'Support', 'wcs-import-export' ) . '</a>',
 		);
 
 		return array_merge( $plugin_links, $links );

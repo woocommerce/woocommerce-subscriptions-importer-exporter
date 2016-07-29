@@ -169,7 +169,7 @@ class WCS_Import_Admin {
 				<div class="squeezer">
 					<h4><?php printf( esc_html__( '%sBefore you begin%s, please prepare your CSV file.', 'wcs-import-export' ), '<strong>', '</strong>' ); ?></h4>
 					<p class="submit">
-						<a href="https://github.com/prospress/woocommerce-subscriptions-importer/blob/master/README.md" class="button-primary"><?php esc_html_e( 'Documentation', 'wcs-import-export' ); ?></a>
+						<a href="https://github.com/prospress/woocommerce-subscriptions-import-export/blob/master/README.md" class="button-primary"><?php esc_html_e( 'Documentation', 'wcs-import-export' ); ?></a>
 						<a href="<?php echo esc_url( WCS_Importer_Exporter::plugin_url() . 'wcs-import-sample.csv' ); ?>" class="button wcs-importer-download"><?php esc_html_e( 'Download Example CSV', 'wcs-import-export' ); ?></a>
 					</p>
 				</div>
