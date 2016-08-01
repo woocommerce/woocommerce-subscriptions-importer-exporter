@@ -60,7 +60,7 @@ class WCS_Export_Admin {
 
 		<?php if ( ! empty( $this->error_message ) ) : ?>
 			<div id="message" class="error">
-				<p><?php esc_html_e( $this->error_message ); ?></p>
+				<p><?php esc_html_e( $this->error_message, 'wcs-import-export' ); ?></p>
 			</div>
 		<?php endif; ?>
 
@@ -135,7 +135,7 @@ class WCS_Export_Admin {
 								<option value="none"><?php esc_html_e( 'None', 'wcs-import-export' ); ?></option>
 
 								<?php foreach ( WC()->payment_gateways->get_available_payment_gateways() as $gateway_id => $gateway ) : ?>
-									<option value="<?php esc_attr_e( $gateway_id ); ?>"><?php esc_html_e( $gateway->title ); ?></option>;
+									<option value="<?php echo esc_attr( $gateway_id ); ?>"><?php esc_html_e( $gateway->title, 'wcs-import-export' ); ?></option>;
 								<?php endforeach; ?>
 							</select>
 						</td>
@@ -237,9 +237,9 @@ class WCS_Export_Admin {
 				<?php foreach ( $csv_headers as $data => $title ) : ?>
 					<tr>
 						<td width="15" style="text-align:center"><input type="checkbox" name="mapped[<?php echo esc_attr( $data ); ?>]" checked></td>
-						<td><label><?php esc_html_e( $title ); ?></label></td>
-						<td><label><?php esc_html_e( $data ); ?></label></td>
-						<td><input type="text" name="<?php esc_attr_e( $data ); ?>" value="<?php esc_attr_e( $data ); ?>" placeholder="<?php esc_attr_e( $data ); ?>"></td>
+						<td><label><?php esc_html_e( $title, 'wcs-import-export' ); ?></label></td>
+						<td><label><?php echo esc_html( $data ); ?></label></td>
+						<td><input type="text" name="<?php echo esc_attr( $data ); ?>" value="<?php echo esc_attr( $data ); ?>" placeholder="<?php echo esc_attr( $data ); ?>"></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
