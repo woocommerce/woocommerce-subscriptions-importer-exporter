@@ -21,7 +21,7 @@ set -ex
 install_wp() {
 
 	# make wordpress dirtectory
-	mkdir -p $WP_CORE_DIR
+	mkdir -p "$WP_CORE_DIR"
 
 	# corect WP archive to grab
 	if [ $WP_VERSION == 'latest' ]; then
@@ -34,10 +34,10 @@ install_wp() {
 	curl https://wordpress.org/${ARCHIVE_NAME}.tar.gz --output /tmp/wordpress.tar.gz --silent
 
 	# unconpress it
-	tar --strip-components=1 -zxmf /tmp/wordpress.tar.gz -C $WP_CORE_DIR
+	tar --strip-components=1 -zxmf /tmp/wordpress.tar.gz -C "$WP_CORE_DIR"
 
 	# get a test db config
-	curl https://raw.github.com/markoheijnen/wp-mysqli/master/db.php?access_token=$GITHUB_TOKEN --output $WP_CORE_DIR/wp-content/db.php --silent
+	curl https://raw.github.com/markoheijnen/wp-mysqli/master/db.php?access_token=$GITHUB_TOKEN --output "$WP_CORE_DIR/wp-content/db.php" --silent
 
 }
 
@@ -51,8 +51,8 @@ install_test_suite() {
 	fi
 
 	# set up testing suite in wordpress test libary directory
-	mkdir -p $WP_TESTS_DIR
-	cd $WP_TESTS_DIR
+	mkdir -p "$WP_TESTS_DIR"
+	cd "$WP_TESTS_DIR"
 	svn co --quiet http://develop.svn.wordpress.org/tags/4.3.1/tests/phpunit/includes/
 
 	curl http://develop.svn.wordpress.org/trunk/wp-tests-config-sample.php --output wp-tests-config.php --silent
