@@ -585,3 +585,10 @@ Before exporting, you have the option to modify the column names which are writt
 `fee_items`               |`string`|Fees|
 `tax_items`               |`string`|Taxes|
 `download_permissions`    |`int`|Download permissions granted (1 or 0)|
+
+
+---
+
+<p align="center">
+<img src="https://cloud.githubusercontent.com/assets/235523/11986380/bb6a0958-a983-11e5-8e9b-b9781d37c64a.png" width="160">
+</p>
