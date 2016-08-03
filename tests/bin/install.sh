@@ -16,7 +16,11 @@ WP_VERSION=${5-latest}
 WP_TESTS_DIR="${PWD}/tmp/wordpress-tests-lib"
 WP_CORE_DIR="${PWD}/tmp/wordpress/"
 
-set -ex
+set -e
+
+say() {
+  echo -e "$1"
+}
 
 install_wp() {
 
@@ -38,6 +42,8 @@ install_wp() {
 
 	# get a test db config
 	curl https://raw.github.com/markoheijnen/wp-mysqli/master/db.php?access_token=$GITHUB_TOKEN --output "$WP_CORE_DIR/wp-content/db.php" --silent
+
+	say "WordPress Installed"
 
 }
 
@@ -68,6 +74,8 @@ install_test_suite() {
 	sed $ioption "s/admin@example.org/tests@woocommerce.com/" wp-tests-config.php
 	sed $ioption "s/Test Blog/WooCommerce Unit Tests/" wp-tests-config.php
 
+	say "Test Suite Installed"
+
 }
 
 install_cs() {
@@ -80,6 +88,8 @@ install_cs() {
 
 	# uncompress codesniffer into the directory we created
 	curl -L https://api.github.com/repos/squizlabs/PHP_CodeSniffer/tarball/2.3.3?access_token=$GITHUB_TOKEN --silent | tar --strip-components=1 -zx -C "php-codesniffer"
+
+	say "PHP_CodeSniffer Installed"
 
 	# make a directory for the WP coding standard rules
 	mkdir -p "wordpress-coding-standards"
@@ -96,8 +106,10 @@ install_cs() {
 	# move in the codesniffer directory
 	cd php-codesniffer
 
- 	# install the WP conding standard rules
+ 	# install the WP coding standard rules
  	scripts/phpcs --config-set installed_paths ../wordpress-coding-standards,../prospress-coding-standards
+
+	say "Coding Standards Installed"
 
  	# for consistency move back into the tmp directory
  	cd ../
@@ -125,6 +137,8 @@ install_db() {
 	# create database - more generic than MAMP for use on multple system
 	#/Applications/MAMP/Library/bin/mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
 	mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
+
+	say "Database Created"
 
 }
 
