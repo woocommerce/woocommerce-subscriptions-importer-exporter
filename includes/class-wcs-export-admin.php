@@ -150,7 +150,7 @@ class WCS_Export_Admin {
 					</tr>
 					<tr>
 						<td><label><?php esc_html_e( 'Limit Export', 'wcs-import-export' ); ?>:</label></td>
-						<td><input type="number" name="limit" min="-1"> <?php esc_html_e( 'Export only a certain number of subscriptions. Leave empty or set to "-1" or "0" to export all subscriptions.', 'wcs-import-export' ); ?></td>
+						<td><input type="number" name="limit" min="0"> <?php esc_html_e( 'Export only a certain number of subscriptions. Leave empty or set to "0" to export all subscriptions.', 'wcs-import-export' ); ?></td>
 					</tr>
 				</tbody>
 			</table>
