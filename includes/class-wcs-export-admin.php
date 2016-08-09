@@ -150,7 +150,7 @@ class WCS_Export_Admin {
 					</tr>
 					<tr>
 						<td><label><?php esc_html_e( 'Limit Export', 'wcs-import-export' ); ?>:</label></td>
-						<td><input type="number" name="limit" min="-1"> <?php esc_html_e( 'Export only a certain number of subscriptions. Leave empty or set to "-1" to export all subscriptions.', 'wcs-import-export' ); ?></td>
+						<td><input type="number" name="limit" min="0"> <?php esc_html_e( 'Export only a certain number of subscriptions. Leave empty or set to "0" to export all subscriptions.', 'wcs-import-export' ); ?></td>
 					</tr>
 				</tbody>
 			</table>
@@ -259,7 +259,7 @@ class WCS_Export_Admin {
 		check_admin_referer( 'wcsie-exporter-home', 'wcsie_wpnonce' );
 
 		$args = array(
-			'subscriptions_per_page' => isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : -1,
+			'subscriptions_per_page' => ! empty( $_POST['limit'] ) ? absint( $_POST['limit'] ) : -1,
 			'offset'                 => isset( $_POST['offset'] ) ? $_POST['offset'] : 0,
 			'product'                => isset( $_POST['product'] ) ? $_POST['product'] : '',
 			'subscription_status'    => 'none', // don't default to 'any' status if no statuses were chosen
