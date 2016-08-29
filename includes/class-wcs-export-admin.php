@@ -169,7 +169,7 @@ class WCS_Export_Admin {
 	 */
 	public function export_headers() {
 
-		$csv_headers = array(
+		$csv_headers = apply_filters( 'wcsie_export_headers', array(
 			'subscription_id'          => __( 'Subscription ID', 'wcs-import-export' ),
 			'subscription_status'      => __( 'Subscription Status', 'wcs-import-export' ),
 			'customer_id'              => __( 'Customer ID', 'wcs-import-export' ),
@@ -221,7 +221,7 @@ class WCS_Export_Admin {
 			'fee_items'                => __( 'Fees', 'wcs-import-export' ),
 			'tax_items'                => __( 'Taxes', 'wcs-import-export' ),
 			'download_permissions'     => __( 'Download Permissions Granted', 'wcs-import-export' ),
-		);
+		) );
 		?>
 
 		<table class="widefat widefat_importer striped" id="wcsi-headers-table" style="display:none;">
