@@ -395,11 +395,11 @@ class WCS_Importer {
 				// only show the following warnings on the import when the subscription requires shipping
 				if ( ! self::$all_virtual ) {
 					if ( ! empty( $missing_shipping_addresses ) ) {
-						$result['warning'][] = esc_html__( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-import-export' );
+						$result['warning'][] = sprintf( esc_html__( 'The following shipping address fields have been left empty: %s. ', 'wcs-import-export' ), rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) );
 					}
 
 					if ( ! empty( $missing_billing_addresses ) ) {
-						$result['warning'][] = esc_html__( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-import-export' );
+						$result['warning'][] = sprintf( esc_html__( 'The following billing address fields have been left empty: %s. ', 'wcs-import-export' ), rtrim( implode( ', ', $missing_billing_addresses ), ',' ) );
 					}
 
 					if ( empty( $shipping_method ) ) {
@@ -853,7 +853,7 @@ class WCS_Importer {
 				} elseif ( ! empty( $tax_data['code'] ) ) {
 					$tax_rate = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_name = %s ORDER BY tax_rate_priority LIMIT 1", $tax_data['code'] ) );
 				} else {
-					$result['warning'][] = esc_html__( sprintf( 'Missing tax code or ID from column: %s', self::$fields['tax_items'] ), 'wcs-import-export' );
+					$result['warning'][] = sprintf( esc_html__( 'Missing tax code or ID from column: %s', 'wcs-import-export' ), self::$fields['tax_items'] );
 				}
 
 				if ( ! empty( $tax_rate ) ) {
@@ -868,7 +868,7 @@ class WCS_Importer {
 						}
 					}
 				} else {
-					$result['warning'][] = esc_html__( sprintf( 'The tax code "%s" could not be found in your store.', $tax_data['code'] ), 'wcs-import-export' );
+					$result['warning'][] = sprintf( esc_html__( 'The tax code "%s" could not be found in your store.', 'wcs-import-export' ), $tax_data['code'] );
 				}
 			}
 		}
