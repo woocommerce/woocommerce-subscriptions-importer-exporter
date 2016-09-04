@@ -876,5 +876,3 @@ class WCS_Importer {
 		return $chosen_tax_rate_id;
 	}
 }
-
-?>
