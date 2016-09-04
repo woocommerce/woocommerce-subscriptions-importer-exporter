@@ -270,8 +270,8 @@ class WCS_Exporter {
 
 					foreach ( $subscription->get_tax_totals() as $tax_code => $tax ) {
 						$tax_items[] = implode( '|', array(
-							'id:' .    $tax->rate_id,
-							'code:' .  $tax->label,
+							'id:' . $tax->rate_id,
+							'code:' . $tax->label,
 							'total:' . wc_format_decimal( $tax->amount, 2 ),
 						) );
 					}
