@@ -525,11 +525,11 @@ class WCS_Importer {
 				if ( $meta_set ) {
 					$subscription->set_payment_method( $payment_gateway, $payment_method_data );
 				} else {
-					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %s subscription (%s). The next renewal is going to fail if you leave this.', 'wcs-import-export' ), $payment_method, $subscription->id );
+					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %1$s subscription (%2$s). The next renewal is going to fail if you leave this.', 'wcs-import-export' ), $payment_method, $subscription->id );
 				}
 			} else {
 				if ( 'paypal' == $payment_method ) {
-					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal, defaulted to manual renewals. Either PayPal was not enabled or your PayPal account does not have Reference Transaction setup. Learn more about enabling Reference Transactions %shere%s.', 'wcs-import-export' ), '<a href="https://support.woothemes.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
+					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal, defaulted to manual renewals. Either PayPal was not enabled or your PayPal account does not have Reference Transaction setup. Learn more about enabling Reference Transactions %1$shere%2$s.', 'wcs-import-export' ), '<a href="https://support.woothemes.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
 				} else {
 					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewals.', 'wcs-import-export' ), $payment_method );
 				}
