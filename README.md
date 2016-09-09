@@ -587,6 +587,46 @@ Before exporting, you have the option to modify the column names which are writt
 `tax_items`               |`string`|Taxes|
 `download_permissions`    |`int`|Download permissions granted (1 or 0)|
 
+## FAQ
+
+#### Can I export custom meta?
+
+Sure can! You will need to:
+
+1. Use the `wcsie_export_headers` to add your custom header so that it's exported in the CSV and;
+2. Use `wcsie_format_export_value` to append the custom export data to each exported row.
+
+```
+/**
+ * Add custom headers to the list of default headers exported in the CSV
+ *
+ * @param array $headers
+ * @return array
+ */
+function my_custom_export_headers( $headers = array() ) {
+    return array_merge( $headers, array(
+        'shipping_code' => 'Shipping Code',
+    ) );
+}
+add_filter( 'wcsie_export_headers', 'my_custom_export_headers', 10, 1 );
+
+/**
+ * Adds a custom meta value to the exported row
+ *
+ * @param string value
+ * @param WC_Subscription $subscription
+ * @param
+ * @return string
+ */
+ function my_custom_export_values( $value, $subscription, $header_key ) {
+    if ( 'shipping_code' == $header_key && empty( $value ) ) {
+        $value = $subscription->shipping_code;
+    }
+
+    return $value;
+ }
+add_filter( 'wcsie_format_export_value', 'my_custom_export_values', 10, 3 );
+```
 
 ---
 
