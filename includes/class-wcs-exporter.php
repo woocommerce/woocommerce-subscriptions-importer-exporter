@@ -286,7 +286,7 @@ class WCS_Exporter {
 					$value = '';
 			}
 
-			$csv_row[ $header_key ] = $value;
+			$csv_row[ $header_key ] = apply_filters( 'wcsie_export_value', $value, $subscription, $header_key );
 		}
 
 		$csv_row = apply_filters( 'wcsie_export_csv_row', $csv_row, $subscription, self::$headers );
