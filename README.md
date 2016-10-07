@@ -278,6 +278,8 @@ For example, if you try to import a subscription with `stripe` set as the `payme
 
 If you need to import subscriptions using a payment gateway other than those above, please ask the gateway's extension developer for details of the post or user meta data required to process automatic payments. If you also let us know which meta data is required, we will include it in this documentation to help others in future.
 
+> Note: Only subscriptions using PayPal Reference Transactions are supported. Subscriptions using PayPal Standard has a number of limitations that make it impossible to migrate them using the importer.
+
 ### Importing Order Items
 
 In WooCommerce, orders can have a number of different line items, including:
@@ -437,9 +439,9 @@ When importing active subscriptions, it's important that the correct [payment me
 #### Can subscriptions using PayPal Standard be imported?
 No. Due to [PayPal Standard limitations](https://docs.woothemes.com/document/subscriptions/payment-gateways/#paypal-limitations), the importer can not migrate subscriptions using PayPal Standard as the payment method.
 
-Note that the same limitations do not apply to [PayPal Reference Transactions](https://docs.woothemes.com/document/subscriptions/faq/paypal-reference-transactions/). Therefore the CSV importer can migrate subscriptions which use a PayPal Billing Agreement to process recurring payments via Reference Transactions.
+The same limitations do not apply to [PayPal Reference Transactions](https://docs.woothemes.com/document/subscriptions/faq/paypal-reference-transactions/). Therefore the CSV importer can migrate subscriptions which use a PayPal Billing Agreement to process recurring payments via Reference Transactions.
 
-If you have subscriptions with PayPal Standard and you're interested in getting your customers to use a different payment method, you can import the subscriptions and request that your customers [change the payment method](https://docs.woothemes.com/document/subscriptions/customers-view/#section-5) on those subscriptions.
+If you have subscriptions with PayPal Standard and you're interested in getting your customers to use a different payment method, you can import the subscriptions with a dummy payment method, as mentioned below, and request that your customers [change the payment method](https://docs.woothemes.com/document/subscriptions/customers-view/#section-5) on those subscriptions.
 
 #### Can subscriptions still be imported with a payment gateway that doesn't support migrating automatic payment meta data?
 Yes. There are two possible options:
@@ -459,6 +461,8 @@ To import the subscription in a way that the first automatic payment fails, you 
 When Subscriptions attempts to process the next renewal payment, the transaction will fail and Subscriptions [failed payment handling](https://docs.woothemes.com/document/subscriptions/renewal-process/#section-6) process will begin.
 
 If the later approach is taken, we strongly recommend that you notify customers about the change to avoid confusion.
+
+> PayPal Standard Note: Unfortunately, this approach isn't suitable for PayPal Standard. With PayPal Standard, if no valid PayPal subscription ID is provided, exceptions will be thrown whenever you or the customer changes the status of the subscription with your store, meaning its impossible to change the status of imported subscriptions. This is because Subscriptions attempts to communicate this state change to PayPal, but is unable to connect it to a valid subscription there. If you need to take this approach for customers using PayPal Standard, temporarily use Stripe or a fake payment method instead.
 
 #### How can I check if a payment method can be imported with automatic payments?
 WooCommerce Subscriptions v2.0 introduced a new way for payment gateways to register the payment meta data they require for processing automatic recurring payments. 
