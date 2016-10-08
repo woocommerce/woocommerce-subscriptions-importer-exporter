@@ -395,11 +395,11 @@ class WCS_Importer {
 				// only show the following warnings on the import when the subscription requires shipping
 				if ( ! self::$all_virtual ) {
 					if ( ! empty( $missing_shipping_addresses ) ) {
-						$result['warning'][] = esc_html__( 'The following shipping address fields have been left empty: ' . rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) . '. ', 'wcs-import-export' );
+						$result['warning'][] = sprintf( esc_html__( 'The following shipping address fields have been left empty: %s. ', 'wcs-import-export' ), rtrim( implode( ', ', $missing_shipping_addresses ), ',' ) );
 					}
 
 					if ( ! empty( $missing_billing_addresses ) ) {
-						$result['warning'][] = esc_html__( 'The following billing address fields have been left empty: ' . rtrim( implode( ', ', $missing_billing_addresses ), ',' ) . '. ', 'wcs-import-export' );
+						$result['warning'][] = sprintf( esc_html__( 'The following billing address fields have been left empty: %s. ', 'wcs-import-export' ), rtrim( implode( ', ', $missing_billing_addresses ), ',' ) );
 					}
 
 					if ( empty( $shipping_method ) ) {
@@ -525,11 +525,11 @@ class WCS_Importer {
 				if ( $meta_set ) {
 					$subscription->set_payment_method( $payment_gateway, $payment_method_data );
 				} else {
-					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %s subscription (%s). The next renewal is going to fail if you leave this.', 'wcs-import-export' ), $payment_method, $subscription->id );
+					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %1$s subscription (%2$s). The next renewal is going to fail if you leave this.', 'wcs-import-export' ), $payment_method, $subscription->id );
 				}
 			} else {
 				if ( 'paypal' == $payment_method ) {
-					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal, defaulted to manual renewals. Either PayPal was not enabled or your PayPal account does not have Reference Transaction setup. Learn more about enabling Reference Transactions %shere%s.', 'wcs-import-export' ), '<a href="https://support.woothemes.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
+					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal, defaulted to manual renewals. Either PayPal was not enabled or your PayPal account does not have Reference Transaction setup. Learn more about enabling Reference Transactions %1$shere%2$s.', 'wcs-import-export' ), '<a href="https://support.woothemes.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
 				} else {
 					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewals.', 'wcs-import-export' ), $payment_method );
 				}
@@ -853,7 +853,7 @@ class WCS_Importer {
 				} elseif ( ! empty( $tax_data['code'] ) ) {
 					$tax_rate = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_name = %s ORDER BY tax_rate_priority LIMIT 1", $tax_data['code'] ) );
 				} else {
-					$result['warning'][] = esc_html__( sprintf( 'Missing tax code or ID from column: %s', self::$fields['tax_items'] ), 'wcs-import-export' );
+					$result['warning'][] = sprintf( esc_html__( 'Missing tax code or ID from column: %s', 'wcs-import-export' ), self::$fields['tax_items'] );
 				}
 
 				if ( ! empty( $tax_rate ) ) {
@@ -868,7 +868,7 @@ class WCS_Importer {
 						}
 					}
 				} else {
-					$result['warning'][] = esc_html__( sprintf( 'The tax code "%s" could not be found in your store.', $tax_data['code'] ), 'wcs-import-export' );
+					$result['warning'][] = sprintf( esc_html__( 'The tax code "%s" could not be found in your store.', 'wcs-import-export' ), $tax_data['code'] );
 				}
 			}
 		}
@@ -876,5 +876,3 @@ class WCS_Importer {
 		return $chosen_tax_rate_id;
 	}
 }
-
-?>

@@ -120,7 +120,7 @@ class WCS_Import_Admin {
 				$script_data = array(
 					'success' 				=> esc_html__( 'success', 'wcs-import-export' ),
 					'failed' 				=> esc_html__( 'failed', 'wcs-import-export' ),
-					'error_string'			=> esc_html( sprintf( __( 'Row #%s from CSV %sfailed to import%s with error/s: %s', 'wcs-import-export' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ) ),
+					'error_string'			=> esc_html( sprintf( __( 'Row #%1$s from CSV %2$sfailed to import%3$s with error/s: %4$s', 'wcs-import-export' ), '{row_number}', '<strong>', '</strong>', '{error_messages}' ) ),
 					'finished_importing' 	=> esc_html__( 'Finished Importing', 'wcs-import-export' ),
 					'edit_order' 			=> esc_html__( 'Edit Order', 'wcs-import-export' ),
 					'warning'				=> esc_html__( 'Warning', 'wcs-import-export' ),
@@ -167,7 +167,7 @@ class WCS_Import_Admin {
 			<?php endif; ?>
 			<?php if ( ! isset( $_GET['step'] ) ) : ?>
 				<div class="squeezer">
-					<h4><?php printf( esc_html__( '%sBefore you begin%s, please prepare your CSV file.', 'wcs-import-export' ), '<strong>', '</strong>' ); ?></h4>
+					<h4><?php printf( esc_html__( '%1$sBefore you begin%2$s, please prepare your CSV file.', 'wcs-import-export' ), '<strong>', '</strong>' ); ?></h4>
 					<p class="submit">
 						<a href="https://github.com/prospress/woocommerce-subscriptions-import-export/blob/master/README.md" class="button-primary"><?php esc_html_e( 'Documentation', 'wcs-import-export' ); ?></a>
 						<a href="<?php echo esc_url( WCS_Importer_Exporter::plugin_url() . 'wcs-import-sample.csv' ); ?>" class="button wcs-importer-download"><?php esc_html_e( 'Download Example CSV', 'wcs-import-export' ); ?></a>
@@ -263,7 +263,7 @@ class WCS_Import_Admin {
 								<th><?php esc_html_e( 'Add Memberships:', 'wcs-import-export' ); ?></th>
 								<td>
 									<input type="checkbox" name="add_memberships" value="yes" <?php checked( $add_memberships, 'yes' ); ?> />
-									<em><?php printf( esc_html__( 'Automatically add the membership to the new subscription if it contains a product that is part of a membership plan (only works with %sWooCommerce Memberships%s).', 'wcs-import-export' ), '<a href="https://www.woothemes.com/products/woocommerce-memberships/">', '</a>' ); ?></em>
+									<em><?php printf( esc_html__( 'Automatically add the membership to the new subscription if it contains a product that is part of a membership plan (only works with %1$sWooCommerce Memberships%2$s).', 'wcs-import-export' ), '<a href="https://www.woothemes.com/products/woocommerce-memberships/">', '</a>' ); ?></em>
 								</td>
 							</tr>
 						<?php endif; ?>
