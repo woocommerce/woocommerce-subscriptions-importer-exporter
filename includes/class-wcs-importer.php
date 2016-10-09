@@ -135,6 +135,7 @@ class WCS_Importer {
 	/**
 	 * Create a new subscription and attach all relevant meta given the data in the CSV.
 	 * This function will also create a user if enough valid information is given and there's no
+	 * user existing
 	 *
 	 * @since 1.0
 	 * @param array $data
@@ -188,12 +189,18 @@ class WCS_Importer {
 				case 'payment_method':
 					$payment_method = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? strtolower( $data[ self::$fields[ $column ] ] ) : '';
 					$title          = ( ! empty( $data[ self::$fields['payment_method_title'] ] ) ) ? $data[ self::$fields['payment_method_title'] ] : $payment_method;
+					$manual_flag    = ( ! empty( $data[ self::$fields['requires_manual_renewal'] ] ) ) ? $data[ self::$fields['requires_manual_renewal'] ] : '';
 
 					if ( ! empty( $payment_method ) && 'manual' != $payment_method ) {
 						$post_meta[] = array( 'key' => '_' . $column, 'value' => $payment_method );
 						$post_meta[] = array( 'key' => '_payment_method_title', 'value' => $title );
 					} else {
 						$set_manual = true;
+					}
+
+					if (!$set_manual && 'true' == $manual_flag ) {
+                        error_log('set manual flag');
+						$post_meta[] = array( 'key' => '_requires_manual_renewal', 'value' => 'true' );
 					}
 					break;
 
@@ -341,9 +348,11 @@ class WCS_Importer {
 					$subscription = null;
 				}
 
-				if ( $set_manual ) {
+				if ( $set_manual && 'true' != $manual_flag ) {
 					$result['warning'][] = esc_html__( 'No payment method was given in CSV and so the subscription has been set to manual renewal.', 'wcs-import-export' );
-				}
+				} else if ('true' == $manual_flag) {
+                    $result['warning'][] = esc_html__( 'Import forced manual renewal.', 'wcs-import-export' );
+                }
 
 				if ( ! empty( $data[ self::$fields['coupon_items'] ] ) ) {
 					self::add_coupons( $subscription, $data );

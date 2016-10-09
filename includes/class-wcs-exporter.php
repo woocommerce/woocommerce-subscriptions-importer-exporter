@@ -107,6 +107,7 @@ class WCS_Exporter {
 				case 'end_date':
 				case 'payment_method':
 				case 'payment_method_title':
+				case 'requires_manual_renewal':
 				case 'billing_first_name':
 				case 'billing_last_name':
 				case 'billing_email':

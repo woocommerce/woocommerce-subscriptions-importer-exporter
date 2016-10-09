@@ -385,6 +385,7 @@ class WCS_Import_Admin {
 									<option value="payment_method_title" <?php selected( $header, 'payment_method_title' ); ?>>payment_method_title</option>
 									<option value="payment_method_post_meta" <?php selected( $header, 'payment_method_post_meta' ); ?>>payment_method_post_meta</option>
 									<option value="payment_method_user_meta" <?php selected( $header, 'payment_method_user_meta' ); ?>>payment_method_user_meta</option>
+									<option value="requires_manual_renewal" <?php selected( $header, 'requires_manual_renewal' ); ?>>requires_manual_renewal</option>
 								</optgroup>
 								<optgroup label="<?php esc_attr_e( 'Address Details', 'wcs-import-export' ); ?>">
 									<?php foreach ( WCS_Importer::$user_meta_fields as $option ) : ?>
@@ -496,6 +497,7 @@ class WCS_Import_Admin {
 			'download_permissions'     => '',
 			'payment_method'           => '',
 			'payment_method_title'     => '',
+			'requires_manual_renewal'  => '',
 			'billing_period'           => '',
 			'billing_interval'         => '',
 		);
