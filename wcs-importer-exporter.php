@@ -54,10 +54,9 @@ class WCS_Importer_Exporter {
 			add_filter('woocommerce_subscription_get_' . 'last_payment' . '_date', array(WCS_Importer_Exporter::class, 'last_payment_calculation'), 10, 3);
 		}
 		if ( is_admin() ) {
-			if (class_exists('WC_Subscriptions') && version_compare(WC_Subscriptions::$version, '2.0', '>=')) {
+			if ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '2.0', '>=' ) ) {
 				self::$wcs_exporter = new WCS_Export_Admin();
 				self::$wcs_importer = new WCS_Import_Admin();
-
 			} else {
 				add_action( 'admin_notices', __CLASS__ . '::plugin_dependency_notice' );
 			}
