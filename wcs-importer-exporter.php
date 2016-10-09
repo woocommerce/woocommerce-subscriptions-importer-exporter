@@ -50,10 +50,14 @@ class WCS_Importer_Exporter {
 	 */
 	public static function setup_importer() {
 
+		if ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '2.0', '>=' ) ) {
+			add_filter('woocommerce_subscription_get_' . 'last_payment' . '_date', array(WCS_Importer_Exporter::class, 'last_payment_calculation'), 10, 3);
+		}
 		if ( is_admin() ) {
-			if ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, '2.0', '>=' ) ) {
+			if (class_exists('WC_Subscriptions') && version_compare(WC_Subscriptions::$version, '2.0', '>=')) {
 				self::$wcs_exporter = new WCS_Export_Admin();
 				self::$wcs_importer = new WCS_Import_Admin();
+
 			} else {
 				add_action( 'admin_notices', __CLASS__ . '::plugin_dependency_notice' );
 			}
@@ -61,10 +65,31 @@ class WCS_Importer_Exporter {
 	}
 
 	/**
+	 * This is to calculate last_payment when the last payment not set by import
+	 * this is done by taking next interval and removing twice.
+	 * Only change from 0 if it was an imported subscription
+	 *
+	 * @param $date
+	 * @param $subscription @class WC_Subscription
+	 * @param $timezone
+	 * @return $date or date of last payment calulation
+	 */
+	public static function last_payment_calculation($date, $subscription, $timezone ) {
+		if ($date == 0 && "importer" === $subscription->__get("created_via")) {
+			$next_payment = strtotime($subscription->get_date('next_payment'));
+			$next_interval = wcs_add_time( $subscription->billing_interval, $subscription->billing_period, $next_payment );
+			$last_payment_cal = $next_payment - ($next_interval - $next_payment);
+			return  gmdate( 'Y-m-d H:i:s',$last_payment_cal);
+		}
+		return $date;
+	}
+
+	/**
 	 * Include Docs & Settings links on the Plugins administration screen
 	 *
 	 * @since 1.0
 	 * @param mixed $links
+	 * @return array
 	 */
 	public static function action_links( $links ) {
 
