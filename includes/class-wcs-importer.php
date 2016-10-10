@@ -199,7 +199,6 @@ class WCS_Importer {
 					}
 
 					if (!$set_manual && 'true' == $manual_flag ) {
-                        error_log('set manual flag');
 						$post_meta[] = array( 'key' => '_requires_manual_renewal', 'value' => 'true' );
 					}
 					break;
