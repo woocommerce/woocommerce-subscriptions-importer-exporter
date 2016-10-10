@@ -197,10 +197,6 @@ class WCS_Importer {
 					} else {
 						$set_manual = true;
 					}
-
-					if (!$set_manual && 'true' == $manual_flag ) {
-						$post_meta[] = array( 'key' => '_requires_manual_renewal', 'value' => 'true' );
-					}
 					break;
 
 				case 'shipping_address_1':
@@ -334,6 +330,10 @@ class WCS_Importer {
 						$subscription->update_manual();
 					} elseif ( ! $subscription->has_status( wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
+					}
+
+					if ( 'true' == $manual_flag ) {
+						$subscription->update_manual();
 					}
 
 					if ( ! empty( $data[ self::$fields['order_notes'] ] ) ) {
