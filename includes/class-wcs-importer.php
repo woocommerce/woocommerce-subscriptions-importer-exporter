@@ -349,7 +349,7 @@ class WCS_Importer {
 					$subscription = null;
 				}
 
-				if ( $set_manual && ! $requires_manual_renewal ) {
+				if ( $set_manual ) {
 					$result['warning'][] = esc_html__( 'No payment method was given in CSV and so the subscription has been set to manual renewal.', 'wcs-import-export' );
 				} else if ( $requires_manual_renewal ) {
                     $result['warning'][] = esc_html__( 'Import forced manual renewal.', 'wcs-import-export' );
