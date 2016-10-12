@@ -193,6 +193,7 @@ class WCS_Export_Admin {
 			'payment_method_title'     => __( 'Payment Method Title', 'wcs-import-export' ),
 			'payment_method_post_meta' => __( 'Payment Method Post Meta', 'wcs-import-export' ),
 			'payment_method_user_meta' => __( 'Payment Method User Meta', 'wcs-import-export' ),
+			'requires_manual_renewal'  => __( 'Requires Manual Renewal Flag', 'wcs-import-export' ),
 			'shipping_method'          => __( 'Shipping Method', 'wcs-import-export' ),
 			'billing_first_name'       => __( 'Billing First Name', 'wcs-import-export' ),
 			'billing_last_name'        => __( 'Billing Last Name', 'wcs-import-export' ),

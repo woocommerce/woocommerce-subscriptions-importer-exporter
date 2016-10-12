@@ -135,6 +135,7 @@ class WCS_Importer {
 	/**
 	 * Create a new subscription and attach all relevant meta given the data in the CSV.
 	 * This function will also create a user if enough valid information is given and there's no
+	 * user existing
 	 *
 	 * @since 1.0
 	 * @param array $data
@@ -143,7 +144,7 @@ class WCS_Importer {
 		global $wpdb;
 
 		self::$row  = $data;
-		$set_manual = false;
+		$set_manual = $requires_manual_renewal = false;
 		$post_meta  = array();
 		$result     = array(
 			'warning'    => array(),
@@ -195,7 +196,12 @@ class WCS_Importer {
 					} else {
 						$set_manual = true;
 					}
+
+					if ( ! empty( $data[ self::$fields['requires_manual_renewal'] ] ) && 'true' == $data[ self::$fields['requires_manual_renewal'] ] ) {
+						$requires_manual_renewal = true;
+					}
 					break;
+
 
 				case 'shipping_address_1':
 				case 'shipping_city':
@@ -324,10 +330,12 @@ class WCS_Importer {
 					$subscription->update_dates( $dates_to_update );
 					$subscription->update_status( $status );
 
-					if ( $set_manual ) {
-						$subscription->update_manual();
-					} elseif ( ! $subscription->has_status( wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
+					if ( ! $set_manual && ! $subscription->has_status( wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
+					}
+
+					if ( $set_manual || $requires_manual_renewal ) {
+						$subscription->update_manual();
 					}
 
 					if ( ! empty( $data[ self::$fields['order_notes'] ] ) ) {
@@ -343,6 +351,8 @@ class WCS_Importer {
 
 				if ( $set_manual ) {
 					$result['warning'][] = esc_html__( 'No payment method was given in CSV and so the subscription has been set to manual renewal.', 'wcs-import-export' );
+				} else if ( $requires_manual_renewal ) {
+					$result['warning'][] = esc_html__( 'Import forced manual renewal.', 'wcs-import-export' );
 				}
 
 				if ( ! empty( $data[ self::$fields['coupon_items'] ] ) ) {
