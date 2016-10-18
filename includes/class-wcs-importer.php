@@ -265,10 +265,6 @@ class WCS_Importer {
 
 			switch ( $date_type ) {
 				case 'end_date' :
-					if ( ! empty( $dates_to_update['last_payment_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['last_payment_date'] ) ) {
-						$result['error'][] = sprintf( __( 'The %s date must occur after the last payment date.', 'wcs-import-export' ), $date_type );
-					}
-
 					if ( ! empty( $dates_to_update['next_payment_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['next_payment_date'] ) ) {
 						$result['error'][] = sprintf( __( 'The %s date must occur after the next payment date.', 'wcs-import-export' ), $date_type );
 					}
