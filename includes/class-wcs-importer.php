@@ -202,7 +202,6 @@ class WCS_Importer {
 					}
 					break;
 
-
 				case 'shipping_address_1':
 				case 'shipping_city':
 				case 'shipping_postcode':
@@ -279,7 +278,7 @@ class WCS_Importer {
 			}
 		}
 
-		// make the sure end of prepaid term exists for subscription that are about to be set to pending-cancellation
+		// make the sure end of prepaid term exists for subscription that are about to be set to pending-cancellation - continue to use the next payment date if that exists
 		if ( in_array( $status, array( 'pending-cancel', 'wc-pending-cancel' ) ) && ( empty( $dates_to_update['next_payment_date'] ) || strtotime( $dates_to_update['next_payment_date'] ) < current_time( 'timestamp', true ) ) ) {
 			if ( ! empty( $dates_to_update['end_date'] ) && strtotime( $dates_to_update['end_date'] ) > current_time( 'timestamp', true ) ) {
 				$dates_to_update['next_payment_date'] = $dates_to_update['end_date'];
