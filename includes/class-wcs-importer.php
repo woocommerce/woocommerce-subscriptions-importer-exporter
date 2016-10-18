@@ -281,7 +281,12 @@ class WCS_Importer {
 
 		// make the sure end of prepaid term exists for subscription that are about to be set to pending-cancellation
 		if ( in_array( $status, array( 'pending-cancel', 'wc-pending-cancel' ) ) && ( empty( $dates_to_update['next_payment_date'] ) || strtotime( $dates_to_update['next_payment_date'] ) < current_time( 'timestamp', true ) ) ) {
-			$result['error'][] = __( 'The next payment date must exist and be in the future in order to import a subscription with pending cancellation status.', 'wcs-import-export' );
+			if ( ! empty( $dates_to_update['end_date'] ) && strtotime( $dates_to_update['end_date'] ) > current_time( 'timestamp', true ) ) {
+				$dates_to_update['next_payment_date'] = $dates_to_update['end_date'];
+				unset( $dates_to_update['end_date'] );
+			} else {
+				$result['error'][] = __( 'Importing a pending cancelled subscription requires an end date in the future.', 'wcs-import-export' );
+			}
 		}
 
 		if ( empty( $result['error'] ) || self::$test_mode ) {
