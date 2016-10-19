@@ -280,12 +280,12 @@ If you need to import subscriptions using a payment gateway other than those abo
 
 > Note: Only subscriptions using PayPal Reference Transactions are supported. Subscriptions using PayPal Standard has a number of limitations that make it impossible to migrate them using the importer.
 
-### Importing Pending Cancelled Subscriptions
+### Importing Subscriptions with the Pending Cancellation Status
 
-There's a couple of things to note about which dates are used before you import a subscription with pending cancelled status.
+There's a couple of things to note about which dates are used before you import a subscription with _pending cancellation_ status.
 
-If the CSV row has a next payment date column and a value that is in the future, this date will be used as the end date (or end of prepaid term) for the pending cancelled subscription.
-If the row with pending cancellation status does not have a next payment date set, it will fall back to using the end date if that exists. If it doesn't exist, you will receive an error asking to set a valie end date when importing subscriptions with `pending-cancel` status.
+1. If the CSV row has a next payment date column and a value that is in the future, this date will be used as the end date (or end of prepaid term) for the pending cancelled subscription.
+1. If the row with pending cancellation status does _not_ have a next payment date set, it will fall back to using the end date if that exists. If it doesn't exist, you will receive an error asking to set a valie end date when importing subscriptions with `pending-cancel` status.
 
 To further explain, importing a subscription with pending cancellation status will require you to make sure an end date is set in the future and no next payment date is set, otherwise this next payment date will be used as the susbcriptions end date.
 
