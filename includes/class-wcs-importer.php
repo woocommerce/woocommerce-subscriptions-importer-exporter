@@ -202,7 +202,6 @@ class WCS_Importer {
 					}
 					break;
 
-
 				case 'shipping_address_1':
 				case 'shipping_city':
 				case 'shipping_postcode':
@@ -265,10 +264,6 @@ class WCS_Importer {
 
 			switch ( $date_type ) {
 				case 'end_date' :
-					if ( ! empty( $dates_to_update['last_payment_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['last_payment_date'] ) ) {
-						$result['error'][] = sprintf( __( 'The %s date must occur after the last payment date.', 'wcs-import-export' ), $date_type );
-					}
-
 					if ( ! empty( $dates_to_update['next_payment_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['next_payment_date'] ) ) {
 						$result['error'][] = sprintf( __( 'The %s date must occur after the next payment date.', 'wcs-import-export' ), $date_type );
 					}
@@ -280,6 +275,16 @@ class WCS_Importer {
 					if ( strtotime( $datetime ) <= strtotime( $dates_to_update['start'] ) ) {
 						$result['error'][] = sprintf( __( 'The %s must occur after the start date.', 'wcs-import-export' ), $date_type );
 					}
+			}
+		}
+
+		// make the sure end of prepaid term exists for subscription that are about to be set to pending-cancellation - continue to use the next payment date if that exists
+		if ( in_array( $status, array( 'pending-cancel', 'wc-pending-cancel' ) ) && ( empty( $dates_to_update['next_payment_date'] ) || strtotime( $dates_to_update['next_payment_date'] ) < current_time( 'timestamp', true ) ) ) {
+			if ( ! empty( $dates_to_update['end_date'] ) && strtotime( $dates_to_update['end_date'] ) > current_time( 'timestamp', true ) ) {
+				$dates_to_update['next_payment_date'] = $dates_to_update['end_date'];
+				unset( $dates_to_update['end_date'] );
+			} else {
+				$result['error'][] = __( 'Importing a pending cancelled subscription requires an end date in the future.', 'wcs-import-export' );
 			}
 		}
 
@@ -328,7 +333,14 @@ class WCS_Importer {
 					}
 
 					$subscription->update_dates( $dates_to_update );
+
+					add_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
+					add_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
+
 					$subscription->update_status( $status );
+
+					remove_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
+					remove_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
 
 					if ( ! $set_manual && ! $subscription->has_status( wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
