@@ -334,15 +334,7 @@ class WCS_Importer {
 
 					$subscription->update_dates( $dates_to_update );
 
-					add_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
-					add_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
-
-					$subscription->update_status( $status );
-
-					remove_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
-					remove_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
-
-					if ( ! $set_manual && ! $subscription->has_status( wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
+					if ( ! $set_manual && ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
 					}
 
@@ -423,6 +415,22 @@ class WCS_Importer {
 
 					if ( empty( $shipping_method ) ) {
 						$result['warning'][] = esc_html__( 'Shipping method and title for the subscription have been left as empty. ', 'wcs-import-export' );
+					}
+				}
+
+				if ( ! self::$test_mode ) {
+					add_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
+					add_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
+
+					$subscription->update_status( $status );
+
+					remove_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
+					remove_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
+
+					if ( self::$add_memberships ) {
+						foreach ( $order_items as $product_id ) {
+							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
+						}
 					}
 				}
 
