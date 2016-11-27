@@ -247,7 +247,7 @@ class WCS_Importer {
 			$status              = 'pending';
 			$result['warning'][] = esc_html__( 'No subscription status was specified. The subscription will be created with the status "pending". ', 'wcs-import-export' );
 		} else {
-			$status = $data[ self::$fields['subscription_status'] ];
+			$status = ( 'wc-' === substr( $data[ self::$fields['subscription_status'] ], 0, 3 ) ) ? substr( $data[ self::$fields['subscription_status'] ], 3 ) : $data[ self::$fields['subscription_status'] ];
 		}
 
 		$dates_to_update = array( 'start' => ( ! empty( $data[ self::$fields['start_date'] ] ) ) ? gmdate( 'Y-m-d H:i:s', strtotime( $data[ self::$fields['start_date'] ] ) ) : gmdate( 'Y-m-d H:i:s', time() - 1 ) );
@@ -279,7 +279,7 @@ class WCS_Importer {
 		}
 
 		// make the sure end of prepaid term exists for subscription that are about to be set to pending-cancellation - continue to use the next payment date if that exists
-		if ( in_array( $status, array( 'pending-cancel', 'wc-pending-cancel' ) ) && ( empty( $dates_to_update['next_payment_date'] ) || strtotime( $dates_to_update['next_payment_date'] ) < current_time( 'timestamp', true ) ) ) {
+		if ( 'pending-cancel' == $status && ( empty( $dates_to_update['next_payment_date'] ) || strtotime( $dates_to_update['next_payment_date'] ) < current_time( 'timestamp', true ) ) ) {
 			if ( ! empty( $dates_to_update['end_date'] ) && strtotime( $dates_to_update['end_date'] ) > current_time( 'timestamp', true ) ) {
 				$dates_to_update['next_payment_date'] = $dates_to_update['end_date'];
 				unset( $dates_to_update['end_date'] );
