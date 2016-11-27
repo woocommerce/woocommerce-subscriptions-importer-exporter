@@ -145,7 +145,7 @@ class WCS_Importer {
 
 		self::$row  = $data;
 		$set_manual = $requires_manual_renewal = false;
-		$post_meta  = array();
+		$post_meta  = $order_items = array();
 		$result     = array(
 			'warning'    => array(),
 			'error'      => array(),
@@ -397,10 +397,7 @@ class WCS_Importer {
 								}
 
 								$result['items'] .= self::add_product( $subscription, $item_data, $chosen_tax_rate_id ) . '<br/>';
-
-								if ( ! self::$test_mode && self::$add_memberships ) {
-									self::maybe_add_memberships( $user_id, $subscription->id, $item_data['product_id'] );
-								}
+								$order_items[]    = $item_data['product_id'];
 							}
 						}
 					}
