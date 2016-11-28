@@ -111,25 +111,25 @@ svn propset svn:ignore "deploy.sh
 README.md
 *.psd
 .git
-.gitignore" "$SVNPATH/trunk/"
+.gitignore" "$TMPPATH/trunk/"
 
 echo "Changing directory to SVN"
-cd $SVNPATH/trunk/
+cd $TMPPATH/trunk/
 # Add all new files that are not set to be ignored
 svn status | grep -v "^.[ \t]*\..*" | grep "^?" | awk '{print $2}' | xargs svn add
 echo "committing to trunk"
 svn commit --username=$SVNUSER -m "$COMMITMSG"
 
 echo "Updating WP plugin repo assets & committing"
-cd $SVNPATH/assets/
+cd $TMPPATH/assets/
 # Add all new files that are not set to be ignored
 svn status | grep -v "^.[ \t]*\..*" | grep "^?" | awk '{print $2}' | xargs svn add
 svn commit --username=$SVNUSER -m "Updating assets repo"
 
 echo "Creating new SVN tag & committing it"
-cd $SVNPATH
+cd $TMPPATH
 svn copy trunk/ tags/$NEWVERSION1/
-cd $SVNPATH/tags/$NEWVERSION1
+cd $TMPPATH/tags/$NEWVERSION1
 svn commit --username=$SVNUSER -m "Tagging version $NEWVERSION1"
 
 echo "Removing temporary directory $TMPPATH"
