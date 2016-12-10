@@ -374,10 +374,10 @@ class WCS_Importer {
 						$result['items'] = self::add_product( $subscription, array( 'product_id' => $product_id ), $chosen_tax_rate_id );
 						$order_items[]   = $product_id;
 					} else {
-						$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
+						$order_items_row = explode( ';', $data[ self::$fields['order_items'] ] );
 
-						if ( ! empty( $order_items ) ) {
-							foreach ( $order_items as $order_item ) {
+						if ( ! empty( $order_items_row ) ) {
+							foreach ( $order_items_row as $order_item ) {
 								$item_data = array();
 
 								foreach ( explode( '|', $order_item ) as $item ) {
