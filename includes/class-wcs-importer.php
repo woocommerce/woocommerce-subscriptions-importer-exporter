@@ -372,10 +372,7 @@ class WCS_Importer {
 					if ( is_numeric( $data[ self::$fields['order_items'] ] ) ) {
 						$product_id      = absint( $data[ self::$fields['order_items'] ] );
 						$result['items'] = self::add_product( $subscription, array( 'product_id' => $product_id ), $chosen_tax_rate_id );
-
-						if ( ! self::$test_mode && self::$add_memberships ) {
-							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
-						}
+						$order_items[]   = $product_id;
 					} else {
 						$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
 
