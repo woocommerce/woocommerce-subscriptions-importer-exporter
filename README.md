@@ -198,7 +198,7 @@ Please follow these general rules when formatting your CSV file:
 ### CSV Columns
 
 |Column Name|Format|Description|Default|
-|---|---|---|---|---|
+|---|---|---|---|
 |`customer_id`|`int`|Can be left blank to creating a new user or if username and/or email of an existing user is present.|-|
 |`customer_email`|`string`|The email of the user to assign this subscription to. If no `customer_id` or `customer_username` is specified, a new user will be created with this email.|-|
 |`customer_username`|`string`|The username of the user to assign this subscription to, if any.|-|
