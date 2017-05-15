@@ -40,7 +40,7 @@ class WCS_Import_Admin {
 	 * @since 1.0
 	 */
 	public function add_sub_menu() {
-		add_submenu_page( 'woocommerce', __( 'Subscription Importer', 'wcs-import-export' ),  __( 'Subscription Importer', 'wcs-import-export' ), 'manage_options', 'import_subscription', array( &$this, 'admin_page' ) );
+		add_submenu_page( 'woocommerce', __( 'Subscription Importer', 'wcs-import-export' ),  __( 'Subscription Importer', 'wcs-import-export' ), 'manage_woocommerce', 'import_subscription', array( &$this, 'admin_page' ) );
 	}
 
 	/**

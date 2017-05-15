@@ -35,7 +35,7 @@ class WCS_Export_Admin {
 	 * @since 1.0
 	 */
 	public function add_sub_menu() {
-		add_submenu_page( 'woocommerce', __( 'Subscription Exporter', 'wcs-import-export' ),  __( 'Subscription Exporter', 'wcs-import-export' ), 'manage_options', 'export_subscriptions', array( &$this, 'export_page' ) );
+		add_submenu_page( 'woocommerce', __( 'Subscription Exporter', 'wcs-import-export' ),  __( 'Subscription Exporter', 'wcs-import-export' ), 'manage_woocommerce', 'export_subscriptions', array( &$this, 'export_page' ) );
 	}
 
 	/**
