@@ -212,9 +212,6 @@ class WCS_Exporter {
 					$value      = '';
 					$line_items = array();
 
-					/**
-* @var  $item_id
-* @var WC_Order_Item_Product $item */
 					foreach ( $subscription->get_items() as $item_id => $item ) {
 
 						$meta_string = '';
