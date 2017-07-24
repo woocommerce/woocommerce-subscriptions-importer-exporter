@@ -10,8 +10,6 @@ class WCS_Export_Admin {
 	public $action        = '';
 	public $error_message = '';
 
-	private $exporter = null;
-
 	/**
 	 * Initialise all admin hooks and filters for the subscriptions exporter
 	 *
@@ -97,7 +95,6 @@ class WCS_Export_Admin {
 	 * @since 1.0
 	 */
 	public function home_page() {
-		global $wpdb;
 
 		$statuses      = wcs_get_subscription_statuses();
 		$status_counts = array();
@@ -112,11 +109,11 @@ class WCS_Export_Admin {
 			<table class="widefat striped" id="wcsi-export-table">
 				<tbody>
 					<tr>
-						<td width="200"><label for="filename"><?php esc_html_e( 'Export File name', 'wcs-import-export' ); ?>:</label></th>
+						<td width="200"><label for="filename"><?php esc_html_e( 'Export File name', 'wcs-import-export' ); ?>:</label></td>
 						<td><input type="text" name="filename" placeholder="export filename" value="<?php echo ! empty( $_POST['filename'] ) ? esc_attr( $_POST['filename'] ) : 'subscriptions.csv'; ?>" required></td>
 					</tr>
 					<tr>
-						<td style="text-align:top"><?php esc_html_e( 'Subscription Statuses', 'wcs-import-export' ); ?>:</td>
+						<td style="vertical-align:top"><?php esc_html_e( 'Subscription Statuses', 'wcs-import-export' ); ?>:</td>
 						<td>
 							<?php foreach ( $statuses as $status => $status_display ) : ?>
 								<input type="checkbox" name="status[<?php echo esc_attr( $status ); ?>]" checked><?php echo esc_html( $status_display ); ?>  [<?php echo esc_html( ! empty( $status_counts[ $status ] ) ? $status_counts[ $status ] : 0 ); ?>]<br>
@@ -134,7 +131,7 @@ class WCS_Export_Admin {
 								<option value="any"><?php esc_html_e( 'Any Payment Method', 'wcs-import-export' ); ?></option>
 								<option value="none"><?php esc_html_e( 'None', 'wcs-import-export' ); ?></option>
 
-								<?php foreach ( WC()->payment_gateways->get_available_payment_gateways() as $gateway_id => $gateway ) : ?>
+								<?php foreach ( WC()->payment_gateways()->get_available_payment_gateways() as $gateway_id => $gateway ) : ?>
 									<option value="<?php echo esc_attr( $gateway_id ); ?>"><?php echo esc_html( $gateway->title ); ?></option>;
 								<?php endforeach; ?>
 							</select>
