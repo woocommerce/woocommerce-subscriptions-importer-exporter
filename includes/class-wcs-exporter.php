@@ -54,11 +54,12 @@ class WCS_Exporter {
 
 		if ( isset( self::$headers['payment_method_post_meta'] ) || isset( self::$headers['payment_method_user_meta'] ) ) {
 			$payment_method_table = apply_filters( 'woocommerce_subscription_payment_meta', array(), $subscription );
+			$subscription_payment_method =  version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_payment_method() : $subscription->payment_method;
 
-			if ( is_array( $payment_method_table ) && ! empty( $payment_method_table[ $subscription->payment_method ] ) ) {
+			if ( is_array( $payment_method_table ) && ! empty( $payment_method_table[ $subscription_payment_method ] ) ) {
 				$post_meta = $user_meta = array();
 
-				foreach ( $payment_method_table[ $subscription->payment_method ] as $meta_table => $meta ) {
+				foreach ( $payment_method_table[ $subscription_payment_method ] as $meta_table => $meta ) {
 					foreach ( $meta as $meta_key => $meta_data ) {
 						switch ( $meta_table ) {
 							case 'post_meta':
@@ -83,7 +84,7 @@ class WCS_Exporter {
 		foreach ( self::$headers as $header_key => $_ ) {
 			switch ( $header_key ) {
 				case 'subscription_status':
-					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_status() : $subscription->post_status;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? 'wc-' . $subscription->get_status() : $subscription->post_status;
 					break;
 				case 'customer_id':
 					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_customer_id() :$subscription->customer_user;
@@ -144,11 +145,15 @@ class WCS_Exporter {
 				case 'end_date':
 					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'end' ) : $subscription->end_date;
 					break;
+				case 'requires_manual_renewal':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ?
+						( $subscription->get_requires_manual_renewal() ? 'true' : 'false' ) :
+						$subscription->requires_manual_renewal;
+					break;
 				case 'billing_period':
 				case 'billing_interval':
 				case 'payment_method':
 				case 'payment_method_title':
-				case 'requires_manual_renewal':
 				case 'billing_first_name':
 				case 'billing_last_name':
 				case 'billing_email':
@@ -207,6 +212,9 @@ class WCS_Exporter {
 					$value      = '';
 					$line_items = array();
 
+					/**
+* @var  $item_id
+* @var WC_Order_Item_Product $item */
 					foreach ( $subscription->get_items() as $item_id => $item ) {
 
 						$meta_string = '';
@@ -225,8 +233,16 @@ class WCS_Exporter {
 
 						foreach ( $item_meta as $meta_id => $meta_data ) {
 
+							if ( version_compare( WC()->version, '3.0', '>=' ) ) {
+								$meta_key   = $meta_data->key;
+								$meta_value = $meta_data->value;
+							} else {
+								$meta_key   = $meta_data['meta_key'];
+								$meta_value = $meta_data['meta_value'];
+							}
+
 							// Skip hidden core fields
-							if ( in_array( $meta_data['meta_key'], apply_filters( 'woocommerce_hidden_order_itemmeta', array(
+							if ( in_array( $meta_key, apply_filters( 'woocommerce_hidden_order_itemmeta', array(
 								'_qty',
 								'_tax_class',
 								'_product_id',
@@ -245,7 +261,7 @@ class WCS_Exporter {
 								$meta_string .= '+';
 							}
 
-							$meta_string .= sprintf( '%s=%s', $meta_data['meta_key'], $meta_data['meta_value'] );
+							$meta_string .= sprintf( '%s=%s', $meta_key, $meta_value );
 						}
 
 						$line_item = array(
