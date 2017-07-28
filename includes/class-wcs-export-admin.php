@@ -173,7 +173,7 @@ class WCS_Export_Admin {
 			'start_date'               => __( 'Start Date', 'wcs-import-export' ),
 			'trial_end_date'           => __( 'Trial End Date', 'wcs-import-export' ),
 			'next_payment_date'        => __( 'Next Payment Date', 'wcs-import-export' ),
-			'last_payment_date'        => __( 'Last Payment Date', 'wcs-import-export' ),
+			'last_payment_date'        => __( 'Last Order Date', 'wcs-import-export' ),
 			'end_date'                 => __( 'End Date', 'wcs-import-export' ),
 			'billing_period'           => __( 'Billing Period', 'wcs-import-export' ),
 			'billing_interval'         => __( 'Billing Interval', 'wcs-import-export' ),
