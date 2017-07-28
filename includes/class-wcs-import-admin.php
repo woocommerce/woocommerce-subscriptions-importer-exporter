@@ -58,7 +58,7 @@ class WCS_Import_Admin {
 
 				wp_enqueue_script( 'wcs-importer-admin', WCS_Importer_Exporter::plugin_url() . 'assets/js/wcs-importer.js' );
 
-                $file_id = absint( $_GET['file_id'] );
+				$file_id = absint( $_GET['file_id'] );
 				$file    = get_attached_file( $file_id );
 				$enc     = mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true );
 

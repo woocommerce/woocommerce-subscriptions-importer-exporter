@@ -87,7 +87,7 @@ class WCS_Exporter {
 					$value = version_compare( WC()->version, '3.0', '>=' ) ? 'wc-' . $subscription->get_status() : $subscription->post_status;
 					break;
 				case 'customer_id':
-					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_customer_id() :$subscription->customer_user;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_customer_id() : $subscription->customer_user;
 					break;
 				case 'subscription_id':
 				case 'fee_total':
@@ -95,7 +95,7 @@ class WCS_Exporter {
 					$value = ${$header_key};
 					break;
 				case 'order_shipping':
-					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_shipping_total() :$subscription->order_shipping;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_shipping_total() : $subscription->order_shipping;
 					if ( empty ( $value ) ) {
 						$value = 0;
 					}
@@ -107,25 +107,25 @@ class WCS_Exporter {
 					}
 					break;
 				case 'order_tax':
-					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_total_tax() :$subscription->order_tax;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_total_tax() : $subscription->order_tax;
 					if ( empty ( $value ) ) {
 						$value = 0;
 					}
 					break;
 				case 'cart_discount':
-					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_total_discount() :$subscription->cart_discount;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_total_discount() : $subscription->cart_discount;
 					if ( empty ( $value ) ) {
 						$value = 0;
 					}
 					break;
 				case 'cart_discount_tax':
-					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_discount_tax() :$subscription->cart_discount_tax;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_discount_tax() : $subscription->cart_discount_tax;
 					if ( empty ( $value ) ) {
 						$value = 0;
 					}
 					break;
 				case 'order_total':
-					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_total() :$subscription->order_total;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_total() : $subscription->order_total;
 					if ( empty ( $value ) ) {
 						$value = 0;
 					}
@@ -146,9 +146,7 @@ class WCS_Exporter {
 					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'end' ) : $subscription->end_date;
 					break;
 				case 'requires_manual_renewal':
-					$value = version_compare( WC()->version, '3.0', '>=' ) ?
-						( $subscription->get_requires_manual_renewal() ? 'true' : 'false' ) :
-						$subscription->requires_manual_renewal;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? ( $subscription->get_requires_manual_renewal() ? 'true' : 'false' ) : $subscription->requires_manual_renewal;
 					break;
 				case 'billing_period':
 				case 'billing_interval':
