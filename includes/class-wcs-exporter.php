@@ -31,6 +31,9 @@ class WCS_Exporter {
 	 * @param WC_Subscription $subscription
 	 */
 	public static function write_subscriptions_csv_row( $subscription ) {
+
+		$subscription_id = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_id() : $subscription->id;
+
 		$fee_total = $fee_tax_total = 0;
 		$fee_items = array();
 
@@ -51,11 +54,12 @@ class WCS_Exporter {
 
 		if ( isset( self::$headers['payment_method_post_meta'] ) || isset( self::$headers['payment_method_user_meta'] ) ) {
 			$payment_method_table = apply_filters( 'woocommerce_subscription_payment_meta', array(), $subscription );
+			$subscription_payment_method =  version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_payment_method() : $subscription->payment_method;
 
-			if ( is_array( $payment_method_table ) && ! empty( $payment_method_table[ $subscription->payment_method ] ) ) {
+			if ( is_array( $payment_method_table ) && ! empty( $payment_method_table[ $subscription_payment_method ] ) ) {
 				$post_meta = $user_meta = array();
 
-				foreach ( $payment_method_table[ $subscription->payment_method ] as $meta_table => $meta ) {
+				foreach ( $payment_method_table[ $subscription_payment_method ] as $meta_table => $meta ) {
 					foreach ( $meta as $meta_key => $meta_data ) {
 						switch ( $meta_table ) {
 							case 'post_meta':
@@ -75,39 +79,79 @@ class WCS_Exporter {
 			}
 		}
 
+		$csv_row = array();
+
 		foreach ( self::$headers as $header_key => $_ ) {
 			switch ( $header_key ) {
-				case 'subscription_id':
-					$value = $subscription->id;
-					break;
 				case 'subscription_status':
-					$value = $subscription->post_status;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? 'wc-' . $subscription->get_status() : $subscription->post_status;
 					break;
 				case 'customer_id':
-					$value = $subscription->customer_user;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_customer_id() : $subscription->customer_user;
 					break;
+				case 'subscription_id':
 				case 'fee_total':
 				case 'fee_tax_total':
 					$value = ${$header_key};
 					break;
 				case 'order_shipping':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_shipping_total() : $subscription->order_shipping;
+					if ( empty ( $value ) ) {
+						$value = 0;
+					}
+					break;
 				case 'order_shipping_tax':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_shipping_tax() : $subscription->order_shipping_tax;
+					if ( empty( $value ) ) {
+						$value = 0;
+					}
+					break;
 				case 'order_tax':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_total_tax() : $subscription->order_tax;
+					if ( empty ( $value ) ) {
+						$value = 0;
+					}
+					break;
 				case 'cart_discount':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_total_discount() : $subscription->cart_discount;
+					if ( empty ( $value ) ) {
+						$value = 0;
+					}
+					break;
 				case 'cart_discount_tax':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_discount_tax() : $subscription->cart_discount_tax;
+					if ( empty ( $value ) ) {
+						$value = 0;
+					}
+					break;
 				case 'order_total':
-					$value = empty( $subscription->{$header_key} ) ? 0 : $subscription->{$header_key};
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_total() : $subscription->order_total;
+					if ( empty ( $value ) ) {
+						$value = 0;
+					}
+					break;
+				case 'start_date':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'date_created' ) : $subscription->start_date;
+					break;
+				case 'trial_end_date':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'trial_end' ) : $subscription->trial_end_date;
+					break;
+				case 'next_payment_date':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'next_payment' ) : $subscription->next_payment_date;
+					break;
+				case 'last_payment_date':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'last_order_date_created' ) : $subscription->last_payment_date;
+					break;
+				case 'end_date':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'end' ) : $subscription->end_date;
+					break;
+				case 'requires_manual_renewal':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? ( $subscription->get_requires_manual_renewal() ? 'true' : 'false' ) : $subscription->requires_manual_renewal;
 					break;
 				case 'billing_period':
 				case 'billing_interval':
-				case 'start_date':
-				case 'trial_end_date':
-				case 'next_payment_date':
-				case 'last_payment_date':
-				case 'end_date':
 				case 'payment_method':
 				case 'payment_method_title':
-				case 'requires_manual_renewal':
 				case 'billing_first_name':
 				case 'billing_last_name':
 				case 'billing_email':
@@ -129,8 +173,14 @@ class WCS_Exporter {
 				case 'shipping_country':
 				case 'shipping_company':
 				case 'customer_note':
+					if ( version_compare( WC()->version, '3.0', '>=' ) ) {
+						$value = call_user_func( array( $subscription, 'get_' . $header_key ) );
+					} else {
+						$value = $subscription->{$header_key};
+					}
+					break;
 				case 'order_currency':
-					$value = $subscription->{$header_key};
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_currency() :$subscription->order_currency;
 					break;
 				case 'payment_method_post_meta':
 					$value = ( ! empty( $payment_post_meta ) ) ? $payment_post_meta : '';
@@ -140,7 +190,7 @@ class WCS_Exporter {
 					break;
 				case 'order_notes':
 					remove_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ) );
-					$notes = get_comments( array( 'post_id' => $subscription->id, 'approve' => 'approve', 'type' => 'order_note' ) );
+					$notes = get_comments( array( 'post_id' => $subscription_id, 'approve' => 'approve', 'type' => 'order_note' ) );
 					add_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ) );
 
 					$order_notes = array();
@@ -164,10 +214,30 @@ class WCS_Exporter {
 
 						$meta_string = '';
 
-						foreach ( $subscription->has_meta( $item_id ) as $meta_id => $meta_data ) {
+						if ( version_compare( WC()->version, '3.0', '>=' ) ) {
+							$item_meta          = $item->get_meta_data();
+							$item_name          = $item->get_name();
+							$item_qty           = $item->get_quantity();
+							$item_line_tax_data = method_exists( $item, 'get_taxes' ) ? $item->get_taxes() : array();
+						} else {
+							$item_meta          = $subscription->has_meta( $item_id );
+							$item_name          = $item['name'];
+							$item_qty           = $item['qty'];
+							$item_line_tax_data = isset( $item['line_tax_data'] ) ? $item['line_tax_data'] : array();
+						}
+
+						foreach ( $item_meta as $meta_id => $meta_data ) {
+
+							if ( version_compare( WC()->version, '3.0', '>=' ) ) {
+								$meta_key   = $meta_data->key;
+								$meta_value = $meta_data->value;
+							} else {
+								$meta_key   = $meta_data['meta_key'];
+								$meta_value = $meta_data['meta_value'];
+							}
 
 							// Skip hidden core fields
-							if ( in_array( $meta_data['meta_key'], apply_filters( 'woocommerce_hidden_order_itemmeta', array(
+							if ( in_array( $meta_key, apply_filters( 'woocommerce_hidden_order_itemmeta', array(
 								'_qty',
 								'_tax_class',
 								'_product_id',
@@ -181,24 +251,24 @@ class WCS_Exporter {
 								continue;
 							}
 
-							// Add a custom delimeter to separate meta (we're running out of special characters to use!)
+							// Add a custom delimiter to separate meta (we're running out of special characters to use!)
 							if ( ! empty( $meta_string ) ) {
 								$meta_string .= '+';
 							}
 
-							$meta_string .= sprintf( '%s=%s', $meta_data['meta_key'], $meta_data['meta_value'] );
+							$meta_string .= sprintf( '%s=%s', $meta_key, $meta_value );
 						}
 
 						$line_item = array(
 							'product_id' => function_exists( 'wcs_get_canonical_product_id' ) ? wcs_get_canonical_product_id( $item ) : '',
-							'name'       => html_entity_decode( $item['name'], ENT_NOQUOTES, 'UTF-8' ),
-							'quantity'   => $item['qty'],
+							'name'       => html_entity_decode( $item_name, ENT_NOQUOTES, 'UTF-8' ),
+							'quantity'   => $item_qty,
 							'total'      => wc_format_decimal( $subscription->get_line_total( $item ), 2 ),
 							'meta'       => html_entity_decode( str_replace( array( "\r", "\r\n", "\n", ': ', ':', ';', '|' ), '', $meta_string ), ENT_NOQUOTES, 'UTF-8' ),
 						);
 
 						// add line item tax
-						$line_tax_data    = isset( $item['line_tax_data'] ) ? $item['line_tax_data'] : array();
+						$line_tax_data    = $item_line_tax_data;
 						$tax_data         = maybe_unserialize( $line_tax_data );
 						$line_item['tax'] = isset( $tax_data['total'] ) ? wc_format_decimal( wc_round_tax_total( array_sum( (array) $tax_data['total'] ) ), 2 ) : '';
 
@@ -221,15 +291,17 @@ class WCS_Exporter {
 					$coupon_items = array();
 
 					foreach ( $subscription->get_items( 'coupon' ) as $_ => $coupon_item ) {
+						$coupon_name = version_compare( WC()->version, '3.0', '>=' ) ? $coupon_item->get_name() : $coupon_item['name'];
 
-						$coupon = new WC_Coupon( $coupon_item['name'] );
+						$coupon = new WC_Coupon( $coupon_name );
 
-						$coupon_post = get_post( $coupon->id );
+						$coupon_post   = get_post( version_compare( WC()->version, '3.0', '>=' ) ? $coupon->get_id() : $coupon->id );
+						$coupon_amount = version_compare( WC()->version, '3.0', '>=' ) ? $coupon_item->get_discount() : $coupon_item['discount_amount'];
 
 						$coupon_items[] = implode( '|', array(
-								'code:' . $coupon_item['name'],
+								'code:' . $coupon_name,
 								'description:' . ( is_object( $coupon_post ) ? $coupon_post->post_excerpt : '' ),
-								'amount:' . wc_format_decimal( $coupon_item['discount_amount'], 2 ),
+								'amount:' . wc_format_decimal( $coupon_amount, 2 ),
 							)
 						);
 					}
@@ -248,12 +320,21 @@ class WCS_Exporter {
 					$shipping_lines = array();
 
 					foreach ( $subscription->get_shipping_methods() as $shipping_item_id => $shipping_item ) {
-						$shipping_lines[] = implode( '|', array(
-								'method_id:' . $shipping_item['method_id'],
-								'method_title:' . $shipping_item['name'],
-								'total:' . wc_format_decimal( $shipping_item['cost'], 2 ),
-							)
-						);
+						if ( version_compare( WC()->version, '3.0', '>=' ) ) {
+							$shipping_lines[] = implode( '|', array(
+									'method_id:' . $shipping_item->get_method_id(),
+									'method_title:' . $shipping_item->get_name(),
+									'total:' . wc_format_decimal( $shipping_item->get_total(), 2 ),
+								)
+							);
+						} else {
+							$shipping_lines[] = implode( '|', array(
+									'method_id:' . $shipping_item['method_id'],
+									'method_title:' . $shipping_item['name'],
+									'total:' . wc_format_decimal( $shipping_item['cost'], 2 ),
+								)
+							);
+						}
 					}
 
 					if ( ! empty( $shipping_lines ) ) {
