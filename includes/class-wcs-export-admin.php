@@ -67,6 +67,7 @@ class WCS_Export_Admin {
 		$tabs = array(
 			'wcsi-export'  => __( 'Export', 'wcs-import-export' ),
 			'wcsi-headers' => __( 'CSV Headers', 'wcs-import-export' ),
+			'wcsi-cron-exports' => __( 'Cron exports', 'wcs-import-export' )
 		);
 
 		$current_tab = ( empty( $_GET['tab'] ) ) ? 'wcsi-export' : urldecode( $_GET['tab'] );
@@ -83,7 +84,8 @@ class WCS_Export_Admin {
 		echo '<form class="wcsi-exporter-form" method="POST" action="' . esc_attr( add_query_arg( 'step', 'download' ) ) . '">';
 		$this->home_page();
 		echo '<p class="submit">';
-		echo '<input type="submit" class="button" value="' . esc_html__( 'Export Subscriptions', 'wcs-import-export' ) . '" />';
+		echo '<input data-action="' . esc_attr( add_query_arg( 'step', 'download' ) ) . '" type="submit" class="button" value="' . esc_html__( 'Export Subscriptions', 'wcs-import-export' ) . '" />';
+		echo '&nbsp;&nbsp;<input data-action="' . esc_attr( add_query_arg( 'step', 'cron-export' ) ) . '" type="submit" class="button" value="' . esc_html__( 'Export Subscriptions (using cron)', 'wcs-import-export' ) . '" />';
 		echo '</p>';
 		wp_nonce_field( 'wcsie-exporter-home', 'wcsie_wpnonce' );
 		echo '</form>';
@@ -153,7 +155,9 @@ class WCS_Export_Admin {
 			</table>
 			<?php esc_html_e( 'When exporting all subscriptions, your site may experience memory exhaustion and therefore you may need to use the limit and offset to separate your export into multiple CSV files.', 'wcs-import-export' ); ?>
 
-			<?php $this->export_headers();
+			<?php
+				$this->export_headers();
+				$this->export_crons();
 		}
 	}
 
@@ -244,6 +248,94 @@ class WCS_Export_Admin {
 		</table>
 		<?php
 
+	}
+
+	/**
+	 * Export crons page
+	 *
+	 * Display a list of all the crons preparing exports.
+	 *
+	 * @since 2.0-beta
+	 */
+	public function export_crons() {
+
+		$files = array();
+		$files_data = array();
+
+		if ( file_exists(WCS_Exporter_Cron::$cron_dir) ) {
+			$files = scandir(WCS_Exporter_Cron::$cron_dir);
+		}
+
+		if ( !empty($files) ) {
+
+			$files = array_diff($files, array('.', '..'));
+			$upload_dir = wp_upload_dir();
+			$files_url = $upload_dir['baseurl'] . '/woocommerce-subscriptions-importer-exporter/';
+
+			foreach ( $files as $file ) {
+
+				// set status
+				$status = 'completed';
+				if ( strpos($file, 'tmp') !== false ) {
+					$status = 'processing';
+				}
+
+				// set date and time
+				$timestamp = substr($file, strpos($file, '-') + 1, 10);
+				$date = date('d/m/Y G:i:s', $timestamp);
+
+				$file_data = array(
+					'name' => $file,
+					'url' => $files_url . $file,
+					'status' => $status,
+					'date' => $date
+				);
+
+				$files_data[] = $file_data;
+			}
+		}
+		?>
+		<table class="widefat widefat_crons striped" id="wcsi-cron-exports-table" style="display:none;">
+			<thead>
+				<tr>
+					<th><?php esc_html_e( 'File', 'wcs-import-export' ); ?></th>
+					<th><?php esc_html_e( 'Date', 'wcs-import-export' ); ?></th>
+					<th><?php esc_html_e( 'Status', 'wcs-import-export' ); ?></th>
+				</tr>
+			</thead>
+			<?php if ( empty($files_data) ): ?>
+				<tbody>
+					<tr>
+						<td colspan="3"><?php esc_html_e( 'There are no files completed or processing.', 'wcs-import-export' ); ?></td>
+					</tr>
+				</tbody>
+			<?php else: ?>
+				<tbody>
+					<?php foreach ( $files_data as $file_data ): ?>
+						<tr>
+							<td>
+								<?php if ( $file_data['status'] == 'processing' ): ?>
+									<?php echo $file_data['name']; ?>
+								<?php else: ?>
+									<a href="<?php echo $file_data['url']; ?>"><?php echo $file_data['name']; ?></a>
+								<?php endif; ?>
+							</td>
+							<td><?php echo $file_data['date']; ?></td>
+							<td>
+								<?php
+									if ( $file_data['status'] == 'processing' ) {
+										esc_html_e( 'Processing', 'wcs-import-export' );
+									} else {
+										esc_html_e( 'Completed', 'wcs-import-export' );
+									}
+								?>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			<?php endif; ?>
+		</table>
+		<?php
 	}
 
 	/**
@@ -340,6 +432,38 @@ class WCS_Export_Admin {
 	}
 
 	/**
+	 * Function to start the cron process
+	 *
+	 * @since 1.0
+	 * @param array $headers
+	 */
+	public function process_cron_export( $headers = array() ) {
+
+		check_admin_referer( 'wcsie-exporter-home', 'wcsie_wpnonce' );
+
+		$post_data = $_POST;
+
+		// add tmp and timestamp to filename.
+		$filename = $post_data['filename'];
+		$file_extension = pathinfo($filename, PATHINFO_EXTENSION);
+		$post_data['filename'] = str_replace('.' . $file_extension, '', $filename) . '-' . time() . '.tmp.' . $file_extension;
+
+		// set the initial limit
+		$post_data['limit'] = 500;
+
+		// set the initial offset
+		$post_data['offset'] = 0;
+
+		// event args
+		$event_args = array(
+			'post_data' => $post_data,
+			'headers' => $headers
+		);
+
+		wp_schedule_single_event( time() + 60, 'wcs_export_cron', $event_args );
+	}
+
+	/**
 	 * Check params sent through as POST and start the export
 	 *
 	 * @since 1.0
@@ -347,7 +471,7 @@ class WCS_Export_Admin {
 	public function export_handler() {
 
 		if ( isset( $_GET['page'] ) && 'export_subscriptions' == $_GET['page'] ) {
-			if ( isset( $_GET['step'] ) && 'download' == $_GET['step'] ) {
+			if ( isset( $_GET['step'] ) && ( 'download' == $_GET['step'] || 'cron-export' == $_GET['step'] ) ) {
 
 				check_admin_referer( 'wcsie-exporter-home', 'wcsie_wpnonce' );
 
@@ -362,7 +486,13 @@ class WCS_Export_Admin {
 				}
 
 				if ( ! empty( $csv_headers ) ) {
-					$this->process_download( $csv_headers );
+					if ( 'download' == $_GET['step'] ) {
+						$this->process_download( $csv_headers );
+					} elseif ( 'cron-export' == $_GET['step'] ) {
+						$this->process_cron_export( $csv_headers );
+						wp_redirect( admin_url('admin.php?page=export_subscriptions') );
+						exit();
+					}
 				} else {
 					$this->error_message = __( 'No csv headers were chosen, please select at least one CSV header to complete the Subscriptions Exporter.', 'wcs-import-export' );
 				}

@@ -6,7 +6,7 @@
  */
 class WCS_Exporter {
 
-	private static $file = null;
+	public static $file = null;
 
 	public static $headers = array();
 
@@ -17,8 +17,11 @@ class WCS_Exporter {
 	 * @param array $header
 	 */
 	public static function write_headers( $headers ) {
+
+		if ( self::$file == null ) {
 		self::$file    = fopen( 'php://output', 'w' );
 		ob_start();
+		}
 
 		self::$headers = $headers;
 		self::write( $headers );

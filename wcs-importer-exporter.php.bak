@@ -58,7 +58,6 @@ class WCS_Importer_Exporter {
 	public static function init() {
 		add_filter( 'plugins_loaded', __CLASS__ . '::setup_importer' );
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), __CLASS__ . '::action_links' );
-		add_action( 'wcs_export_cron', array( 'WCS_Exporter_Cron', 'cron_handler' ), 10, 2 );
 
 		spl_autoload_register( __CLASS__ . '::autoload' );
 	}
