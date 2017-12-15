@@ -131,4 +131,23 @@ class WCS_Exporter_Cron {
 		return $query_args;
 	}
 
+    /**
+	 * Delete subscription export file.
+	 *
+	 * @since 2.0-beta
+	 * @param string $file_name
+	 * @return array
+	 */
+    public static function delete_export_file( $file_name )  {
+
+        if ( $file_name == '' ) {
+            return;
+        }
+
+        $file_path = self::$cron_dir . '/' . $file_name;
+        if ( file_exists($file_path) ) {
+            unlink($file_path);
+        }
+    }
+
 }

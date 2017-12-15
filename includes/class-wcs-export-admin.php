@@ -27,6 +27,8 @@ class WCS_Export_Admin {
 		$this->action = admin_url( 'admin.php?page=export_subscriptions' );
 
 		add_action( 'admin_notices', array( &$this, 'cron_start_notice' ), 500 );
+
+		add_action( 'admin_init', array( &$this, 'process_cron_export_delete' ) );
 	}
 
 	/**
@@ -307,6 +309,7 @@ class WCS_Export_Admin {
 					<th><?php esc_html_e( 'File', 'wcs-import-export' ); ?></th>
 					<th><?php esc_html_e( 'Date', 'wcs-import-export' ); ?></th>
 					<th><?php esc_html_e( 'Status', 'wcs-import-export' ); ?></th>
+					<th></th>
 				</tr>
 			</thead>
 			<?php if ( empty($files_data) ): ?>
@@ -335,6 +338,9 @@ class WCS_Export_Admin {
 										esc_html_e( 'Completed', 'wcs-import-export' );
 									}
 								?>
+							</td>
+							<td align="right">
+								<a class="button" href="<?php echo wp_nonce_url(admin_url('admin.php?page=export_subscriptions&delete_export=' . $file_data['name']), 'delete_export', '_wpnonce'); ?>" onclick="return confirm('<?php esc_html_e( 'Are you sure you want to delete this export?', 'wcs-import-export' ); ?>')"><?php esc_html_e( 'Delete', 'wcs-import-export' ); ?></a>
 							</td>
 						</tr>
 					<?php endforeach; ?>
@@ -480,6 +486,19 @@ class WCS_Export_Admin {
 	}
 
 	/**
+	 * Function to remove a cron export file.
+	 *
+	 * @since 2.0-beta
+	 * @param array $headers
+	 */
+	public function process_cron_export_delete() {
+		if ( isset($_GET['delete_export']) && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'delete_export')) {
+			WCS_Exporter_Cron::delete_export_file($_GET['delete_export']);
+			wp_redirect( admin_url('admin.php?page=export_subscriptions&cron_deleted=true') );
+		}
+	}
+
+	/**
 	 * Check params sent through as POST and start the export
 	 *
 	 * @since 1.0
@@ -543,5 +562,13 @@ class WCS_Export_Admin {
 			</div>
 			<?php
 		}
+		if ( isset($_GET["cron_deleted"]) && $_GET["cron_deleted"] == "true") {
+			?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php echo __( 'The export file was successfully deleted.', 'wcs-import-export' ); ?></p>
+			</div>
+			<?php
+		}
+
     }
 }
