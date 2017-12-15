@@ -319,7 +319,11 @@ class WCS_Exporter {
 
 					break;
 				case 'download_permissions':
-					$value = $subscription->download_permissions_granted ? $subscription->download_permissions_granted : 0;
+					if ( version_compare( WC()->version, '3.0', '>=' ) ) {
+						$value = $subscription->is_download_permitted() ? $subscription->is_download_permitted() : 0;
+					} else {
+						$value = $subscription->download_permissions_granted ? $subscription->download_permissions_granted : 0;
+					}
 					break;
 				case 'shipping_method':
 					$shipping_lines = array();
