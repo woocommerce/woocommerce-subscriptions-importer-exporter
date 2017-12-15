@@ -19,8 +19,8 @@ class WCS_Exporter {
 	public static function write_headers( $headers ) {
 
 		if ( self::$file == null ) {
-		self::$file    = fopen( 'php://output', 'w' );
-		ob_start();
+			self::$file    = fopen( 'php://output', 'w' );
+			ob_start();
 		}
 
 		self::$headers = $headers;
