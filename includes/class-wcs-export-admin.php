@@ -536,10 +536,12 @@ class WCS_Export_Admin {
 	 * @since 2.0-beta
 	 */
 	public function cron_start_notice() {
-		?>
-		<div class="notice notice-success is-dismissible">
-			<p><?php echo __( 'The export is scheduled. You can see the status and download the file on the "Cron export" tab.', 'wcs-import-export' ); ?></p>
-		</div>
-		<?php
+		if ( isset($_GET["cron_started"]) && $_GET["cron_started"] == "true") {
+			?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php echo __( 'The export is scheduled. You can see the status and download the file on the "Cron export" tab.', 'wcs-import-export' ); ?></p>
+			</div>
+			<?php
+		}
     }
 }
