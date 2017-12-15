@@ -255,6 +255,11 @@ class WCS_Exporter {
 							if ( ! empty( $meta_string ) ) {
 								$meta_string .= '+';
 							}
+							
+							// Prevent array to string notice caused by Composite Products when using Subscribe All The Things
+							if ( is_array( $meta_value ) ) {
+								$meta_value = json_encode( $meta_value );
+							}
 
 							$meta_string .= sprintf( '%s=%s', $meta_key, $meta_value );
 						}
