@@ -25,6 +25,8 @@ class WCS_Export_Admin {
 		add_filter( 'woocommerce_screen_ids', array( &$this, 'register_export_screen_id' ) );
 
 		$this->action = admin_url( 'admin.php?page=export_subscriptions' );
+
+		add_action( 'admin_notices', array( &$this, 'cron_start_notice' ), 500 );
 	}
 
 	/**
@@ -150,6 +152,10 @@ class WCS_Export_Admin {
 					<tr>
 						<td><label><?php esc_html_e( 'Limit Export', 'wcs-import-export' ); ?>:</label></td>
 						<td><input type="number" name="limit" min="0"> <?php esc_html_e( 'Export only a certain number of subscriptions. Leave empty or set to "0" to export all subscriptions.', 'wcs-import-export' ); ?></td>
+					</tr>
+					<tr>
+						<td><label><?php esc_html_e( 'Limit Batch', 'wcs-import-export' ); ?>:</label></td>
+						<td><input type="number" name="limit_batch" min="10" value="500" step="10"> <?php esc_html_e( 'When exporting using cron, this will limit the number of records that will processed on each batch. Reduce this if your PHP limits are low.', 'wcs-import-export' ); ?></td>
 					</tr>
 				</tbody>
 			</table>
@@ -449,7 +455,8 @@ class WCS_Export_Admin {
 		$post_data['filename'] = str_replace('.' . $file_extension, '', $filename) . '-' . time() . '.tmp.' . $file_extension;
 
 		// set the initial limit
-		$post_data['limit'] = 500;
+		$post_data['limit'] = $post_data['limit_batch'] != '' ? $post_data['limit_batch'] : 500;
+		unset($post_data['limit_batch']);
 
 		// set the initial offset
 		$post_data['offset'] = 0;
@@ -459,6 +466,15 @@ class WCS_Export_Admin {
 			'post_data' => $post_data,
 			'headers' => $headers
 		);
+
+		// Create directory if it does not exist and create the file.
+		if ( !file_exists(WCS_Exporter_Cron::$cron_dir) ) {
+			mkdir(WCS_Exporter_Cron::$cron_dir, 0775);
+		}
+
+		$file_path = WCS_Exporter_Cron::$cron_dir . '/' . $post_data['filename'];
+		$file = fopen($file_path, 'a');
+		fclose($file);
 
 		wp_schedule_single_event( time() + 60, 'wcs_export_cron', $event_args );
 	}
@@ -490,7 +506,7 @@ class WCS_Export_Admin {
 						$this->process_download( $csv_headers );
 					} elseif ( 'cron-export' == $_GET['step'] ) {
 						$this->process_cron_export( $csv_headers );
-						wp_redirect( admin_url('admin.php?page=export_subscriptions') );
+						wp_redirect( admin_url('admin.php?page=export_subscriptions&cron_started=true') );
 						exit();
 					}
 				} else {
@@ -513,4 +529,17 @@ class WCS_Export_Admin {
 
 		return $screen_ids;
 	}
+
+	/**
+	 * Display success message when cron job is set to start.
+	 *
+	 * @since 2.0-beta
+	 */
+	public function cron_start_notice() {
+		?>
+		<div class="notice notice-success is-dismissible">
+			<p><?php echo __( 'The export is scheduled. You can see the status and download the file on the "Cron export" tab.', 'wcs-import-export' ); ?></p>
+		</div>
+		<?php
+    }
 }

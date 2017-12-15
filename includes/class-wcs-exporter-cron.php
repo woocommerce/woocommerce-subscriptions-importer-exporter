@@ -63,7 +63,7 @@ class WCS_Exporter_Cron {
         } else {
             $done_export = true;
         }
-        error_log($done_export);
+
         if ( $done_export === true ) {
             rename($file_path, str_replace('.tmp', '', $file_path));
         }
@@ -74,7 +74,7 @@ class WCS_Exporter_Cron {
     /**
 	 * Query the subscriptions using the users specific filters.
 	 *
-	 * @since 1.0
+	 * @since 2.0-beta
 	 * @return array
 	 */
     public static function get_subscriptions_to_export( $post_data ) {
@@ -112,7 +112,7 @@ class WCS_Exporter_Cron {
     /**
 	 * Filter the query in @see wcs_get_subscriptions() by payment method.
 	 *
-	 * @since 1.0
+	 * @since 2.0-beta
 	 * @param array $query_args
 	 * @param array $args
 	 * @return array
