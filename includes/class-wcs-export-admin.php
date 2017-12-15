@@ -288,7 +288,7 @@ class WCS_Export_Admin {
 
 				// set date and time
 				$timestamp = substr($file, strpos($file, '-') + 1, 10);
-				$date = date('d/m/Y G:i:s', $timestamp);
+				$date = date('d/m/Y G:i:s', strtotime($timestamp));
 
 				$file_data = array(
 					'name' => $file,
