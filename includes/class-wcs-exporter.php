@@ -255,6 +255,11 @@ class WCS_Exporter {
 							if ( ! empty( $meta_string ) ) {
 								$meta_string .= '+';
 							}
+							
+							// Prevent array to string notice caused by Composite Products when using Subscribe All The Things
+							if ( is_array( $meta_value ) ) {
+								$meta_value = json_encode( $meta_value );
+							}
 
 							$meta_string .= sprintf( '%s=%s', $meta_key, $meta_value );
 						}
@@ -314,7 +319,11 @@ class WCS_Exporter {
 
 					break;
 				case 'download_permissions':
-					$value = $subscription->download_permissions_granted ? $subscription->download_permissions_granted : 0;
+					if ( version_compare( WC()->version, '3.0', '>=' ) ) {
+						$value = $subscription->is_download_permitted() ? $subscription->is_download_permitted() : 0;
+					} else {
+						$value = $subscription->download_permissions_granted ? $subscription->download_permissions_granted : 0;
+					}
 					break;
 				case 'shipping_method':
 					$shipping_lines = array();
