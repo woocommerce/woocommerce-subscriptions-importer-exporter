@@ -670,13 +670,14 @@ class WCS_Importer {
 		}
 
 		$_product = wc_get_product( $data['product_id'] );
+		$_product_id  = version_compare( WC()->version, '3.0', '>=' ) ? $_product->get_id() : $_product->id;
 
 		if ( ! $_product ) {
 			throw new Exception( sprintf( __( 'No product or variation in your store matches the product ID #%s.', 'wcs-import-export' ), $data['product_id'] ) );
 		}
 
 		$line_item_name = ( ! empty( $data['name'] ) ) ? $data['name'] : $_product->get_title();
-		$product_string = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product->id ), $line_item_name );
+		$product_string = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product_id ), $line_item_name );
 
 		foreach ( array( 'total', 'tax', 'subtotal', 'subtotal_tax' ) as $line_item_data ) {
 
