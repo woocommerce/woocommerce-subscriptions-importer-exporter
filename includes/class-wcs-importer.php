@@ -610,8 +610,9 @@ class WCS_Importer {
 				}
 
 				// if the product is a variation we want to also check if the parent variable product has any plans as well and add them
-				$product = wc_get_product( $product_id );
-				if ( $product && $product->is_type( 'variation' ) && ! empty( $product->parent->id ) && $plan->has_product( $product->parent->id ) ) {
+				$product   = wc_get_product( $product_id );
+				$parent_id = wcs_get_objects_property( $product, 'parent_id' );
+				if ( $product && $product->is_type( 'variation' ) && ! empty( $parent_id ) && $plan->has_product( $parent_id ) ) {
 					$plan->grant_access_from_purchase( $user_id, $product->parent->id, $subscription_id );
 				}
 			}
