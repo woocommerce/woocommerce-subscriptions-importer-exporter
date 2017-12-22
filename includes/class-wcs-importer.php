@@ -695,10 +695,11 @@ class WCS_Importer {
 		}
 
 		// Add this site's variation meta data if no line item meta data was specified in the CSV
-		if ( empty( $data['meta'] ) && $_product->variation_data ) {
+		$_product_variation_data = version_compare( WC()->version, '3.0', '>=' ) ? $_product->get_available_variations() : $_product->variation_data;
+		if ( empty( $data['meta'] ) && $_product_variation_data ) {
 			$item_args['variation'] = array();
 
-			foreach ( $_product->variation_data as $attribute => $variation ) {
+			foreach ( $_product_variation_data as $attribute => $variation ) {
 				$item_args['variation'][ $attribute ] = $variation;
 			}
 			$product_string .= ' [#' . $data['product_id'] . ']';
