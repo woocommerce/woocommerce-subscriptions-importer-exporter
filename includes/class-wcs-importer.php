@@ -315,19 +315,21 @@ class WCS_Importer {
 						throw new Exception( sprintf( esc_html__( 'Could not create subscription: %s', 'wcs-import-export' ), $subscription->get_error_message() ) );
 					}
 
+					$subscription_id = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_id() : $subscription->id;
+
 					foreach ( $post_meta as $meta_data ) {
-						update_post_meta( $subscription->id, $meta_data['key'], $meta_data['value'] );
+						update_post_meta( $subscription_id, $meta_data['key'], $meta_data['value'] );
 					}
 
 					foreach ( self::$fields['custom_post_meta'] as $meta_key ) {
 						if ( ! empty( $data[ $meta_key ] ) ) {
-							update_post_meta( $subscription->id, $meta_key, $data[ $meta_key ] );
+							update_post_meta( $subscription_id, $meta_key, $data[ $meta_key ] );
 						}
 					}
 
 					foreach ( self::$fields['custom_user_post_meta'] as $meta_key ) {
 						if ( ! empty( $data[ $meta_key ] ) ) {
-							update_post_meta( $subscription->id, $meta_key, $data[ $meta_key ] );
+							update_post_meta( $subscription_id, $meta_key, $data[ $meta_key ] );
 							update_user_meta( $user_id, $meta_key, $data[ $meta_key ] );
 						}
 					}
@@ -351,6 +353,7 @@ class WCS_Importer {
 					}
 				} else {
 					$subscription = null;
+					$subscription_id = 0;
 				}
 
 				if ( $set_manual ) {
@@ -443,7 +446,7 @@ class WCS_Importer {
 
 			if ( empty( $result['error'] ) ) {
 				$result['status']              = 'success';
-				$result['subscription']        = sprintf( '<a href="%s">#%s</a>', esc_url( admin_url( 'post.php?post=' . absint( $subscription->id ) . '&action=edit' ) ), $subscription->get_order_number() );
+				$result['subscription']        = sprintf( '<a href="%s">#%s</a>', esc_url( admin_url( 'post.php?post=' . absint( $subscription_id ) . '&action=edit' ) ), $subscription->get_order_number() );
 				$result['subscription_status'] = $subscription->get_status();
 
 			} else {
@@ -494,7 +497,8 @@ class WCS_Importer {
 	public static function set_payment_meta( $subscription, $data ) {
 		$warnings         = array();
 		$payment_gateways = WC()->payment_gateways->get_available_payment_gateways();
-		$payment_method   = $subscription->payment_method;
+		$subscription_id  = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_id() : $subscription->id;
+		$payment_method   = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_payment_method() : $subscription->payment_method;
 
 		if ( ! empty( $payment_method ) ) {
 			$payment_method_table = apply_filters( 'woocommerce_subscription_payment_meta', array(), $subscription );
@@ -549,7 +553,7 @@ class WCS_Importer {
 				if ( $meta_set ) {
 					$subscription->set_payment_method( $payment_gateway, $payment_method_data );
 				} else {
-					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %1$s subscription (%2$s). The next renewal is going to fail if you leave this.', 'wcs-import-export' ), $payment_method, $subscription->id );
+					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %1$s subscription (%2$s). The next renewal is going to fail if you leave this.', 'wcs-import-export' ), $payment_method, $subscription_id );
 				}
 			} else {
 				if ( 'paypal' == $payment_method ) {
@@ -574,8 +578,9 @@ class WCS_Importer {
 	public static function save_download_permissions( $subscription, $product, $quantity = 1 ) {
 
 		if ( $product && $product->exists() && $product->is_downloadable() ) {
-			$downloads  = $product->get_files();
-			$product_id = isset( $product->variation_id ) ? $product->variation_id : $product->id;
+			$downloads  = version_compare( WC()->version, '3.0', '>=' ) ? $product->get_downloads() : $product->get_files();
+			$product_id = version_compare( WC()->version, '3.0', '>=' ) ? $product->get_id() :
+				isset( $product->variation_id ) ? $product->variation_id : $product->id;
 
 			foreach ( array_keys( $downloads ) as $download_id ) {
 				wc_downloadable_file_permission( $download_id, $product_id, $subscription, $quantity );
@@ -641,7 +646,7 @@ class WCS_Importer {
 				} elseif ( isset( $coupon_data['amount'] ) ) {
 					$discount_amount = floatval( $coupon_data['amount'] );
 				} else {
-					$discount_amount = $coupon->discount_amount;
+					$discount_amount = version_compare( WC()->version, '3.0', '>=' ) ? $coupon->get_discount_amount() : $coupon->discount_amount;
 				}
 
 				if ( ! self::$test_mode ) {
@@ -673,13 +678,14 @@ class WCS_Importer {
 		}
 
 		$_product = wc_get_product( $data['product_id'] );
+		$_product_id  = version_compare( WC()->version, '3.0', '>=' ) ? $_product->get_id() : $_product->id;
 
 		if ( ! $_product ) {
 			throw new Exception( sprintf( __( 'No product or variation in your store matches the product ID #%s.', 'wcs-import-export' ), $data['product_id'] ) );
 		}
 
 		$line_item_name = ( ! empty( $data['name'] ) ) ? $data['name'] : $_product->get_title();
-		$product_string = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product->id ), $line_item_name );
+		$product_string = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product_id ), $line_item_name );
 
 		foreach ( array( 'total', 'tax', 'subtotal', 'subtotal_tax' ) as $line_item_data ) {
 
@@ -697,10 +703,12 @@ class WCS_Importer {
 		}
 
 		// Add this site's variation meta data if no line item meta data was specified in the CSV
-		if ( empty( $data['meta'] ) && $_product->variation_data ) {
+		if ( empty( $data['meta'] ) && $_product->is_type( 'variable' ) ) {
+			$_product_variation_data = version_compare( WC()->version, '3.0', '>=' ) ? $_product->get_available_variations() : $_product->variation_data;
+
 			$item_args['variation'] = array();
 
-			foreach ( $_product->variation_data as $attribute => $variation ) {
+			foreach ( $_product_variation_data as $attribute => $variation ) {
 				$item_args['variation'][ $attribute ] = $variation;
 			}
 			$product_string .= ' [#' . $data['product_id'] . ']';
@@ -749,7 +757,7 @@ class WCS_Importer {
 	 * @since 1.0
 	 * @param WC_Subscription $subscription
 	 * @param array $data
-	 * @param int chosen_tax_rate_id
+	 * @param int $chosen_tax_rate_id
 	 */
 	public static function add_fees( $subscription, $data, $chosen_tax_rate_id ) {
 		$fee_items = explode( ';', $data[ self::$fields['fee_items'] ] );
@@ -810,6 +818,7 @@ class WCS_Importer {
 		$shipping_items   = explode( ';', $data[ self::$fields['shipping_method'] ] );
 		$shipping_method  = '';
 		$default_total    = ( ! empty( $data[ self::$fields['order_shipping'] ] ) ) ? $data[ self::$fields['order_shipping'] ] : 0;
+		$subscription_id  = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_id() : $subscription->id;
 
 		if ( ! empty( $shipping_items ) ) {
 			foreach ( $shipping_items as $shipping_item ) {
@@ -839,8 +848,8 @@ class WCS_Importer {
 						throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription, a subscription not been created for this row.', 'wcs-import-export' ) );
 					}
 
-					update_post_meta( $subscription->id, '_shipping_method', $shipping_method );
-					update_post_meta( $subscription->id, '_shipping_method_title', $shipping_title );
+					update_post_meta( $subscription_id, '_shipping_method', $shipping_method );
+					update_post_meta( $subscription_id, '_shipping_method_title', $shipping_title );
 				}
 			}
 		}
