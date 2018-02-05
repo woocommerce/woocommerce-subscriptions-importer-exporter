@@ -785,11 +785,11 @@ class WCS_Importer {
 				$fee->taxable   = false;
 				$fee->tax       = 0;
 				$fee->tax_data  = array();
-				$fee->tax_class = '';
+				$fee->tax_class = 0;
 
 				if ( ! empty( $fee_data['tax'] ) ) {
 					$fee->tax       = wc_format_decimal( $fee_data['tax'] );
-					$fee->tax_class = ( ! empty( $fee_data['tax_class'] ) ) ? $fee_data['tax_class'] : '';
+					$fee->tax_class = ( ! empty( $fee_data['tax_class'] ) ) ? $fee_data['tax_class'] : 0;
 					$fee->taxable   = true;
 
 					if ( ! empty( $chosen_tax_rate_id ) ) {
@@ -798,7 +798,22 @@ class WCS_Importer {
 				}
 
 				if ( ! self::$test_mode ) {
-					$fee_id = $subscription->add_fee( $fee );
+
+					$fee_line_item = new WC_Order_Item_Fee();
+					$fee_line_item->set_props( array(
+						'name'      => $fee->name,
+						'tax_class' => $fee->taxable ? $fee->tax_class : 0,
+						'total'     => $fee->amount,
+						'total_tax' => $fee->tax,
+						'taxes'     => array(
+							'total' => $fee->tax_data,
+						),
+						'order_id'  => $subscription->get_id(),
+					) );
+					$fee_line_item->save();
+					$subscription->add_item( $fee_line_item );
+
+					$fee_id = $fee_line_item->get_id();
 
 					if ( ! $fee_id ) {
 						throw new Exception( __( 'Could not add the fee to your subscription, the subscription has not been imported.', 'wcs-import-export' ) );
