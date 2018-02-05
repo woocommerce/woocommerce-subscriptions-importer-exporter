@@ -839,13 +839,28 @@ class WCS_Importer {
 				$shipping_title  = isset( $shipping_line['method_title'] ) ? $shipping_line['method_title'] : $shipping_method;
 
 				if ( ! self::$test_mode ) {
-					$rate = new WC_Shipping_Rate( $shipping_method, $shipping_title, isset( $shipping_line['total'] ) ? floatval( $shipping_line['total'] ) : $default_total, array(), $shipping_method );
+					$shipping_rate = new WC_Shipping_Rate( $shipping_method, $shipping_title, isset( $shipping_line['total'] ) ? floatval( $shipping_line['total'] ) : $default_total, array(), $shipping_method );
 
 					if ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) && ! empty( $chosen_tax_rate_id ) ) {
-						$rate->taxes = array( $chosen_tax_rate_id => $data[ self::$fields['order_shipping_tax'] ] );
+						$shipping_rate->taxes = array( $chosen_tax_rate_id => $data[ self::$fields['order_shipping_tax'] ] );
 					}
 
-					$shipping_id = $subscription->add_shipping( $rate );
+					$shipping_line_item = new WC_Order_Item_Shipping();
+					$shipping_line_item->set_props( array(
+						'method_title' => $shipping_rate->label,
+						'method_id'    => $shipping_rate->id,
+						'total'        => wc_format_decimal( $shipping_rate->cost ),
+						'taxes'        => $shipping_rate->taxes,
+						'order_id'     => $subscription->get_id(),
+					) );
+					foreach ( $shipping_rate->get_meta_data() as $key => $value ) {
+						$shipping_line_item->add_meta_data( $key, $value, true );
+					}
+					$shipping_line_item->save();
+					$subscription->add_item( $shipping_line_item );
+					wc_do_deprecated_action( 'woocommerce_order_add_shipping', array( $subscription->get_id(), $shipping_line_item->get_id(), $shipping_rate ), '3.0', 'woocommerce_new_order_item action instead.' );
+					$shipping_id = $shipping_line_item->get_id();
+
 					if ( ! $shipping_id ) {
 						throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription, a subscription not been created for this row.', 'wcs-import-export' ) );
 					}
