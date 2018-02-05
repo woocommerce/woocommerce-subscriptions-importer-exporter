@@ -819,7 +819,6 @@ class WCS_Importer {
 		$shipping_items   = explode( ';', $data[ self::$fields['shipping_method'] ] );
 		$shipping_method  = '';
 		$default_total    = ( ! empty( $data[ self::$fields['order_shipping'] ] ) ) ? $data[ self::$fields['order_shipping'] ] : 0;
-		$subscription_id  = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_id() : $subscription->id;
 
 		if ( ! empty( $shipping_items ) ) {
 			foreach ( $shipping_items as $shipping_item ) {
@@ -849,8 +848,8 @@ class WCS_Importer {
 						throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription, a subscription not been created for this row.', 'wcs-import-export' ) );
 					}
 
-					update_post_meta( $subscription_id, '_shipping_method', $shipping_method );
-					update_post_meta( $subscription_id, '_shipping_method_title', $shipping_title );
+					update_post_meta( $subscription->get_id(), '_shipping_method', $shipping_method );
+					update_post_meta( $subscription->get_id(), '_shipping_method_title', $shipping_title );
 				}
 			}
 		}
