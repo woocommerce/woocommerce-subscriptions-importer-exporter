@@ -434,6 +434,10 @@ class WCS_Importer {
 					}
 				}
 
+				if ( ! self::$test_mode ) {
+					$subscription->save();
+				}
+
 				$wpdb->query( 'COMMIT' );
 
 			} catch ( Exception $e ) {
@@ -896,7 +900,18 @@ class WCS_Importer {
 				if ( ! empty( $tax_rate ) ) {
 					if ( ! self::$test_mode ) {
 						$tax_rate = array_pop( $tax_rate );
-						$tax_id   = $subscription->add_tax( $tax_rate->tax_rate_id, ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) ) ? $data[ self::$fields['order_shipping_tax'] ] : 0, ( ! empty( $data[ self::$fields['order_tax'] ] ) ) ? $data[ self::$fields['order_tax'] ] : 0 );
+
+						$tax_line_item = new WC_Order_Item_Tax();
+						$tax_line_item->set_props( array(
+							'rate_id'            => $tax_rate->tax_rate_id,
+							'tax_total'          => ( ! empty( $data[ self::$fields['order_tax'] ] ) ) ? $data[ self::$fields['order_tax'] ] : 0,
+							'shipping_tax_total' => ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) ) ? $data[ self::$fields['order_shipping_tax'] ] : 0,
+						) );
+						$tax_line_item->set_rate( $tax_rate->tax_rate_id );
+						$tax_line_item->set_order_id( $subscription->get_id() );
+						$tax_line_item->save();
+						$subscription->add_item( $tax_line_item );
+						$tax_id = $tax_line_item->get_id();
 
 						if ( ! $tax_id ) {
 							$result['warning'][] = esc_html__( 'Tax line item could not properly be added to this subscription. Please review this subscription.', 'wcs-import-export' );
