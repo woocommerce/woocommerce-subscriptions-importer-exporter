@@ -578,12 +578,10 @@ class WCS_Importer {
 	public static function save_download_permissions( $subscription, $product, $quantity = 1 ) {
 
 		if ( $product && $product->exists() && $product->is_downloadable() ) {
-			$downloads  = version_compare( WC()->version, '3.0', '>=' ) ? $product->get_downloads() : $product->get_files();
-			$product_id = version_compare( WC()->version, '3.0', '>=' ) ? $product->get_id() :
-				isset( $product->variation_id ) ? $product->variation_id : $product->id;
+			$downloads = $product->get_downloads();
 
 			foreach ( array_keys( $downloads ) as $download_id ) {
-				wc_downloadable_file_permission( $download_id, $product_id, $subscription, $quantity );
+				wc_downloadable_file_permission( $download_id, $product->get_id(), $subscription, $quantity );
 			}
 		}
 	}
