@@ -23,7 +23,7 @@ To do this, open your `~/.bash_profile` file and add something like (modifying t
 
 3) Make sure you have the core WooCommerce and WooCommerce Subscriptions plugins/repositories  installed in the same parent directory as your WooCommerce Subscriptions Importer extension (i.e. `/wp-content/plugins/`). 
 
-You will need WooCommerce 2.3 and WooCommerce Subscriptions 2.0 or newer from the official github repo as it includes unit testing framework and helper methods relied upon by these tests.
+You will need WooCommerce 3.0 and WooCommerce Subscriptions 2.2 or newer from the official github repo as it includes unit testing framework and helper methods relied upon by these tests.
 
 4) Create a github personal access token following the standard [github instructions](https://help.github.com/articles/creating-an-access-token-for-command-line-use/) with the `Access private repositories` scope. This token does NOT need any other scopes/permissions to delete, write etc.
 
