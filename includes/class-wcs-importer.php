@@ -653,7 +653,17 @@ class WCS_Importer {
 				}
 
 				if ( ! self::$test_mode ) {
-					$coupon_id = $subscription->add_coupon( $coupon_code, $discount_amount );
+
+					$coupon_line_item = new WC_Order_Item_Coupon();
+					$coupon_line_item->set_props( array(
+						'code'         => $coupon_code,
+						'discount'     => $discount_amount,
+						'discount_tax' => 0,
+						'order_id'     => $subscription->get_id(),
+					) );
+					$coupon_line_item->save();
+					$subscription->add_item( $coupon_line_item );
+					$coupon_id =  $coupon_line_item->get_id();
 
 					if ( ! $coupon_id ) {
 						throw new Exception( sprintf( esc_html__( 'Coupon "%s" could not be added to subscription.', 'wcs-import-export' ), $coupon_code ) );
