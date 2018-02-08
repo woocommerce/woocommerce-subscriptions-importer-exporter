@@ -334,6 +334,9 @@ class WCS_Importer {
 						}
 					}
 
+					// Now that we've set all the meta data, reinit the object so the data is set
+					$subscription = wcs_get_subscription( $subscription_id );
+
 					$subscription->update_dates( $dates_to_update );
 
 					if ( ! $set_manual && ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
