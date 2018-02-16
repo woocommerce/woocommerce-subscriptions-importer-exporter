@@ -17,6 +17,8 @@ env:
   - WP_VERSION=4.4 WC_VERSION=2.6.4 WCS_VERSION=2.0.18 CODECOV=0
   - WP_VERSION=4.3 WC_VERSION=2.6.4 WCS_VERSION=2.0.18 CODECOV=0
 
+dist: precise
+
 branches:
   only:
     - master
