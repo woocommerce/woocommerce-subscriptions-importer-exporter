@@ -175,6 +175,28 @@ To view the shutdown logs:
 01-12-2016 @ 05:52:16 - PHP Fatal error Call to undefined method WCS_Importer::add_coupons() in /Users/Matt/Dropbox/Sites/subs2.0/wp-content/plugins/woocommerce-subscriptions-importer-exporter/includes/class-wcs-import-parser.php on line 425.
 ```
 
+### Import HTTP Error Handling
+
+While the _Import Error Logs_ handle PHP errors that can be caught and logged, the Importer will also attempt to handle HTTP errors from Ajax.
+
+To this, it will:
+
+1. catch a HTTP error code returned by the request and
+    1. display the HTTP error in the _Importing Results_ table
+    1. output the full `xmlhttprequest` object to the console
+1. wait for 20 seconds
+1. resume the import by attempting the next set of rows
+
+Importantly, **the set of rows with a failure will not be reattempted as there is no way to know which subscriptions were imported successfully**. The subscriptions in the rows with HTTP errors need to be manually checked.
+
+To aid in checking these rows, the Importer will provide:
+
+1. the rows affected during the import when the HTTP error code is detected
+1. a list of all rows affected during the entire import once the import process completes
+
+![](https://cl.ly/2c353z3d0k1i/Screen%20Shot%202018-02-23%20at%2010.23.17%20am.png)
+**Screenshot of CSV Import affected by various HTTP errors**
+
 ## CSV Formatting Guide
 By far the most difficult aspect of migrating your subscriptions using the CSV Importer is formatting a valid CSV with all required data.
 

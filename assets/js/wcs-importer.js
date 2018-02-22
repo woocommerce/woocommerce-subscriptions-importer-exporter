@@ -4,8 +4,9 @@ jQuery(document).ready(function ($) {
 		import_count = 0,
 		warning_count = 0,
 		error_count = 0,
+		retry_count = 0,
 		estimate,
-		$wcsi_timeout = $('#wcsi-timeout'),
+		$wcsi_error = $('#wcsi-error'),
 		$wcsi_time_completition = $('#wcsi-time-completion'),
 		$wcsi_estimated_time = $('#wcsi-estimated-time'),
 		$wcsi_completed_message = $('#wcsi-completed-message'),
@@ -62,6 +63,9 @@ jQuery(document).ready(function ($) {
 						append_text = '',
 						append_warning_text = '',
 						append_failed_text = '';
+
+					// Reset the failed import retry count after a successful import
+					retry_count = 0;
 
 					if (wcsi_data.test_mode === 'false') {
 						for (i = 0; i < results.length; i += 1) {
@@ -169,6 +173,7 @@ jQuery(document).ready(function ($) {
 					counter += 2;
 
 					if ((counter / 2) >= wcsi_data.total) {
+						display_http_error_rows();
 						if (wcsi_data.test_mode === 'false') {
 							$importer_loading.addClass('finished').removeClass('importer-loading');
 							$importer_loading.html('<td colspan="6" class="row">' + wcsi_data.finished_importing + '</td>');
@@ -182,16 +187,86 @@ jQuery(document).ready(function ($) {
 					}
 				},
 				error: function (xmlhttprequest, textstatus) {
-					$importer_loading.addClass('finished').removeClass('importer-loading');
-					if (textstatus === 'timeout') {
-						$wcsi_timeout.show();
-						$wcsi_completed_message.html($wcsi_timeout.html());
+
+					// Log the full error details to the console
+					console.log('Subscriptions CSV Import Error: xmlhttprequest = ', xmlhttprequest);
+
+					var table_row_data,
+						retry_wait_time     = 20000,
+						// Retry for 5 minutes before finally calling it quits
+						retry_attempts      = ( 300000 / retry_wait_time ),
+						last_csv_row_number = wcsi_data.start_row_num[counter / 2];
+
+					table_row_data  = '<tr class="error-import http-error-import">';
+					table_row_data += '<td class="row warning error-import" colspan="6">';
+					table_row_data += '<p><strong>HTTP error: <span class="http-error-code">' + xmlhttprequest.status + ' - ' + xmlhttprequest.statusText + '</span></strong></p>';
+					table_row_data += '<p>Last import batch start at CSV row number: ' + last_csv_row_number + '. <strong>The <span class="rows-with-http-errors">' + wcsi_data.rows_per_request + ' rows after row ' + last_csv_row_number + '</span> will not be reattempted</strong>. Please manually verify if those subscriptions were imported.</p>';
+
+					if ( retry_count >= retry_attempts ) {
+
+						table_row_data += '<p><strong>Terminating import due to HTTP errors.</strong> Maximum retry attempts (' + retry_attempts + ') completed unsuccessfully.</p>';
+						table_row_data += '</td>';
+						table_row_data += '</tr>';
+
+						$wcsi_all_tbody.append( table_row_data );
+
+						display_http_error_rows();
+
+						$importer_loading.addClass('finished').removeClass('importer-loading');
+
+						$wcsi_error.show();
+						$wcsi_completed_message.html($wcsi_error.html());
 						$wcsi_completed_message.show();
 						$wcsi_time_completition.hide();
-					}
-				}
 
+						return;
+					}
+
+					table_row_data += '<p>Another import request will be attempted in ' + retry_wait_time / 1000 + ' seconds.</p>';
+					table_row_data += '<p>' + retry_count + ' retry attempts completed already of the ' + retry_attempts + ' attempts that will be performed before terminating the import.</p>';
+					table_row_data += '</td>';
+					table_row_data += '</tr>';
+
+					$wcsi_all_tbody.append( table_row_data );
+
+					setTimeout( function() {
+
+						counter += 2;
+
+						retry_count++;
+
+						table_row_data  = '<tr class="http-error-import-retry">';
+						table_row_data += '<td class="row warning" colspan="6">Waited ' + retry_wait_time / 1000 + ' seconds, attempting import again starting at row number ' + wcsi_data.start_row_num[counter / 2] + '.</td>';
+						table_row_data += '</tr>';
+
+						$wcsi_all_tbody.append( table_row_data );
+
+						ajax_import( wcsi_data.file_positions[counter], wcsi_data.file_positions[counter + 1], wcsi_data.start_row_num[counter / 2] );
+					}, retry_wait_time );
+				}
 			});
+		},
+		display_http_error_rows = function () {
+			var table_row_data,
+				http_error_count = $('.rows-with-http-errors').length;
+
+			if ( http_error_count < 1 ) {
+				return;
+			}
+
+			table_row_data  = '<tr class="error-import http-error-import">';
+			table_row_data += '<td class="row warning error-import" colspan="6"><strong>HTTP errors interrupted ' + http_error_count + ' of the attempts to import. Please manually confirm successful import of the following rows of the CSV file:</strong>.';
+			table_row_data += '<ol>';
+
+			$('.http-error-import').each(function() {
+				table_row_data += '<li>' + $('.rows-with-http-errors',this).text() + ' (Error code ' + $('.http-error-code',this).text() + ')</li>';
+			});
+
+			table_row_data += '</ol>';
+			table_row_data += '</td>';
+			table_row_data += '</tr>';
+
+			$wcsi_all_tbody.append( table_row_data );
 		},
 		populate_test_errors = function (errors, wcsi_data) {
 			var results_text = '',

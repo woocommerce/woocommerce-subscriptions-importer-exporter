@@ -52,6 +52,12 @@
 	padding-left: 1em;
 }
 
+#wcsi-progress .http-error-import-retry td.row,
+#wcsi-progress .http-error-import td.row {
+	text-align: left;
+	padding-left: 6em;
+}
+
 .wcsier-download {
 	display: inline-block;
 	margin-right: 16px;
