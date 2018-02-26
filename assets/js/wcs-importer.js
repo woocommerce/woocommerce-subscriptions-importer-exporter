@@ -102,8 +102,10 @@ jQuery(document).ready(function ($) {
 								}
 							} else {
 								table_data += '<td class="row error-import">' + wcsi_data.failed + '</td>';
-								for (x = 0; x < results[i].error.length; x += 1) {
-									error_string += '<br>' + (x + 1) + '. ' + results[i].error[x];
+								if (typeof results[i].error !== 'undefined') {
+									for (x = 0; x < results[i].error.length; x += 1) {
+										error_string += '<br>' + (x + 1) + '. ' + results[i].error[x];
+									}
 								}
 
 								table_data += '<td colspan="5">' + wcsi_data.error_string + '</td>';
