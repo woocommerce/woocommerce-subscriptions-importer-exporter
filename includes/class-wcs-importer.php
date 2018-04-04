@@ -79,9 +79,43 @@ class WCS_Importer {
 
 		self::import_start( $file_path, $data['file_start'], $data['file_end'] );
 
+		self::add_order_key_post_meta_if_missing();
+
 		remove_action( 'shutdown', 'WCS_Import_Logger::shutdown_handler' );
 
 		return self::$results;
+	}
+
+	/**
+	 * Looks for subscriptions whose order_key post meta is missing or NULL or empty in the database
+	 * and generates order_key for them
+	 *
+	 * @since 2.1
+	 */
+	public static function add_order_key_post_meta_if_missing() {
+		global $wpdb;
+
+		// Get the post_ids of the subscriptions whose order_key post meta is NULL or empty or missing
+		$subscription_ids_needing_order_key = $wpdb->get_results( "
+			SELECT ID FROM {$wpdb->prefix}posts WHERE
+				post_type = 'shop_subscription'
+					AND
+				ID NOT IN (
+					SELECT post_id FROM mywcs_postmeta WHERE
+						meta_key = '_order_key'
+							AND
+						meta_value IS NOT NULL
+							AND
+						meta_value <> ''
+				)
+					AND
+				post_status IN ( '" . implode( "','", array_keys( wcs_get_subscription_statuses() ) ) . "' )"
+		);
+
+		//Set the order_key post meta for each of them
+		foreach( $subscription_ids_needing_order_key as $key => $post ) {
+			update_post_meta( $post->ID, '_order_key', uniqid( 'order_' ) );
+		}
 	}
 
 	/**
