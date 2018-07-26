@@ -145,7 +145,7 @@ class WCS_Importer {
 
 		self::$row  = $data;
 		$set_manual = $requires_manual_renewal = false;
-		$post_meta  = array();
+		$post_meta  = $order_items = array();
 		$result     = array(
 			'warning'    => array(),
 			'error'      => array(),
@@ -247,7 +247,7 @@ class WCS_Importer {
 			$status              = 'pending';
 			$result['warning'][] = esc_html__( 'No subscription status was specified. The subscription will be created with the status "pending". ', 'wcs-import-export' );
 		} else {
-			$status = $data[ self::$fields['subscription_status'] ];
+			$status = ( 'wc-' === substr( $data[ self::$fields['subscription_status'] ], 0, 3 ) ) ? substr( $data[ self::$fields['subscription_status'] ], 3 ) : $data[ self::$fields['subscription_status'] ];
 		}
 
 		$dates_to_update = array( 'start' => ( ! empty( $data[ self::$fields['start_date'] ] ) ) ? gmdate( 'Y-m-d H:i:s', strtotime( $data[ self::$fields['start_date'] ] ) ) : gmdate( 'Y-m-d H:i:s', time() - 1 ) );
@@ -279,7 +279,7 @@ class WCS_Importer {
 		}
 
 		// make the sure end of prepaid term exists for subscription that are about to be set to pending-cancellation - continue to use the next payment date if that exists
-		if ( in_array( $status, array( 'pending-cancel', 'wc-pending-cancel' ) ) && ( empty( $dates_to_update['next_payment_date'] ) || strtotime( $dates_to_update['next_payment_date'] ) < current_time( 'timestamp', true ) ) ) {
+		if ( 'pending-cancel' == $status && ( empty( $dates_to_update['next_payment_date'] ) || strtotime( $dates_to_update['next_payment_date'] ) < current_time( 'timestamp', true ) ) ) {
 			if ( ! empty( $dates_to_update['end_date'] ) && strtotime( $dates_to_update['end_date'] ) > current_time( 'timestamp', true ) ) {
 				$dates_to_update['next_payment_date'] = $dates_to_update['end_date'];
 				unset( $dates_to_update['end_date'] );
@@ -336,15 +336,7 @@ class WCS_Importer {
 
 					$subscription->update_dates( $dates_to_update );
 
-					add_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
-					add_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
-
-					$subscription->update_status( $status );
-
-					remove_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
-					remove_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
-
-					if ( ! $set_manual && ! $subscription->has_status( wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
+					if ( ! $set_manual && ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
 					}
 
@@ -383,15 +375,12 @@ class WCS_Importer {
 					if ( is_numeric( $data[ self::$fields['order_items'] ] ) ) {
 						$product_id      = absint( $data[ self::$fields['order_items'] ] );
 						$result['items'] = self::add_product( $subscription, array( 'product_id' => $product_id ), $chosen_tax_rate_id );
-
-						if ( ! self::$test_mode && self::$add_memberships ) {
-							self::maybe_add_memberships( $user_id, $subscription_id, $product_id );
-						}
+						$order_items[]   = $product_id;
 					} else {
-						$order_items = explode( ';', $data[ self::$fields['order_items'] ] );
+						$order_items_row = explode( ';', $data[ self::$fields['order_items'] ] );
 
-						if ( ! empty( $order_items ) ) {
-							foreach ( $order_items as $order_item ) {
+						if ( ! empty( $order_items_row ) ) {
+							foreach ( $order_items_row as $order_item ) {
 								$item_data = array();
 
 								foreach ( explode( '|', $order_item ) as $item ) {
@@ -400,10 +389,7 @@ class WCS_Importer {
 								}
 
 								$result['items'] .= self::add_product( $subscription, $item_data, $chosen_tax_rate_id ) . '<br/>';
-
-								if ( ! self::$test_mode && self::$add_memberships ) {
-									self::maybe_add_memberships( $user_id, $subscription_id, $item_data['product_id'] );
-								}
+								$order_items[]    = $item_data['product_id'];
 							}
 						}
 					}
@@ -429,6 +415,22 @@ class WCS_Importer {
 
 					if ( empty( $shipping_method ) ) {
 						$result['warning'][] = esc_html__( 'Shipping method and title for the subscription have been left as empty. ', 'wcs-import-export' );
+					}
+				}
+
+				if ( ! self::$test_mode ) {
+					add_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
+					add_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
+
+					$subscription->update_status( $status );
+
+					remove_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
+					remove_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
+
+					if ( self::$add_memberships ) {
+						foreach ( $order_items as $product_id ) {
+							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
+						}
 					}
 				}
 
@@ -605,6 +607,13 @@ class WCS_Importer {
 			foreach ( self::$membership_plans as $plan ) {
 				if ( $plan->has_product( $product_id ) ) {
 					$plan->grant_access_from_purchase( $user_id, $product_id, $subscription_id );
+				}
+
+				// if the product is a variation we want to also check if the parent variable product has any plans as well and add them
+				$product   = wc_get_product( $product_id );
+				$parent_id = wcs_get_objects_property( $product, 'parent_id' );
+				if ( $product && $product->is_type( 'variation' ) && ! empty( $parent_id ) && $plan->has_product( $parent_id ) ) {
+					$plan->grant_access_from_purchase( $user_id, $product->parent->id, $subscription_id );
 				}
 			}
 		}
