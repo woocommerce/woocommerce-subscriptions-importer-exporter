@@ -13,7 +13,7 @@ class WCS_Import_Admin {
 	public function __construct() {
 
 		$this->admin_url        = admin_url( 'admin.php?page=import_subscription' );
-		$this->rows_per_request = ( defined( 'WCS_IMPORT_ROWS_PER_REQUEST' ) ) ? WCS_IMPORT_ROWS_PER_REQUEST : 20;
+		$this->rows_per_request = ( defined( 'WCS_IMPORT_ROWS_PER_REQUEST' ) ) ? WCS_IMPORT_ROWS_PER_REQUEST : 10;
 
 		add_action( 'admin_init', array( &$this, 'post_request_handler' ) );
 		add_action( 'admin_init', array( &$this, 'add_import_tool' ) );

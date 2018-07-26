@@ -334,6 +334,9 @@ class WCS_Importer {
 						}
 					}
 
+					// Now that we've set all the meta data, reinit the object so the data is set
+					$subscription = wcs_get_subscription( $subscription_id );
+
 					$subscription->update_dates( $dates_to_update );
 
 					if ( ! $set_manual && ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
@@ -432,6 +435,10 @@ class WCS_Importer {
 							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
 						}
 					}
+				}
+
+				if ( ! self::$test_mode ) {
+					$subscription->save();
 				}
 
 				$wpdb->query( 'COMMIT' );
@@ -578,12 +585,10 @@ class WCS_Importer {
 	public static function save_download_permissions( $subscription, $product, $quantity = 1 ) {
 
 		if ( $product && $product->exists() && $product->is_downloadable() ) {
-			$downloads  = version_compare( WC()->version, '3.0', '>=' ) ? $product->get_downloads() : $product->get_files();
-			$product_id = version_compare( WC()->version, '3.0', '>=' ) ? $product->get_id() :
-				isset( $product->variation_id ) ? $product->variation_id : $product->id;
+			$downloads = $product->get_downloads();
 
 			foreach ( array_keys( $downloads ) as $download_id ) {
-				wc_downloadable_file_permission( $download_id, $product_id, $subscription, $quantity );
+				wc_downloadable_file_permission( $download_id, $product->get_id(), $subscription, $quantity );
 			}
 		}
 	}
@@ -651,7 +656,17 @@ class WCS_Importer {
 				}
 
 				if ( ! self::$test_mode ) {
-					$coupon_id = $subscription->add_coupon( $coupon_code, $discount_amount );
+
+					$coupon_line_item = new WC_Order_Item_Coupon();
+					$coupon_line_item->set_props( array(
+						'code'         => $coupon_code,
+						'discount'     => $discount_amount,
+						'discount_tax' => 0,
+						'order_id'     => $subscription->get_id(),
+					) );
+					$coupon_line_item->save();
+					$subscription->add_item( $coupon_line_item );
+					$coupon_id =  $coupon_line_item->get_id();
 
 					if ( ! $coupon_id ) {
 						throw new Exception( sprintf( esc_html__( 'Coupon "%s" could not be added to subscription.', 'wcs-import-export' ), $coupon_code ) );
@@ -679,12 +694,12 @@ class WCS_Importer {
 		}
 
 		$_product = wc_get_product( $data['product_id'] );
-		$_product_id  = version_compare( WC()->version, '3.0', '>=' ) ? $_product->get_id() : $_product->id;
 
 		if ( ! $_product ) {
 			throw new Exception( sprintf( __( 'No product or variation in your store matches the product ID #%s.', 'wcs-import-export' ), $data['product_id'] ) );
 		}
 
+		$_product_id    = version_compare( WC()->version, '3.0', '>=' ) ? $_product->get_id() : $_product->id;
 		$line_item_name = ( ! empty( $data['name'] ) ) ? $data['name'] : $_product->get_title();
 		$product_string = sprintf( '<a href="%s">%s</a>', get_edit_post_link( $_product_id ), $line_item_name );
 
@@ -783,11 +798,11 @@ class WCS_Importer {
 				$fee->taxable   = false;
 				$fee->tax       = 0;
 				$fee->tax_data  = array();
-				$fee->tax_class = '';
+				$fee->tax_class = 0;
 
 				if ( ! empty( $fee_data['tax'] ) ) {
 					$fee->tax       = wc_format_decimal( $fee_data['tax'] );
-					$fee->tax_class = ( ! empty( $fee_data['tax_class'] ) ) ? $fee_data['tax_class'] : '';
+					$fee->tax_class = ( ! empty( $fee_data['tax_class'] ) ) ? $fee_data['tax_class'] : 0;
 					$fee->taxable   = true;
 
 					if ( ! empty( $chosen_tax_rate_id ) ) {
@@ -796,7 +811,22 @@ class WCS_Importer {
 				}
 
 				if ( ! self::$test_mode ) {
-					$fee_id = $subscription->add_fee( $fee );
+
+					$fee_line_item = new WC_Order_Item_Fee();
+					$fee_line_item->set_props( array(
+						'name'      => $fee->name,
+						'tax_class' => $fee->taxable ? $fee->tax_class : 0,
+						'total'     => $fee->amount,
+						'total_tax' => $fee->tax,
+						'taxes'     => array(
+							'total' => $fee->tax_data,
+						),
+						'order_id'  => $subscription->get_id(),
+					) );
+					$fee_line_item->save();
+					$subscription->add_item( $fee_line_item );
+
+					$fee_id = $fee_line_item->get_id();
 
 					if ( ! $fee_id ) {
 						throw new Exception( __( 'Could not add the fee to your subscription, the subscription has not been imported.', 'wcs-import-export' ) );
@@ -819,7 +849,6 @@ class WCS_Importer {
 		$shipping_items   = explode( ';', $data[ self::$fields['shipping_method'] ] );
 		$shipping_method  = '';
 		$default_total    = ( ! empty( $data[ self::$fields['order_shipping'] ] ) ) ? $data[ self::$fields['order_shipping'] ] : 0;
-		$subscription_id  = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_id() : $subscription->id;
 
 		if ( ! empty( $shipping_items ) ) {
 			foreach ( $shipping_items as $shipping_item ) {
@@ -838,19 +867,34 @@ class WCS_Importer {
 				$shipping_title  = isset( $shipping_line['method_title'] ) ? $shipping_line['method_title'] : $shipping_method;
 
 				if ( ! self::$test_mode ) {
-					$rate = new WC_Shipping_Rate( $shipping_method, $shipping_title, isset( $shipping_line['total'] ) ? floatval( $shipping_line['total'] ) : $default_total, array(), $shipping_method );
+					$shipping_rate = new WC_Shipping_Rate( $shipping_method, $shipping_title, isset( $shipping_line['total'] ) ? floatval( $shipping_line['total'] ) : $default_total, array(), $shipping_method );
 
 					if ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) && ! empty( $chosen_tax_rate_id ) ) {
-						$rate->taxes = array( $chosen_tax_rate_id => $data[ self::$fields['order_shipping_tax'] ] );
+						$shipping_rate->taxes = array( $chosen_tax_rate_id => $data[ self::$fields['order_shipping_tax'] ] );
 					}
 
-					$shipping_id = $subscription->add_shipping( $rate );
+					$shipping_line_item = new WC_Order_Item_Shipping();
+					$shipping_line_item->set_props( array(
+						'method_title' => $shipping_rate->label,
+						'method_id'    => $shipping_rate->id,
+						'total'        => wc_format_decimal( $shipping_rate->cost ),
+						'taxes'        => $shipping_rate->taxes,
+						'order_id'     => $subscription->get_id(),
+					) );
+					foreach ( $shipping_rate->get_meta_data() as $key => $value ) {
+						$shipping_line_item->add_meta_data( $key, $value, true );
+					}
+					$shipping_line_item->save();
+					$subscription->add_item( $shipping_line_item );
+					wc_do_deprecated_action( 'woocommerce_order_add_shipping', array( $subscription->get_id(), $shipping_line_item->get_id(), $shipping_rate ), '3.0', 'woocommerce_new_order_item action instead.' );
+					$shipping_id = $shipping_line_item->get_id();
+
 					if ( ! $shipping_id ) {
 						throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription, a subscription not been created for this row.', 'wcs-import-export' ) );
 					}
 
-					update_post_meta( $subscription_id, '_shipping_method', $shipping_method );
-					update_post_meta( $subscription_id, '_shipping_method_title', $shipping_title );
+					update_post_meta( $subscription->get_id(), '_shipping_method', $shipping_method );
+					update_post_meta( $subscription->get_id(), '_shipping_method_title', $shipping_title );
 				}
 			}
 		}
@@ -899,7 +943,18 @@ class WCS_Importer {
 				if ( ! empty( $tax_rate ) ) {
 					if ( ! self::$test_mode ) {
 						$tax_rate = array_pop( $tax_rate );
-						$tax_id   = $subscription->add_tax( $tax_rate->tax_rate_id, ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) ) ? $data[ self::$fields['order_shipping_tax'] ] : 0, ( ! empty( $data[ self::$fields['order_tax'] ] ) ) ? $data[ self::$fields['order_tax'] ] : 0 );
+
+						$tax_line_item = new WC_Order_Item_Tax();
+						$tax_line_item->set_props( array(
+							'rate_id'            => $tax_rate->tax_rate_id,
+							'tax_total'          => ( ! empty( $data[ self::$fields['order_tax'] ] ) ) ? $data[ self::$fields['order_tax'] ] : 0,
+							'shipping_tax_total' => ( ! empty( $data[ self::$fields['order_shipping_tax'] ] ) ) ? $data[ self::$fields['order_shipping_tax'] ] : 0,
+						) );
+						$tax_line_item->set_rate( $tax_rate->tax_rate_id );
+						$tax_line_item->set_order_id( $subscription->get_id() );
+						$tax_line_item->save();
+						$subscription->add_item( $tax_line_item );
+						$tax_id = $tax_line_item->get_id();
 
 						if ( ! $tax_id ) {
 							$result['warning'][] = esc_html__( 'Tax line item could not properly be added to this subscription. Please review this subscription.', 'wcs-import-export' );
