@@ -145,6 +145,9 @@ class WCS_Exporter {
 				case 'last_payment_date':
 					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'last_order_date_created' ) : $subscription->last_payment_date;
 					break;
+				case 'cancelled_date':
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'cancelled' ) : $subscription->cancelled_date;
+					break;
 				case 'end_date':
 					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'end' ) : $subscription->end_date;
 					break;
