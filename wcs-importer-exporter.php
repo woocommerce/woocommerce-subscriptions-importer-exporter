@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Subscriptions CSV Importer and Exporter
  * Plugin URI: https://github.com/Prospress/woocommerce-subscriptions-importer-exporter
  * Description: Import or export subscriptions in your WooCommerce store via CSV.
- * Version: 2.0-RC-1
+ * Version: 2.0.0
  * Author: Prospress Inc
  * Author URI: http://prospress.com
  * License: GPLv3
@@ -49,7 +49,7 @@ class WCS_Importer_Exporter {
 
 	public static $wcs_exporter;
 
-	public static $version = '2.0.0-RC-1';
+	public static $version = '2.0.0';
 
 	protected static $required_subscriptions_version = '2.2.0';
 
