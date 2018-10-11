@@ -376,11 +376,7 @@ class WCS_Export_Admin {
 		);
 
 		if ( ! empty( $_POST['status'] ) ) {
-			$statuses = array_keys( $_POST['status'] );
-
-			if ( ! empty( $statuses ) && is_array( $statuses ) ) {
-				$args['subscription_status'] = implode( ',', $statuses );
-			}
+			$args['subscription_status'] = array_keys( $_POST['status'] );
 		}
 
 		if ( ! empty( $_POST['customer'] ) && is_numeric( $_POST['customer'] ) ) {
