@@ -213,7 +213,7 @@ Please follow these general rules when formatting your CSV file:
 * Most fields are not required. However, to avoid creating subscriptions with unintended default data applied, specify as many fields as possible in your CSV.
 * Two-letter country and state/county abbreviations should be used for all country, state or county data.
 * Date values should always be in UTC/GMT timezone.
-* Date fields can be in any string format handled by PHP's `strtotime()` function. However, `strtotime()` is a strange beast that on occasion creates unexpected date strings. It also doesn't always handle timezones as expected. Becuase of this, we encourage you to always use MySQL format for dates, e.g. `YYYY-MM-DD HH:MM:SS` or in [PHP's date formatting terms](http://php.net/manual/en/function.date.php) `y-m-d H:i:s`). For example, `1984-01-22 17:45:13`.
+* Date fields can be in any string format handled by PHP's `strtotime()` function. However, `strtotime()` is a strange beast that on occasion creates unexpected date strings. It also doesn't always handle timezones as expected. Becuase of this, we encourage you to always use MySQL format for dates, e.g. `YYYY-MM-DD HH:MM:SS` or in [PHP's date formatting terms](http://php.net/manual/en/function.date.php) `y-m-d H:i:s`). For example, `1970-01-01 00:00:01`.
 * All dollar amounts can be either an integer or decima/float value. For example, `5.65`, `3` and `127.2` are all valid.
 * Arrays are formated as `key:value|key:value|key:value`.
 
