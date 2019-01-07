@@ -28,7 +28,7 @@ If you think you have found a bug in the extension, problem with the documentati
 # Subscriptions Importer
 With the WooCommerce Subscriptions CSV Importer, you can import subscriptions from a CSV file into your WooCommerce store. This is particularly useful when migrating stores from a different eCommerce platform.
 
-The subscriptions will be setup with the [WooCommerce Subscriptions](https://www.woothemes.com/products/woocommerce-subscriptions/) extension to process future recurring payments.
+The subscriptions will be setup with the [WooCommerce Subscriptions](https://www.woocommerce.com/products/woocommerce-subscriptions/) extension to process future recurring payments.
 
 ![](https://cldup.com/r53E41w11p.png)
 
@@ -95,9 +95,9 @@ Please note: the minimum requirement for creating a new user is an email address
 
 #### Add Memberships
 
-If you have [WooCommerce Memberships](https://www.woothemes.com/products/woocommerce-memberships/) active on your site, you will also be presented with the option to **Add Memberships**.
+If you have [WooCommerce Memberships](https://www.woocommerce.com/products/woocommerce-memberships/) active on your site, you will also be presented with the option to **Add Memberships**.
 
-When this option is enabled, subscriptions imported with product line items linked to a [membership plan](https://docs.woothemes.com/document/woocommerce-memberships-plans/) will also grant the subscriber's user account with corresponding membership access.
+When this option is enabled, subscriptions imported with product line items linked to a [membership plan](https://docs.woocommerce.com/document/woocommerce-memberships-plans/) will also grant the subscriber's user account with corresponding membership access.
 
 ### Column Mapping
 
@@ -261,11 +261,11 @@ Please follow these general rules when formatting your CSV file:
 |`order_shipping_tax`|`float`|The total tax amount included in the total shipping amount.|`0`|
 |`order_total`|`float`|The total amount to charge for each renewal payment. Displayed on the subscription and each renewal order.|`0`|
 |`order_tax`|`float`|The total tax amount to be charged with each renewal payment.|`0`|
-|`order_currency`|`string`|A three character currency code (e.g. `USD`). Represents the currency in which renewal payments should be processed.|[Store's currency](https://docs.woothemes.com/document/shop-currency/).|
+|`order_currency`|`string`|A three character currency code (e.g. `USD`). Represents the currency in which renewal payments should be processed.|[Store's currency](https://docs.woocommerce.com/document/shop-currency/).|
 |`shipping_method`|`mixed`|This can be either the shipping method ID as seen in the table at **WooCommerce > Settings > Shipping** page, i.e. `"free_shipping"` or `"flat_rate"`, or this can be an in the format `"shipping_id:flat_rate:|shipping_title:Flat Rate|total:10.00"`.|-|
 |`download_permissions`|`int`|Can be either `true` / `1` to grant download permissions for product line items on the subscription, or `false` / `0` to not grant download permissions.|`false`|
 |`order_notes`|`array`|A string of order notes separated by the `;` symbol. For example `"Payment received.;Subscription activated."` will create two order notes on your subscription.|-|
-|`payment_method`|`string`|Set as the Gateway ID which can be seen in table at **WooCommerce > Settings > Checkout**. Leave blank for [manual renewals](http://docs.woothemes.com/document/subscriptions/renewal-process/).|-|
+|`payment_method`|`string`|Set as the Gateway ID which can be seen in table at **WooCommerce > Settings > Checkout**. Leave blank for [manual renewals](http://docs.woocommerce.com/document/subscriptions/renewal-process/).|-|
 |`payment_method_title`|`string`|The name of the payment gateway to display to the customer when viewing the subscription or related orders (e.g. "Credit Card")|The value of `payment_method`, if set, else `''`.|
 |`payment_method_post_meta`|`array`|Payment gateway meta data required to process automatic recurring payments. See [Importing Payment Gateway Meta Data](#importing-payment-gateway-meta-data) for more information.|-|
 |`payment_method_user_meta`|`array`|Payment gateway meta data required to process automatic recurring payments. See [Importing Payment Gateway Meta Data](#importing-payment-gateway-meta-data) for more information.|-|
@@ -277,7 +277,7 @@ Please follow these general rules when formatting your CSV file:
 If any of the above columns contains invalid data, the importer will display these during in the test run. If you choose to ignore the errors and continue to import with invalid data, no subscription will be imported for that row.
 
 ### Importing Payment Gateway Meta Data
-You can import payment gateway meta data, like customer or credit card tokens, in your CSV file to link a subscription with a payment method for processing [recurring payments automatically](https://docs.woothemes.com/document/subscriptions/renewal-process/).
+You can import payment gateway meta data, like customer or credit card tokens, in your CSV file to link a subscription with a payment method for processing [recurring payments automatically](https://docs.woocommerce.com/document/subscriptions/renewal-process/).
 
 Properly importing payment gateway meta data is a difficult, yet crucial part of the import. It's important to take the time and get this right otherwise your subscription may not renew properly. It is also much faster to set this data in bulk on import than to set it on each individual subscription after the import.
 
@@ -285,13 +285,13 @@ Properly importing payment gateway meta data is a difficult, yet crucial part of
 
 The Importer can support any payment gateway that supports the new  `woocommerce_subscription_payment_meta` filter introduced in WooCommerce Subscriptions v2.0.
 
-Each payment method requires different meta data to process automatic payments. Because of this, we are not able to provide documentation on what meta data is required for every possible [payment gateway](https://docs.woothemes.com/document/subscriptions/payment-gateways/).
+Each payment method requires different meta data to process automatic payments. Because of this, we are not able to provide documentation on what meta data is required for every possible [payment gateway](https://docs.woocommerce.com/document/subscriptions/payment-gateways/).
 
 However, here is a list of the column headers and meta data description for three popular payment methods:
  * __PayPal Reference Transactions__: `_paypal_subscription_id` must be mapped to `payment_method_post_meta` column. This value needs to be the customers billing agreement (will start with `I-**************`).
- * __Authorize.net CIM__: `_wc_authorize_net_cim_credit_card_customer_id` and `_wc_authorize_net_cim_credit_card_payment_token` mapped to `payment_method_post_meta` column.
+ * [__Authorize.net CIM__](https://woocommerce.com/products/authorize-net-cim/): `_wc_authorize_net_cim_credit_card_customer_id` and `_wc_authorize_net_cim_credit_card_payment_token` mapped to `payment_method_post_meta` column.
  * [__PayPal Powered by Braintree__](https://wordpress.org/plugins/woocommerce-gateway-paypal-powered-by-braintree/): `_wc_braintree_credit_card_customer_id` and `_wc_braintree_credit_card_payment_token` mapped to `payment_method_post_meta` and `payment_method_post_meta` columns.
- * __Stripe__: `_stripe_customer_id` mapped to `payment_method_post_meta` column and optionally, `_stripe_source_id` also mapped to `payment_method_post_meta` column if you want to charge recurring payments against a specific payment method on the customer's account. Only values beginning with `cus_` and `card_` will be considered valid tokens.
+ * [__Stripe__](https://woocommerce.com/products/stripe/): `_stripe_customer_id` mapped to `payment_method_post_meta` column and optionally, `_stripe_source_id` also mapped to `payment_method_post_meta` column if you want to charge recurring payments against a specific payment method on the customer's account. Only values beginning with `cus_` and `card_` will be considered valid tokens.
 
 
 > Note: the above information relates to the official [Stripe](https://www.woocommerce.com/products/stripe/), [__PayPal Powered by Braintree__](https://wordpress.org/plugins/woocommerce-gateway-paypal-powered-by-braintree/) and [Authorize.net CIM](https://www.woocommerce.com/products/authorize-net-cim/) extensions. It will not work with other extensions for those payment gateways.
@@ -447,7 +447,7 @@ Because the Sample CSV file uses almost all the available CSV columns, it is a g
 - Missing tax code or ID from column: [row from CSV]
 - The tax code "<tax_code>" could not be found in your store.
 
-When a warning is included in the [Import Completion Table](#import-completion-table), a link to [edit the subscription](https://docs.woothemes.com/document/subscriptions/add-or-modify-a-subscription/) administration screen is provided alongside the subscription.
+When a warning is included in the [Import Completion Table](#import-completion-table), a link to [edit the subscription](https://docs.woocommerce.com/document/subscriptions/add-or-modify-a-subscription/) administration screen is provided alongside the subscription.
 
 #### Errors
 - The product_id is missing from CSV.
@@ -465,22 +465,22 @@ Any exceptions thrown during the import process will be caught and appear as a f
 
 ## Importer FAQ
 #### Is it possible to make sure the active subscriptions will still process automatic payments?
-Yes. If your subscriptions payment gateway supports [automatic recurring payments](http://docs.woothemes.com/document/subscriptions/payment-gateways/), it may also be able to have its [payment method meta data](#importing-payment-gateway-meta-data) imported to link the subscription to the payment gateway to process future automatic recurring payments.
+Yes. If your subscriptions payment gateway supports [automatic recurring payments](http://docs.woocommerce.com/document/subscriptions/payment-gateways/), it may also be able to have its [payment method meta data](#importing-payment-gateway-meta-data) imported to link the subscription to the payment gateway to process future automatic recurring payments.
 
 When importing active subscriptions, it's important that the correct [payment method meta data](#importing-payment-gateway-meta-data) is provided in the CSV. Depending on the payment gateway being used, the information required varies. For details, see the section on [Importing Payment Gateway Meta Data](#importing-payment-gateway-meta-data).
 
 #### Can subscriptions using PayPal Standard be imported?
-No. Due to [PayPal Standard limitations](https://docs.woothemes.com/document/subscriptions/payment-gateways/#paypal-limitations), the importer can not migrate subscriptions using PayPal Standard as the payment method.
+No. Due to [PayPal Standard limitations](https://docs.woocommerce.com/document/subscriptions/payment-gateways/#paypal-limitations), the importer can not migrate subscriptions using PayPal Standard as the payment method.
 
-The same limitations do not apply to [PayPal Reference Transactions](https://docs.woothemes.com/document/subscriptions/faq/paypal-reference-transactions/). Therefore the CSV importer can migrate subscriptions which use a PayPal Billing Agreement to process recurring payments via Reference Transactions.
+The same limitations do not apply to [PayPal Reference Transactions](https://docs.woocommerce.com/document/subscriptions/faq/paypal-reference-transactions/). Therefore the CSV importer can migrate subscriptions which use a PayPal Billing Agreement to process recurring payments via Reference Transactions.
 
-If you have subscriptions with PayPal Standard and you're interested in getting your customers to use a different payment method, you can import the subscriptions with a dummy payment method, as mentioned below, and request that your customers [change the payment method](https://docs.woothemes.com/document/subscriptions/customers-view/#section-5) on those subscriptions.
+If you have subscriptions with PayPal Standard and you're interested in getting your customers to use a different payment method, you can import the subscriptions with a dummy payment method, as mentioned below, and request that your customers [change the payment method](https://docs.woocommerce.com/document/subscriptions/customers-view/#section-5) on those subscriptions.
 
 #### Can subscriptions still be imported with a payment gateway that doesn't support migrating automatic payment meta data?
 Yes. There are two possible options:
 
-* switch the subscriptions to use [manual renewals](http://docs.woothemes.com/document/subscriptions/renewal-process/); or
-* force the first payment to fail and allow the customer to [pay for renewal](https://docs.woothemes.com/document/subscriptions/customers-view/#section-3), which will update their payment details for future payments
+* switch the subscriptions to use [manual renewals](http://docs.woocommerce.com/document/subscriptions/renewal-process/); or
+* force the first payment to fail and allow the customer to [pay for renewal](https://docs.woocommerce.com/document/subscriptions/customers-view/#section-3), which will update their payment details for future payments
 
 To switch the subscriptions to use manual renewal, you can leave the `payment_method` column empty.
 
@@ -491,7 +491,7 @@ To import the subscription in a way that the first automatic payment fails, you 
 1. import using a temporary, valid payment method (e.g. `stripe`)
 1. set a valid column value for the [payment method meta data](#importing-payment-gateway-meta-data) (e.g. set `_stripe_customer_id` to `cus_12345`)
 
-When Subscriptions attempts to process the next renewal payment, the transaction will fail and Subscriptions [failed payment handling](https://docs.woothemes.com/document/subscriptions/renewal-process/#section-6) process will begin.
+When Subscriptions attempts to process the next renewal payment, the transaction will fail and Subscriptions [failed payment handling](https://docs.woocommerce.com/document/subscriptions/renewal-process/#section-6) process will begin.
 
 If the later approach is taken, we strongly recommend that you notify customers about the change to avoid confusion.
 
@@ -510,7 +510,7 @@ If that filter is being used correctly by the payment gateway then it should als
 
 An alternative method to checking for importer support is to purchase a test subscription in your store using that payment gateway. Visit the **WooCommerce > Edit Subscription** page of the subscription you just created, and check if you can view and edit the payment method meta (see image below). If you can see these fields, the importer can import subscriptions using that payment gateway and process automatic recurring payments.
 
-![Admin Change Payment Method](https://docs.woothemes.com/wp-content/uploads/2015/09/change-recurring-payment-method-screenshot.png?w=2260)
+![Admin Change Payment Method](https://docs.woocommerce.com/wp-content/uploads/2015/09/change-recurring-payment-method-screenshot.png?w=2260)
 
 #### Why aren't my product line item attribute keys capitalised?
 WooCommerce displays product line item attribute keys based on either:
@@ -518,7 +518,7 @@ WooCommerce displays product line item attribute keys based on either:
 * the attribute label in the store, if set; or
 * the string key, if no matching attribute can be found.
 
-If you have imported subscriptions with line items that have product attributes, you should also create matching [product attributes](https://docs.woothemes.com/document/managing-product-taxonomies/#section-3) in the new store.
+If you have imported subscriptions with line items that have product attributes, you should also create matching [product attributes](https://docs.woocommerce.com/document/managing-product-taxonomies/#section-3) in the new store.
 
 #### Why aren't taxes showing on my fee line items?
 Although the Importer provides a way to import tax data about fee line item, unfortunately, WooCommerce only displays tax line item data based on an array of tax data linked to the tax rate IDs. Becuase these are not imported, fee taxes will not be displayed on the on the **WooCommerce > Edit Subscription** and **WooCommerce > Edit Order** screens.
@@ -538,7 +538,7 @@ You can also choose which data to include in the CSV file.
 
 ![](https://cldup.com/WK-9aRHQ7r.png)
 
-Please note: this extension will not export any related orders for your subscriptions (this includes parent and renewal orders, etc); to export orders, you will need the [WooCommerce Order CSV Exporter](https://www.woothemes.com/products/ordercustomer-csv-export/).
+Please note: this extension will not export any related orders for your subscriptions (this includes parent and renewal orders, etc); to export orders, you will need the [WooCommerce Order CSV Exporter](https://www.woocommerce.com/products/ordercustomer-csv-export/).
 
 ## Exporter Usage Guide
 
