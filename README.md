@@ -294,7 +294,7 @@ However, here is a list of the column headers and meta data description for thre
  * [__Stripe__](https://woocommerce.com/products/stripe/): `_stripe_customer_id` mapped to `payment_method_post_meta` column and optionally, `_stripe_source_id` also mapped to `payment_method_post_meta` column if you want to charge recurring payments against a specific payment method on the customer's account. Only values beginning with `cus_` and `card_` will be considered valid tokens.
 
 
-> Note: the above information relates to the official [Stripe](https://www.woocommerce.com/products/stripe/), [__PayPal Powered by Braintree__](https://wordpress.org/plugins/woocommerce-gateway-paypal-powered-by-braintree/) and [Authorize.net CIM](https://www.woocommerce.com/products/authorize-net-cim/) extensions. It will not work with other extensions for those payment gateways.
+> Note: the above information relates to the official [Stripe](https://www.woocommerce.com/products/stripe/), [PayPal Powered by Braintree](https://wordpress.org/plugins/woocommerce-gateway-paypal-powered-by-braintree/) and [Authorize.net CIM](https://www.woocommerce.com/products/authorize-net-cim/) extensions. It will not work with other extensions for those payment gateways.
 
 As long as the payment gateway extension for your payment gateway is active, the Subscriptions CSV Importer will validate that you have included the necessary payment gateway meta data.
 
