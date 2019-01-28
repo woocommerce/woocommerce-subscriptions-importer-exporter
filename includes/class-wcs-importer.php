@@ -592,7 +592,10 @@ class WCS_Importer {
 				}
 
 				if ( $meta_set ) {
+					// Reload the subscription to update the meta values.
+					$subscription  = wcs_get_subscription( $subscription->get_id() );
 					$subscription->set_payment_method( $payment_gateway, $payment_method_data );
+					$subscription->save();
 				} else {
 					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %1$s subscription (%2$s). The next renewal is going to fail if you leave this.', 'wcs-import-export' ), $payment_method, $subscription_id );
 				}
