@@ -101,7 +101,7 @@ class WCS_Importer {
 				post_type = 'shop_subscription'
 					AND
 				ID NOT IN (
-					SELECT post_id FROM mywcs_postmeta WHERE
+					SELECT post_id FROM {$wpdb->prefix}postmeta WHERE
 						meta_key = '_order_key'
 							AND
 						meta_value IS NOT NULL
