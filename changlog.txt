@@ -1,3 +1,7 @@
 *** WooCommerce Subscriptions CSV Importer and Exporter Changelog ***
 
+2019.02.11 - version 2.0.1
+* Fix saving of subscription meta data, especiallly payment gateway meta like _stripe_source_id.
+* Fix use of hardcoded table prefix mywcs_postmeta
+
 2016.05.01 - version 2.0.0-beta
