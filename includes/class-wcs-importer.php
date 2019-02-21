@@ -371,8 +371,6 @@ class WCS_Importer {
 					// Now that we've set all the meta data, reinit the object so the data is set
 					$subscription = wcs_get_subscription( $subscription_id );
 
-					$subscription->update_dates( $dates_to_update );
-
 					if ( ! $set_manual && ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
 					}
@@ -460,6 +458,8 @@ class WCS_Importer {
 					add_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
 
 					$subscription->update_status( $status );
+
+					$subscription->update_dates( $dates_to_update );
 
 					remove_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
 					remove_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
