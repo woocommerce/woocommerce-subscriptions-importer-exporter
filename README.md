@@ -578,7 +578,7 @@ Before exporting, you have the option to modify the column names which are writt
 `start_date`              |Y-m-d H:i:s|Subscription start date|
 `trial_end_date`          |Y-m-d H:i:s|Subscription trial end date (defaults to 0 when the subscription has no trial period|
 `next_payment_date`       |Y-m-d H:i:s|Subscription next payment date|
-`last_payment_date`       |Y-m-d H:i:s|Subscription last payment date|
+`last_payment_date`       |Y-m-d H:i:s|Subscription's most recent parent or renewal order created date|
 `end_date`                |Y-m-d H:i:s|Subscription end date (defaults to 0 when the subscription has no end)|
 `billing_period`          |`string`|Billing period|
 `billing_interval`        |`int`|Billing interval|
