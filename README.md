@@ -1,7 +1,6 @@
 # WooCommerce Subscriptions Importer and Exporter
 
 [![Build Status](https://travis-ci.org/Prospress/woocommerce-subscriptions-importer-exporter.svg?branch=master)](https://travis-ci.org/Prospress/woocommerce-subscriptions-importer-exporter)
-[![codecov](https://codecov.io/gh/Prospress/woocommerce-subscriptions-importer-exporter/branch/master/graph/badge.svg)](https://codecov.io/gh/Prospress/woocommerce-subscriptions-importer-exporter)
 [![license: GPL v2](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://opensource.org/licenses/GPL-2.0)
 
 Import subscriptions to WooCommerce via CSV, or export your subscriptions from WooCommerce to a CSV.

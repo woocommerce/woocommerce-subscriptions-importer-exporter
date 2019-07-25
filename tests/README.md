@@ -120,10 +120,6 @@ This will find all the `.php` files excluding the `tmp` and `tests` directories.
 
 Tests are automatically run with [Travis-CI](https://travis-ci.org) for each pull request.
 
-## Code Coverage
-
-Code coverage is available on [Codecov](https://codecov.io/) which receives updated data from Travis builds.
-
 ## Using Grunt to run the Tests
 
 1) Install [Node.js / NPM](https://nodejs.org/) and [Grunt](http://gruntjs.com/getting-started) by following the standard installation instructions.
