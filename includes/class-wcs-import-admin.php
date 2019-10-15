@@ -61,7 +61,7 @@ class WCS_Import_Admin {
 				$file_id = absint( $_GET['file_id'] );
 				$file    = get_attached_file( $file_id );
 
-				// Check if the function mb_detect_encoding exists. The function does not found if the mbstring extension is not installed on the server.
+				// Check if the function mb_detect_encoding exists. The function is not found if the mbstring extension is not installed on the server.
 				$enc     = function_exists('mb_detect_encoding') ? mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true ) : false;
 
 				if ( $enc ) {
@@ -291,7 +291,7 @@ class WCS_Import_Admin {
 		$file    = get_attached_file( $file_id );
 
 		if ( $file ) {
-			// Check if the function mb_detect_encoding exists. The function does not found if the mbstring extension is not installed on the server.
+			// Check if the function mb_detect_encoding exists. The function is not found if the mbstring extension is not installed on the server.
 			$enc = function_exists('mb_detect_encoding') ? mb_detect_encoding( $file, 'UTF-8, ISO-8859-1', true ) : false;
 
 			if ( $enc ) {
