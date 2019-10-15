@@ -8,7 +8,7 @@
  * @param string $file_encoding
  */
 function wcsi_format_data( $data, $file_encoding = 'UTF-8' ) {
-	// Check if the function utf8_encode( $data ) exists. The function does not found if the php-xml extension is not installed on the server.
+	// Check if the function utf8_encode exists. The function does not found if the php-xml extension is not installed on the server.
 	$return = function_exists('utf8_encode') ? utf8_encode( $data ) : $data;
 	return ( 'UTF-8' == $file_encoding ) ? $data : $return;
 }
