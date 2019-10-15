@@ -115,7 +115,7 @@ class WCS_Importer_Exporter {
 		if ( ! class_exists( 'WC_Subscriptions' ) || ! class_exists( 'WC_Subscriptions_Admin' ) ) :
 			if ( is_woocommerce_active() ) : ?>
 				<div id="message" class="error">
-					<p><?php printf( esc_html__( '%1$sWooCommerce Subscriptions CSV Importer and Exporter is inactive.%2$s The %3$sWooCommerce Subscriptions plugin%4$s must be active for WooCommerce Subscriptions CSV Importer and Exporter to work. Please %5$sinstall & activate%6$s WooCommerce.', 'wcs-import-export' ), '<strong>', '</strong>', '<a href="http://www.woocommerce.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">', '</a>' ); ?></p>
+					<p><?php printf( esc_html__( '%1$sWooCommerce Subscriptions CSV Importer and Exporter is inactive.%2$s The %3$sWooCommerce Subscriptions plugin%4$s must be active for WooCommerce Subscriptions CSV Importer and Exporter to work. Please %5$sinstall & activate%6$s WooCommerce Subscriptions.', 'wcs-import-export' ), '<strong>', '</strong>', '<a href="http://www.woocommerce.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">', '</a>' ); ?></p>
 				</div>
 			<?php else : ?>
 				<div id="message" class="error">
