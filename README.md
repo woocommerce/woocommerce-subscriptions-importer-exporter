@@ -20,7 +20,7 @@ You can learn more about the migration service WisdmLabs offer and contact them 
 
 Prospress do not provide support for migration issues. This means Prospress can not help with CSV formatting, fixing broken renewals or other issues with subscriptions imported incorrectly. Similarly, issues with subscriptions created with this plugin are not supported via the WooCommerce support system.
 
-If you think you have found a bug in the extension, problem with the documentation or limitation in the data that can be imported, please [open a new issue to report it](https://github.com/Prospress/woocommerce-subscriptions-importer-exporter/issues/new).
+If you think you have found a bug in the extension, problem with the documentation or limitation in the data that can be imported, please [open a new issue to report it](https://github.com/woocommerce/woocommerce-subscriptions-importer-exporter/issues/new).
 
 ---
 
@@ -373,7 +373,7 @@ Notice the _Shirt Colour_ meta key is in lowercase and uses a `-` instead of a s
 ##### Multiple Product Line Items
 To import a subscription with multiple product line items, separate each line item data with a `;`. You can use a combination of the single product ID method and full line item data array method.
 
-For example, an `order_items` column value for two products could look like: `"product_id:5179|quantity:2|total:9.09|tax:0.91;product_id:2156|total:30"`. See the [Sample CSV](https://github.com/Prospress/woocommerce-subscriptions-importer-exporter/blob/master/wcs-import-sample.csv) for an example of importing multiple product line items using the importer.
+For example, an `order_items` column value for two products could look like: `"product_id:5179|quantity:2|total:9.09|tax:0.91;product_id:2156|total:30"`. See the [Sample CSV](https://github.com/woocommerce/woocommerce-subscriptions-importer-exporter/blob/master/wcs-import-sample.csv) for an example of importing multiple product line items using the importer.
 
 #### Importing Subscriptions with Coupons
 The importer provides the `coupon_items` column header to apply coupons to your imported subscriptions.
@@ -420,7 +420,7 @@ When the tax rate is successfully added to your subscription, this rate is then 
 
 ### Sample CSV
 
-A [Sample CSV](https://github.com/Prospress/woocommerce-subscriptions-importer-exporter/blob/master/wcs-import-sample.csv) file is included in the Importer's folder with the file name `wcs-import-sample.csv`.
+A [Sample CSV](https://github.com/woocommerce/woocommerce-subscriptions-importer-exporter/blob/master/wcs-import-sample.csv) file is included in the Importer's folder with the file name `wcs-import-sample.csv`.
 
 This CSV includes a number of rows to provide examples for the many different acceptable values for CSV column content. It uses almost all the available CSV column headers (though not all rows fill in all columns).
 
@@ -664,8 +664,3 @@ add_filter( 'wcsie_export_headers', 'my_custom_export_headers', 10, 1 );
 add_filter( 'wcsie_format_export_value', 'my_custom_export_values', 10, 3 );
 ```
 
----
-
-<p align="center">
-<img src="https://cloud.githubusercontent.com/assets/235523/11986380/bb6a0958-a983-11e5-8e9b-b9781d37c64a.png" width="160">
-</p>
