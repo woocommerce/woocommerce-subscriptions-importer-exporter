@@ -128,7 +128,8 @@ class WCS_Importer {
 	 */
 	public static function import_start( $file_path, $start_position, $end_position ) {
 
-		$file_encoding = mb_detect_encoding( $file_path, 'UTF-8, ISO-8859-1', true );
+		// Check if the function mb_detect_encoding exists. The function does not found if the mbstring extension is not installed on the server.
+		$file_encoding = function_exists('mb_detect_encoding') ? mb_detect_encoding( $file_path, 'UTF-8, ISO-8859-1', true ) : false;
 
 		if ( $file_encoding ) {
 			setlocale( LC_ALL, 'en_US.' . $file_encoding );
