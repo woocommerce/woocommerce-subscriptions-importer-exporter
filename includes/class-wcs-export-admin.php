@@ -460,9 +460,11 @@ class WCS_Export_Admin {
 		$post_data = $_POST;
 
 		// add tmp and timestamp to filename.
-		$filename = $post_data['filename'];
+		$filename       = $post_data['filename'];
 		$file_extension = pathinfo($filename, PATHINFO_EXTENSION);
-		$post_data['filename'] = str_replace('.' . $file_extension, '', $filename) . '-' . time() . '.tmp.' . $file_extension;
+		$handle         = str_replace('.' . $file_extension, '', $filename );
+
+		$post_data['filename'] = $handle . '-' . time() . '-' . wp_hash( $handle ) . '.tmp.' . $file_extension;
 
 		// set the initial limit
 		$post_data['limit'] = $post_data['limit_batch'] != '' ? $post_data['limit_batch'] : 500;
