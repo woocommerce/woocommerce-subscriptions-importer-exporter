@@ -281,9 +281,9 @@ class WCS_Export_Admin {
 
 		if ( !empty($files) ) {
 
-			$files = array_diff($files, array('.', '..'));
+			$files      = array_diff( $files, array('.', '..', 'index.php', '.htaccess' ) );
 			$upload_dir = wp_upload_dir();
-			$files_url = $upload_dir['baseurl'] . '/woocommerce-subscriptions-importer-exporter/';
+			$files_url  = $upload_dir['baseurl'] . '/woocommerce-subscriptions-importer-exporter/';
 
 			foreach ( $files as $file ) {
 
@@ -478,9 +478,7 @@ class WCS_Export_Admin {
 		);
 
 		// Create directory if it does not exist and create the file.
-		if ( !file_exists(WCS_Exporter_Cron::$cron_dir) ) {
-			mkdir(WCS_Exporter_Cron::$cron_dir, 0775);
-		}
+		WCS_Exporter_Cron::create_upload_directory();
 
 		$file_path = WCS_Exporter_Cron::$cron_dir . '/' . $post_data['filename'];
 		$file = fopen($file_path, 'a');
