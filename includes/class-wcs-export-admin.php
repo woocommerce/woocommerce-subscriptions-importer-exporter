@@ -487,6 +487,7 @@ class WCS_Export_Admin {
 		fclose($file);
 
 		wp_schedule_single_event( time() + 60, 'wcs_export_cron', $event_args );
+		wp_schedule_single_event( time() + WEEK_IN_SECONDS, 'wcs_export_scheduled_cleanup', array( $post_data['filename'] ) );
 	}
 
 	/**
