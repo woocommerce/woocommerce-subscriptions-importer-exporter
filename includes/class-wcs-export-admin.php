@@ -281,9 +281,9 @@ class WCS_Export_Admin {
 
 		if ( !empty($files) ) {
 
-			$files = array_diff($files, array('.', '..'));
+			$files      = array_diff( $files, array('.', '..', 'index.php', '.htaccess' ) );
 			$upload_dir = wp_upload_dir();
-			$files_url = $upload_dir['baseurl'] . '/woocommerce-subscriptions-importer-exporter/';
+			$files_url  = $upload_dir['baseurl'] . '/woocommerce-subscriptions-importer-exporter/';
 
 			foreach ( $files as $file ) {
 
@@ -460,9 +460,11 @@ class WCS_Export_Admin {
 		$post_data = $_POST;
 
 		// add tmp and timestamp to filename.
-		$filename = $post_data['filename'];
+		$filename       = $post_data['filename'];
 		$file_extension = pathinfo($filename, PATHINFO_EXTENSION);
-		$post_data['filename'] = str_replace('.' . $file_extension, '', $filename) . '-' . time() . '.tmp.' . $file_extension;
+		$handle         = str_replace('.' . $file_extension, '', $filename );
+
+		$post_data['filename'] = $handle . '-' . time() . '-' . wp_hash( $handle ) . '.tmp.' . $file_extension;
 
 		// set the initial limit
 		$post_data['limit'] = $post_data['limit_batch'] != '' ? $post_data['limit_batch'] : 500;
@@ -478,9 +480,7 @@ class WCS_Export_Admin {
 		);
 
 		// Create directory if it does not exist and create the file.
-		if ( !file_exists(WCS_Exporter_Cron::$cron_dir) ) {
-			mkdir(WCS_Exporter_Cron::$cron_dir, 0775);
-		}
+		WCS_Exporter_Cron::create_upload_directory();
 
 		$file_path = WCS_Exporter_Cron::$cron_dir . '/' . $post_data['filename'];
 		$file = fopen($file_path, 'a');

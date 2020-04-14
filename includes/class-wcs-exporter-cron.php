@@ -19,9 +19,7 @@ class WCS_Exporter_Cron {
 	 */
     public static function cron_handler( $post_data, $headers ) {
 
-        if ( !file_exists(self::$cron_dir) ) {
-            mkdir(self::$cron_dir, 0775);
-        }
+		self::create_upload_directory();
 
         $done_export = false;
 
@@ -150,4 +148,25 @@ class WCS_Exporter_Cron {
         }
     }
 
+	/**
+	 * Creates upload directory. Does nothing if directory and index/htaccess files already exist
+	 *
+	 * @since 2.1
+	 * @return void
+	 */
+	public static function create_upload_directory() {
+		$base = self::$cron_dir;
+
+		if ( wp_mkdir_p( $base ) ) {
+			// create an empty index.php
+			if ( ! file_exists( $base . '/index.php' ) ) {
+				file_put_contents( $base . '/index.php', '' );
+			}
+
+			// create a .htaccess file with "deny from all" command
+			if ( ! file_exists( $base . '/.htaccess' ) ) {
+				file_put_contents( $base . '/.htaccess', 'Deny from all' );
+			}
+		}
+	}
 }

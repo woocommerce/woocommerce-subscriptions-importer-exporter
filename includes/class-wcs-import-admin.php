@@ -545,6 +545,10 @@ class WCS_Import_Admin {
 			);
 
 			if ( 'upload_file' == $_POST['action'] ) {
+				// Make sure the uploaded filename is hashed
+				if ( ! empty( $_FILES['import']['name'] ) ) {
+					$_FILES['import']['name'] = sanitize_file_name( wp_hash( $_FILES['import']['name'] ) );
+				}
 
 				$file = wp_import_handle_upload();
 
