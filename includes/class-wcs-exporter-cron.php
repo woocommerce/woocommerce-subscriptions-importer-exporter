@@ -130,14 +130,13 @@ class WCS_Exporter_Cron {
 	}
 
     /**
-	 * Delete subscription export file.
+	 * Delete subscription export file, including the tmp file if it exists.
 	 *
 	 * @since 2.0-beta
 	 * @param string $file_name
 	 * @return array
 	 */
     public static function delete_export_file( $file_name )  {
-
         if ( $file_name == '' ) {
             return;
         }
@@ -146,6 +145,10 @@ class WCS_Exporter_Cron {
         if ( file_exists($file_path) ) {
             unlink($file_path);
         }
+
+		if ( false !== strpos( $file_name, '.tmp' ) && file_exists( $file_path = str_replace( '.tmp', '', $file_path ) ) ) {
+			unlink( $file_path );
+		}
     }
 
 	/**

@@ -64,6 +64,7 @@ class WCS_Importer_Exporter {
 		add_filter( 'plugins_loaded', __CLASS__ . '::setup_importer' );
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), __CLASS__ . '::action_links' );
 		add_action( 'wcs_export_cron', array( 'WCS_Exporter_Cron', 'cron_handler' ), 10, 2 );
+		add_action( 'wcs_export_scheduled_cleanup', array( 'WCS_Exporter_Cron', 'delete_export_file' ), 10, 1 );
 
 		spl_autoload_register( __CLASS__ . '::autoload' );
 	}

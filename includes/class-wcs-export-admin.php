@@ -293,18 +293,11 @@ class WCS_Export_Admin {
 					$status = 'processing';
 				}
 
-				// set date and time
-				$date = '-';
-				$timestamp = absint(substr($file, strpos($file, '-') + 1, 10));
-				if ( strlen($timestamp) == 10 ) {
-					$date = date('d/m/Y G:i:s', absint($timestamp));
-				}
-
 				$file_data = array(
-					'name' => $file,
-					'url' => $files_url . $file,
+					'name'   => $file,
+					'url'    => $files_url . $file,
 					'status' => $status,
-					'date' => $date
+					'date'   => date( 'd/m/Y G:i:s', absint( filectime( trailingslashit( WCS_Exporter_Cron::$cron_dir ) . $file ) ) ),
 				);
 
 				$files_data[] = $file_data;
@@ -464,7 +457,7 @@ class WCS_Export_Admin {
 		$file_extension = pathinfo($filename, PATHINFO_EXTENSION);
 		$handle         = str_replace('.' . $file_extension, '', $filename );
 
-		$post_data['filename'] = $handle . '-' . time() . '-' . wp_hash( $handle ) . '.tmp.' . $file_extension;
+		$post_data['filename'] = $handle . '-' . wp_hash( time() . $handle ) . '.tmp.' . $file_extension;
 
 		// set the initial limit
 		$post_data['limit'] = $post_data['limit_batch'] != '' ? $post_data['limit_batch'] : 500;
@@ -487,6 +480,7 @@ class WCS_Export_Admin {
 		fclose($file);
 
 		wp_schedule_single_event( time() + 60, 'wcs_export_cron', $event_args );
+		wp_schedule_single_event( time() + WEEK_IN_SECONDS, 'wcs_export_scheduled_cleanup', array( $post_data['filename'] ) );
 	}
 
 	/**
