@@ -457,7 +457,7 @@ class WCS_Export_Admin {
 		$file_extension = pathinfo($filename, PATHINFO_EXTENSION);
 		$handle         = str_replace('.' . $file_extension, '', $filename );
 
-		$post_data['filename'] = $handle . '-' . time() . '-' . wp_hash( $handle ) . '.tmp.' . $file_extension;
+		$post_data['filename'] = $handle . '-' . wp_hash( time() . $handle ) . '.tmp.' . $file_extension;
 
 		// set the initial limit
 		$post_data['limit'] = $post_data['limit_batch'] != '' ? $post_data['limit_batch'] : 500;
