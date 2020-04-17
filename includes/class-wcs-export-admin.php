@@ -293,18 +293,11 @@ class WCS_Export_Admin {
 					$status = 'processing';
 				}
 
-				// set date and time
-				$date = '-';
-				$timestamp = absint(substr($file, strpos($file, '-') + 1, 10));
-				if ( strlen($timestamp) == 10 ) {
-					$date = date('d/m/Y G:i:s', absint($timestamp));
-				}
-
 				$file_data = array(
-					'name' => $file,
-					'url' => $files_url . $file,
+					'name'   => $file,
+					'url'    => $files_url . $file,
 					'status' => $status,
-					'date' => $date
+					'date'   => date( 'd/m/Y G:i:s', absint( filectime( trailingslashit( WCS_Exporter_Cron::$cron_dir ) . $file ) ) ),
 				);
 
 				$files_data[] = $file_data;
