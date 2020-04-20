@@ -1,5 +1,11 @@
 *** WooCommerce Subscriptions CSV Importer and Exporter Changelog ***
 
+2020.04.20 - version 2.1.0
+* Fix fatal errors which occur during the subscription import process. PR#214
+* Add .htaccess and index.php files to the export directory. PR#218
+* Hash imported and exported file names. PR#218
+* Automatically delete all export files after 7 days. PR#219
+
 2019.02.11 - version 2.0.1
 * Fix saving of subscription meta data, especiallly payment gateway meta like _stripe_source_id.
 * Fix use of hardcoded table prefix mywcs_postmeta
