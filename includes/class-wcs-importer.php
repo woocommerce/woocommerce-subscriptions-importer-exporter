@@ -379,7 +379,7 @@ class WCS_Importer {
 					}
 
 					if ( $set_manual || $requires_manual_renewal ) {
-						$subscription->update_manual();
+						$subscription->set_requires_manual_renewal( true );
 					}
 
 					if ( ! empty( $data[ self::$fields['order_notes'] ] ) ) {
@@ -606,7 +606,7 @@ class WCS_Importer {
 				} else {
 					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewals.', 'wcs-import-export' ), $payment_method );
 				}
-				$subscription->update_manual();
+				$subscription->set_requires_manual_renewal( true );
 			}
 		}
 		return $warnings;
