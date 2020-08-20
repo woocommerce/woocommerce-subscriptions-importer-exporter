@@ -467,7 +467,7 @@ class WCS_Importer {
 
 					if ( self::$add_memberships ) {
 						foreach ( $order_items as $product_id ) {
-							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
+							self::maybe_add_memberships( $user_id, $subscription->get_id(), $product_id );
 						}
 					}
 				}
