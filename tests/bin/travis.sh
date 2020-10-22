@@ -15,9 +15,12 @@ if [ $1 == 'before' ]; then
 
 	say "WooCommerce Installed"
 
-	# place a copy of woocommerce subscriptions where the unit tests etc. expect it to be - needs to be a repo with the test dir
-	git clone https://$GITHUB_TOKEN@github.com/woocommerce/woocommerce-subscriptions.git "../woocommerce-subscriptions" -b $WCS_VERSION
-
-	say "WooCommerce Subscriptions Installed"
-
 fi
+
+# Install WooCommerce Subscriptions.
+if [[ -n "$GITHUB_TOKEN" ]]; then
+	WCS_GIT_URI="https://$GITHUB_TOKEN@github.com/woocommerce/woocommerce-subscriptions.git"
+else
+	WCS_GIT_URI="git@github.com:woocommerce/woocommerce-subscriptions.git"
+fi
+git clone --depth=1 --branch="${WCS_VERSION}" "$WCS_GIT_URI" "${WP_CORE_DIR}/wp-content/plugins/woocommerce-subscriptions"
