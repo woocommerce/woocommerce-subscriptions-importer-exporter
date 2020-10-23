@@ -23,4 +23,4 @@ if [[ -n "$GITHUB_TOKEN" ]]; then
 else
 	WCS_GIT_URI="git@github.com:woocommerce/woocommerce-subscriptions.git"
 fi
-git clone --depth=1 --branch="${WCS_VERSION}" "$WCS_GIT_URI" "${WP_CORE_DIR}/wp-content/plugins/woocommerce-subscriptions"
+git clone "$WCS_GIT_URI" "../woocommerce-subscriptions" --branch="${WCS_VERSION}"
