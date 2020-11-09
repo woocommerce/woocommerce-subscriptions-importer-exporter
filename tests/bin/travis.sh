@@ -18,9 +18,4 @@ if [ $1 == 'before' ]; then
 fi
 
 # Install WooCommerce Subscriptions.
-if [[ -n "$GITHUB_TOKEN" ]]; then
-	WCS_GIT_URI="https://$GITHUB_TOKEN@github.com/woocommerce/woocommerce-subscriptions.git"
-else
-	WCS_GIT_URI="git@github.com:woocommerce/woocommerce-subscriptions.git"
-fi
-git clone "$WCS_GIT_URI" "../woocommerce-subscriptions" --branch="${WCS_VERSION}"
+git clone https://$GITHUB_TOKEN@github.com/woocommerce/woocommerce-subscriptions.git "../woocommerce-subscriptions" --branch $WCS_VERSION
