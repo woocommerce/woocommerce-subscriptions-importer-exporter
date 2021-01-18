@@ -551,7 +551,8 @@ class WCS_Importer {
 
 				if ( ! empty( $data[ self::$fields['payment_method_post_meta'] ] ) ) {
 					foreach ( explode( '|', $data[ self::$fields['payment_method_post_meta'] ] ) as $meta ) {
-						list( $name, $value ) = explode( ':', $meta );
+						// Some payment gateway meta (like Square), includes a ':' in the token so limit the explode to only split once (2 values).
+						list( $name, $value ) = explode( ':', $meta, 2 );
 						$payment_post_meta[ trim( $name ) ] = trim( $value );
 					}
 				}
