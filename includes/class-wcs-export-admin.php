@@ -201,6 +201,7 @@ class WCS_Export_Admin {
 			'order_tax'                => __( 'Subscription Total Tax', 'wcs-import-export' ),
 			'cart_discount'            => __( 'Total Discount', 'wcs-import-export' ),
 			'cart_discount_tax'        => __( 'Total Discount Tax', 'wcs-import-export' ),
+			'order_id'                 => __( 'Parent Order Id', 'wcs-import-export'),
 			'order_total'              => __( 'Subscription Total', 'wcs-import-export' ),
 			'order_currency'           => __( 'Subscription Currency', 'wcs-import-export' ),
 			'payment_method'           => __( 'Payment Method', 'wcs-import-export' ),

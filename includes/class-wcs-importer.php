@@ -323,6 +323,21 @@ class WCS_Importer {
 			}
 		}
 
+        $found_order_id = '';
+        $order_id_field = self::$fields['order_id'];
+        if (!empty($order_id_field)) {
+            $input_order_id = $data[$order_id_field];
+            if (!empty($input_order_id)) {
+                $parent_order = wc_get_order($input_order_id);
+                if ($parent_order) {
+                    $found_order_id = $parent_order->get_order_number();
+                } else {
+                    $result['warning'][] = sprintf(__('Parent order was not found, possibly because it was deleted or imported under a new ID. Clear or correct "%s" field in CSV or correct manually after import. Not correcting will prevent renewal (customer_id: "%s", start_date: "%s", order_id: "%s").', 'wcs-import-export'),
+                        $order_id_field, $user_id, $dates_to_update['start'], $input_order_id);
+                }
+            }
+        }
+
 		if ( empty( $result['error'] ) || self::$test_mode ) {
 			try {
 				if ( ! self::$test_mode ) {
@@ -342,7 +357,8 @@ class WCS_Importer {
 							'billing_period'   => ( ! empty( $data[ self::$fields['billing_period'] ] ) ) ? $data[ self::$fields['billing_period'] ] : '',
 							'created_via'      => 'importer',
 							'customer_note'    => ( ! empty( $data[ self::$fields['customer_note'] ] ) ) ? $data[ self::$fields['customer_note'] ] : '',
-							'currency'         => ( ! empty( $data[ self::$fields['order_currency'] ] ) ) ? $data[ self::$fields['order_currency'] ] : '',
+                            'currency'         => ( ! empty( $data[ self::$fields['order_currency'] ] ) ) ? $data[ self::$fields['order_currency'] ] : '',
+                            'order_id'         => $found_order_id,
 						)
 					);
 
@@ -379,7 +395,7 @@ class WCS_Importer {
 					}
 
 					if ( $set_manual || $requires_manual_renewal ) {
-						$subscription->update_manual();
+                        $subscription->set_requires_manual_renewal( true );
 					}
 
 					if ( ! empty( $data[ self::$fields['order_notes'] ] ) ) {
@@ -467,7 +483,7 @@ class WCS_Importer {
 
 					if ( self::$add_memberships ) {
 						foreach ( $order_items as $product_id ) {
-							self::maybe_add_memberships( $user_id, $subscription->id, $product_id );
+                            self::maybe_add_memberships( $user_id, $subscription->get_id(), $product_id );
 						}
 					}
 				}
@@ -606,7 +622,7 @@ class WCS_Importer {
 				} else {
 					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewals.', 'wcs-import-export' ), $payment_method );
 				}
-				$subscription->update_manual();
+                $subscription->set_requires_manual_renewal( true );
 			}
 		}
 		return $warnings;

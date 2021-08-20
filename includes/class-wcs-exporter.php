@@ -261,7 +261,7 @@ class WCS_Exporter {
 							if ( ! empty( $meta_string ) ) {
 								$meta_string .= '+';
 							}
-							
+
 							// Prevent array to string notice caused by Composite Products when using Subscribe All The Things
 							if ( is_array( $meta_value ) ) {
 								$meta_value = json_encode( $meta_value );
@@ -379,6 +379,10 @@ class WCS_Exporter {
 						$value = '';
 					}
 					break;
+                case 'order_id':
+                    $parent_order = $subscription->get_parent();
+                    $value = $parent_order ? $parent_order->get_order_number() : 0;
+                    break;
 				default :
 					$value = '';
 			}
