@@ -120,7 +120,7 @@ class WCS_Importer_Exporter {
 				</div>
 			<?php else : ?>
 				<div id="message" class="error">
-					<p><?php printf( esc_html__( '%1$sWooCommerce Subscriptions CSV Importer and Exporter is inactive.%2$s Both %3$sWooCommerce%4$s and %5$sWooCommerce Subscriptions%6$s plugins must be active for WooCommerce Subscriptions CSV Importer and Exporter to work. Please %7$sinstall & activate%8$s these plugins before continuing.', 'wcs-import-export' ), '<strong>', '</strong>', '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>', '<a href="http://www.woocommerce.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">', '</a>' ); ?></p>
+					<p><?php printf( esc_html__( '%1$sWooCommerce Subscriptions CSV Importer and Exporter is inactive.%2$s Both %3$sWooCommerce%4$s and %5$sWooCommerce Subscriptions%6$s plugins must be active for WooCommerce Subscriptions CSV Importer and Exporter to work. Please %7$sinstall & activate%8$s these plugins before continuing.', 'wcs-import-export' ), '<strong>', '</strong>', '<a href="http://wordpress.org/plugins/woocommerce/">', '</a>', '<a href="http://www.woocommerce.com/products/woocommerce-subscriptions/">', '</a>', '<a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">', '</a>' ); ?></p>
 				</div>
 			<?php endif;?>
 		<?php elseif ( ! class_exists( 'WC_Subscriptions' ) || version_compare( WC_Subscriptions::$version, self::$required_subscriptions_version, '<' ) ) : ?>
