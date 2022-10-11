@@ -96,8 +96,8 @@ class WCS_Importer_Exporter {
 
 		$plugin_links = array(
 			'<a href="' . esc_url( admin_url( 'admin.php?page=import_subscription' ) ) . '">' . esc_html__( 'Import', 'wcs-import-export' ) . '</a>',
-			'<a href="https://github.com/Prospress/woocommerce-subscriptions-importer-exporter/blob/master/README.md">' . esc_html__( 'Docs', 'wcs-import-export' ) . '</a>',
-			'<a href="https://github.com/Prospress/woocommerce-subscriptions-importer-exporter/issues/new">' . esc_html__( 'Support', 'wcs-import-export' ) . '</a>',
+			'<a href="https://github.com/woocommerce/woocommerce-subscriptions-importer-exporter/blob/master/README.md">' . esc_html__( 'Docs', 'wcs-import-export' ) . '</a>',
+			'<a href="https://github.com/woocommerce/woocommerce-subscriptions-importer-exporter/issues/new">' . esc_html__( 'Support', 'wcs-import-export' ) . '</a>',
 		);
 
 		return array_merge( $plugin_links, $links );
