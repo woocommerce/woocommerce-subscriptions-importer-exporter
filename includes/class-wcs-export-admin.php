@@ -293,15 +293,26 @@ class WCS_Export_Admin {
 					$status = 'processing';
 				}
 
+				$ctime = absint( filectime( trailingslashit( WCS_Exporter_Cron::$cron_dir ) . $file ) );
+
 				$file_data = array(
 					'name'   => $file,
 					'url'    => $files_url . $file,
 					'status' => $status,
-					'date'   => date( 'd/m/Y G:i:s', absint( filectime( trailingslashit( WCS_Exporter_Cron::$cron_dir ) . $file ) ) ),
+					'ctime'  => $ctime,
+					'date'   => date( 'd/m/Y G:i:s', $ctime ),
 				);
 
 				$files_data[] = $file_data;
 			}
+
+			// Sort files by date (desc).
+			usort(
+				$files_data,
+				function( $file1, $file2 ) {
+					return $file2['ctime'] - $file1['ctime'];
+				}
+			);
 		}
 		?>
 		<table class="widefat widefat_crons striped" id="wcsi-cron-exports-table" style="display:none;">
