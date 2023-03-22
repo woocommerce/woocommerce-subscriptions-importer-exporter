@@ -145,3 +145,14 @@ function wcsi_check_customer( $data, $mapped_fields, $test_mode = false, $email_
 
 	return $found_customer;
 }
+
+/**
+ * Checks whether HPOS is in use in WooCommerce.
+ *
+ * @since 2.2.0
+ *
+ * @return bool TRUE if HPOS is enabled, FALSE otherwise.
+ */
+function wcsi_is_hpos_enabled() {
+	return function_exists( 'wcs_is_custom_order_tables_usage_enabled' ) && wcs_is_custom_order_tables_usage_enabled();
+}

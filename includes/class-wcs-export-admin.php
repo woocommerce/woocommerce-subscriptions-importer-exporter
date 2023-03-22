@@ -101,13 +101,20 @@ class WCS_Export_Admin {
 	 * @since 1.0
 	 */
 	public function home_page() {
-
 		$statuses      = wcs_get_subscription_statuses();
 		$status_counts = array();
 
-		foreach ( wp_count_posts( 'shop_subscription' ) as $status => $count ) {
-			if ( array_key_exists( $status, $statuses ) ) {
-				$status_counts[ $status ] = $count;
+		if ( wcsi_is_hpos_enabled() ) {
+			$wcs_datastore = WC_Data_Store::load( 'subscription' );
+
+			foreach ( array_keys( $statuses ) as $status ) {
+				$status_counts[ $status ] = $wcs_datastore->get_order_count( $status );
+			}
+		} else {
+			foreach ( wp_count_posts( 'shop_subscription' ) as $status => $count ) {
+				if ( array_key_exists( $status, $statuses ) ) {
+					$status_counts[ $status ] = $count;
+				}
 			}
 		}
 
@@ -398,10 +405,14 @@ class WCS_Export_Admin {
 		if ( isset( $_POST['payment'] ) && 'any' != $_POST['payment'] ) {
 			$payment_payment = ( 'none' == $_POST['payment'] ) ? '' : $_POST['payment'];
 
-			$query_args['meta_query'][] = array(
-				'key'   => '_payment_method',
-				'value' => $payment_payment,
-			);
+			if ( wcsi_is_hpos_enabled() ) {
+				$query_args['payment_method'] = $payment_payment;
+			} else {
+				$query_args['meta_query'][] = array(
+					'key'   => '_payment_method',
+					'value' => $payment_payment,
+				);
+			}
 		}
 
 		return $query_args;
