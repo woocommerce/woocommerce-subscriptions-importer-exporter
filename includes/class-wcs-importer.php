@@ -60,6 +60,17 @@ class WCS_Importer {
 		'shipping_country',
 	);
 
+	private static $order_meta_setter_map = [
+		'cart_discount'      => 'discount_total',
+		'cart_discount_tax'  => 'discount_tax',
+		'customer_user'      => 'customer_id',
+		'order_tax'          => 'cart_tax',
+		'order_shipping'     => 'shipping_total',
+		'order_currency'     => 'currency',
+		'order_shipping_tax' => 'shipping_tax',
+		'order_total'        => 'total',
+	];
+
 	/**
 	 * Setup function for the import parse class
 	 *
@@ -206,7 +217,7 @@ class WCS_Importer {
 
 		self::$row  = $data;
 		$set_manual = $requires_manual_renewal = false;
-		$post_meta  = $order_items = array();
+		$order_meta = $order_items = array();
 		$result     = array(
 			'warning'    => array(),
 			'error'      => array(),
@@ -243,17 +254,14 @@ class WCS_Importer {
 				case 'order_shipping':
 				case 'order_shipping_tax':
 				case 'order_total':
-					$value       = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : 0;
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[ $column ] = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : 0;
 					break;
-
 				case 'payment_method':
 					$payment_method = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? strtolower( $data[ self::$fields[ $column ] ] ) : '';
-					$title          = ( ! empty( $data[ self::$fields['payment_method_title'] ] ) ) ? $data[ self::$fields['payment_method_title'] ] : $payment_method;
 
 					if ( ! empty( $payment_method ) && 'manual' != $payment_method ) {
-						$post_meta[] = array( 'key' => '_' . $column, 'value' => $payment_method );
-						$post_meta[] = array( 'key' => '_payment_method_title', 'value' => $title );
+						$order_meta[ $column ]                = $payment_method;
+						$order_meta[ 'payment_method_title' ] = ( ! empty( $data[ self::$fields['payment_method_title'] ] ) ) ? $data[ self::$fields['payment_method_title'] ] : $payment_method;
 					} else {
 						$set_manual = true;
 					}
@@ -262,7 +270,6 @@ class WCS_Importer {
 						$requires_manual_renewal = true;
 					}
 					break;
-
 				case 'shipping_address_1':
 				case 'shipping_city':
 				case 'shipping_postcode':
@@ -295,12 +302,11 @@ class WCS_Importer {
 						}
 					}
 
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[ $column ] = $value;
 					break;
 
 				default:
-					$value       = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : '';
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[ $column ] = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : '';
 			}
 		}
 
@@ -378,8 +384,8 @@ class WCS_Importer {
 
 					$subscription_id = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_id() : $subscription->id;
 
-					foreach ( $post_meta as $meta_data ) {
-						$subscription->update_meta_data( $meta_data['key'], $meta_data['value'] );
+					foreach ( $order_meta as $key => $value ) {
+						$subscription->{'set_' . ( self::$order_meta_setter_map[ $key ] ?? $key )}( $value );
 					}
 
 					foreach ( self::$fields['custom_post_meta'] as $meta_key ) {
