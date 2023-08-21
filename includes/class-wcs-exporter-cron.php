@@ -85,11 +85,7 @@ class WCS_Exporter_Cron {
 		);
 
 		if ( ! empty( $post_data['status'] ) ) {
-			$statuses = array_keys( $post_data['status'] );
-
-			if ( ! empty( $statuses ) && is_array( $statuses ) ) {
-				$args['subscription_status'] = implode( ',', $statuses );
-			}
+			$args['subscription_status'] = array_keys( $post_data['status'] );
 		}
 
 		if ( ! empty( $post_data['customer'] ) && is_numeric( $post_data['customer'] ) ) {

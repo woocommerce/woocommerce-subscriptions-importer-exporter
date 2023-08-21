@@ -60,6 +60,17 @@ class WCS_Importer {
 		'shipping_country',
 	);
 
+	private static $order_meta_setter_map = [
+		'cart_discount'      => 'discount_total',
+		'cart_discount_tax'  => 'discount_tax',
+		'customer_user'      => 'customer_id',
+		'order_tax'          => 'cart_tax',
+		'order_shipping'     => 'shipping_total',
+		'order_currency'     => 'currency',
+		'order_shipping_tax' => 'shipping_tax',
+		'order_total'        => 'total',
+	];
+
 	/**
 	 * Setup function for the import parse class
 	 *
@@ -95,26 +106,52 @@ class WCS_Importer {
 	public static function add_order_key_post_meta_if_missing() {
 		global $wpdb;
 
-		// Get the post_ids of the subscriptions whose order_key post meta is NULL or empty or missing
-		$subscription_ids_needing_order_key = $wpdb->get_results( "
-			SELECT ID FROM {$wpdb->prefix}posts WHERE
-				post_type = 'shop_subscription'
-					AND
-				ID NOT IN (
-					SELECT post_id FROM {$wpdb->prefix}postmeta WHERE
-						meta_key = '_order_key'
-							AND
-						meta_value IS NOT NULL
-							AND
-						meta_value <> ''
+		if ( ! wcsi_is_hpos_enabled() ) {
+			// Get the post_ids of the subscriptions whose order_key post meta is NULL or empty or missing
+			$subscription_ids_needing_order_key = $wpdb->get_col( "
+				SELECT ID FROM {$wpdb->prefix}posts WHERE
+					post_type = 'shop_subscription'
+						AND
+					ID NOT IN (
+						SELECT post_id FROM {$wpdb->prefix}postmeta WHERE
+							meta_key = '_order_key'
+								AND
+							meta_value IS NOT NULL
+								AND
+							meta_value <> ''
+					)
+						AND
+					post_status IN ( '" . implode( "','", array_keys( wcs_get_subscription_statuses() ) ) . "' )"
+			);
+		} else {
+			$subscription_ids_needing_order_key = wc_get_orders(
+				array(
+					'type'      => 'shop_subscription',
+					'field_query' => array(
+						array(
+							'relation' => 'or',
+							array(
+								'field' => 'order_key',
+								'value' => 'NOT EXISTS',
+							),
+							array(
+								'field' => 'order_key',
+								'value' => '',
+							),
+						)
+					),
+					'status'    => array_keys( wcs_get_subscription_statuses() ),
+					'return'    => 'ids',
+					'limit'     => -1,
 				)
-					AND
-				post_status IN ( '" . implode( "','", array_keys( wcs_get_subscription_statuses() ) ) . "' )"
-		);
+			);
+		}
 
 		//Set the order_key post meta for each of them
-		foreach( $subscription_ids_needing_order_key as $key => $post ) {
-			update_post_meta( $post->ID, '_order_key', uniqid( 'order_' ) );
+		foreach( $subscription_ids_needing_order_key as $order_id ) {
+			$order = wc_get_order( $order_id );
+			$order->set_order_key( wc_generate_order_key() );
+			$order->save();
 		}
 	}
 
@@ -180,7 +217,7 @@ class WCS_Importer {
 
 		self::$row  = $data;
 		$set_manual = $requires_manual_renewal = false;
-		$post_meta  = $order_items = array();
+		$order_meta = $order_items = array();
 		$result     = array(
 			'warning'    => array(),
 			'error'      => array(),
@@ -217,17 +254,14 @@ class WCS_Importer {
 				case 'order_shipping':
 				case 'order_shipping_tax':
 				case 'order_total':
-					$value       = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : 0;
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[ $column ] = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : 0;
 					break;
-
 				case 'payment_method':
 					$payment_method = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? strtolower( $data[ self::$fields[ $column ] ] ) : '';
-					$title          = ( ! empty( $data[ self::$fields['payment_method_title'] ] ) ) ? $data[ self::$fields['payment_method_title'] ] : $payment_method;
 
 					if ( ! empty( $payment_method ) && 'manual' != $payment_method ) {
-						$post_meta[] = array( 'key' => '_' . $column, 'value' => $payment_method );
-						$post_meta[] = array( 'key' => '_payment_method_title', 'value' => $title );
+						$order_meta[ $column ]                = $payment_method;
+						$order_meta[ 'payment_method_title' ] = ( ! empty( $data[ self::$fields['payment_method_title'] ] ) ) ? $data[ self::$fields['payment_method_title'] ] : $payment_method;
 					} else {
 						$set_manual = true;
 					}
@@ -236,7 +270,6 @@ class WCS_Importer {
 						$requires_manual_renewal = true;
 					}
 					break;
-
 				case 'shipping_address_1':
 				case 'shipping_city':
 				case 'shipping_postcode':
@@ -269,12 +302,11 @@ class WCS_Importer {
 						}
 					}
 
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[ $column ] = $value;
 					break;
 
 				default:
-					$value       = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : '';
-					$post_meta[] = array( 'key' => '_' . $column, 'value' => $value );
+					$order_meta[ $column ] = ( ! empty( $data[ self::$fields[ $column ] ] ) ) ? $data[ self::$fields[ $column ] ] : '';
 			}
 		}
 
@@ -352,22 +384,24 @@ class WCS_Importer {
 
 					$subscription_id = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_id() : $subscription->id;
 
-					foreach ( $post_meta as $meta_data ) {
-						update_post_meta( $subscription_id, $meta_data['key'], $meta_data['value'] );
+					foreach ( $order_meta as $key => $value ) {
+						$subscription->{'set_' . ( self::$order_meta_setter_map[ $key ] ?? $key )}( $value );
 					}
 
 					foreach ( self::$fields['custom_post_meta'] as $meta_key ) {
 						if ( ! empty( $data[ $meta_key ] ) ) {
-							update_post_meta( $subscription_id, $meta_key, $data[ $meta_key ] );
+							$subscription->update_meta_data( $meta_key, $data[ $meta_key ] );
 						}
 					}
 
 					foreach ( self::$fields['custom_user_post_meta'] as $meta_key ) {
 						if ( ! empty( $data[ $meta_key ] ) ) {
-							update_post_meta( $subscription_id, $meta_key, $data[ $meta_key ] );
+							$subscription->update_meta_data( $meta_key, $data[ $meta_key ] );
 							update_user_meta( $user_id, $meta_key, $data[ $meta_key ] );
 						}
 					}
+
+					$subscription->save();
 
 					// Now that we've set all the meta data, reinit the object so the data is set
 					$subscription = wcs_get_subscription( $subscription_id );
@@ -931,8 +965,9 @@ class WCS_Importer {
 						throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription, a subscription not been created for this row.', 'wcs-import-export' ) );
 					}
 
-					update_post_meta( $subscription->get_id(), '_shipping_method', $shipping_method );
-					update_post_meta( $subscription->get_id(), '_shipping_method_title', $shipping_title );
+					$subscription->update_meta_data( '_shipping_method', $shipping_method );
+					$subscription->update_meta_data( '_shipping_method_title', $shipping_title );
+					$subscription->save();
 				}
 			}
 		}

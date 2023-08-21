@@ -41,6 +41,18 @@ if ( ! function_exists( 'woothemes_queue_update' ) || ! function_exists( 'is_woo
 	require_once( 'woo-includes/woo-functions.php' );
 }
 
+/**
+ * Declare plugin compatibility with WooCommerce HPOS.
+ */
+add_action(
+	'before_woocommerce_init',
+	function() {
+		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
+);
+
 require_once( 'includes/wcsi-functions.php' );
 
 class WCS_Importer_Exporter {
