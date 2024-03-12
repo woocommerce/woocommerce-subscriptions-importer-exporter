@@ -50,7 +50,7 @@ To import your subscriptions to WooCommerce via CSV, you need to:
 	1. Check **Email Passwords** to email customers that are newly created their account details
 	1. Check **Add memberships** to grant subscribers any membership/s plan corresponding to subscription products
 1. Click **Upload and file and import**
-1. Review each column of data in your file to make sure the Importer has mapped it to the correct column header. 
+1. Review each column of data in your file to make sure the Importer has mapped it to the correct column header.
 1. Click **Test CSV**
 1. If there are errors, fix up the CSV file and return to step 1.
 1. If there are no errors, click **Run Import**
@@ -70,7 +70,7 @@ Import options:
 ![](https://cldup.com/YFwi6NIp-L.png)
 
 #### Run in Test Mode
-Running the import in test mode will analyse each row of your CSV and notify you of any [warnings or errors](#list-of-warnings-and-errors) with that data. 
+Running the import in test mode will analyse each row of your CSV and notify you of any [warnings or errors](#list-of-warnings-and-errors) with that data.
 
 It will not import any subscription data in your store's database, like users or subscriptions.
 
@@ -90,7 +90,7 @@ When the **Email Passwords** option is enabled, if the Importer creates a new us
 
 If left unticked, the new users created  will need to go through the "forgot your password" process which will let them reset their details via email.
 
-Please note: the minimum requirement for creating a new user is an email address. If no username is given, the importer will to create a username from the email. Say you you need to create a new user and have only given the email address, janedoe@example.com, the importer will try a new user with username janedoe. If this username is already taken, we then try the username janedoe1, janedoe2 and so on; until it finds a free username (i.e janedoe102). 
+Please note: the minimum requirement for creating a new user is an email address. If no username is given, the importer will to create a username from the email. Say you you need to create a new user and have only given the email address, janedoe@example.com, the importer will try a new user with username janedoe. If this username is already taken, we then try the username janedoe1, janedoe2 and so on; until it finds a free username (i.e janedoe102).
 
 #### Add Memberships
 
@@ -247,7 +247,8 @@ Please follow these general rules when formatting your CSV file:
 |`start_date`|`Y-m-d H:i:s`|The start time to set on the subscription. Must be in the past.|The current time.|
 |`trial_end_date`|`Y-m-d H:i:s`|A date in the past or future on which a the subscriptions trial period will end. If set, the trial end date must come after the start date.|-|
 |`next_payment_date`|`Y-m-d H:i:s`|The date to process the next renewal payment. If set, the next payment date must come after the start date and trial end date and be in the future. If left empty, when the status is next updated to `wc-active` the next payment date will be calculated based on the start or trial end date and billing period/interval.|-|
-|`end_date`|`Y-m-d H:i:s`|The date on which the subscription will expire, if in the future, or was cancelled or expired, if in the past. Leave empty to have the subscription continue to renew until manually cancelled.|-|
+|`cancelled_date`|`Y-m-d H:i:s`|The date on which the subscription was set to be cancelled, either by the customer or via admin action. If setting this date, the subscription status must be one of the following: `cancelled`, `trash`, `expired`, `switched`, `pending-cancel`. Leave empty if the subscription was never set to be cancelled.|-|
+|`end_date`|`Y-m-d H:i:s`|The date on which the subscription will cancel/expire, if in the future, or did cancel/expire, if in the past. Leave empty to have the subscription continue to renew until manually cancelled. If setting this with `cancelled_date`, the `cancelled_date` must occur before `end_date`. If setting this without `cancelled_date`, the `cancelled_date` will be set to the same time as `end_date`.|-|
 |`billing_period`|`string`|The time period used for calculating renewal payment dates. Must be either: `day`, `week`, `month`, `year`. An invalid or empty billing period will cause an error during the import and the subscription will not be imported.|-|
 |`billing_interval`|`int`|The interval used for calculating renewal payment dates. Must be an integer value to represent how many subscription periods between each payment. For example, a `2` here and `week` for the `billing_period` will create a subscription processes a renewal payment every two weeks.|`1`|
 |`order_items`|`mixed`|The product line items on the subscription used to set the line items on renewal orders. Can be a product or variation ID or a more advanced set of data as detailed in the [Importing Order Items](#importing-order-items-product-line-items) section.|-|
@@ -497,7 +498,7 @@ If the later approach is taken, we strongly recommend that you notify customers 
 > PayPal Standard Note: Unfortunately, this approach isn't suitable for PayPal Standard. With PayPal Standard, if no valid PayPal subscription ID is provided, exceptions will be thrown whenever you or the customer changes the status of the subscription with your store, meaning its impossible to change the status of imported subscriptions. This is because Subscriptions attempts to communicate this state change to PayPal, but is unable to connect it to a valid subscription there. If you need to take this approach for customers using PayPal Standard, temporarily use Stripe or a fake payment method instead.
 
 #### How can I check if a payment method can be imported with automatic payments?
-WooCommerce Subscriptions v2.0 introduced a new way for payment gateways to register the payment meta data they require for processing automatic recurring payments. 
+WooCommerce Subscriptions v2.0 introduced a new way for payment gateways to register the payment meta data they require for processing automatic recurring payments.
 
 To support this method, the payment gateway extension must use the filter: `'woocommerce_subscription_payment_meta'`.
 
