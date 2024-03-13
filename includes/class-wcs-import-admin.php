@@ -333,7 +333,7 @@ class WCS_Import_Admin {
 		$row_number  = 1;
 
 		$customer_fields     = array( 'customer_id', 'customer_email', 'customer_username', 'customer_password' );
-		$subscription_fields = array( 'start_date', 'next_payment_date', 'cancelled_date', 'cancelled_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
+		$subscription_fields = array( 'start_date', 'next_payment_date', 'cancelled_date', 'end_date', 'trial_end_date', 'last_payment_date', 'billing_interval', 'billing_period' );
 		?>
 
 		<h3><?php esc_html_e( 'Step 2: Map Fields to Column Names', 'wcs-import-export' ); ?></h3>
