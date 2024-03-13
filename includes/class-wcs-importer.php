@@ -331,7 +331,7 @@ class WCS_Importer {
 
 			switch ( $date_type ) {
 				case 'cancelled_date':
-					if ( 'cancelled_date' === $date_type && ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) {
+					if ( ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) {
 						$result['error'][] = sprintf( __( 'Cannot set a %s date for an active subscription.', 'wcs-import-export' ), $date_type );
 					}
 				case 'end_date' :
@@ -341,18 +341,12 @@ class WCS_Importer {
 					if ( 'end_date' === $date_type && ! empty( $dates_to_update['cancelled_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['cancelled_date'] ) ) {
 						$result['error'][] = sprintf( __( 'The %s date must occur after the cancelled date.', 'wcs-import-export' ), $date_type );
 					}
-
-					if ( 'end_date' === $date_type && empty( $dates_to_update['cancelled_date'] ) ) {
-						$dates_to_update['cancelled_date'] = $datetime;
-						ksort( $dates_to_update ); // Sort so that `cancelled_date` is processed before `end_date`, otherwise updating dates will trigger a fatal.
-						$result['warning'][] = sprintf( __( 'Setting %1$s date requires a cancelled date. Setting the cancelled date to %2$s.', 'wcs-import-export' ), $date_type, $datetime );
-					}
 				case 'next_payment_date' :
-					if ( 'next_payment_date' === $date_type && ! empty( $dates_to_update['trial_end_date'] ) && strtotime( $datetime ) < strtotime( $dates_to_update['trial_end_date'] ) ) {
+					if ( ! empty( $dates_to_update['trial_end_date'] ) && strtotime( $datetime ) < strtotime( $dates_to_update['trial_end_date'] ) ) {
 						$result['error'][] = sprintf( __( 'The %s date must occur after the trial end date.', 'wcs-import-export' ), $date_type );
 					}
 				case 'trial_end_date' :
-					if ( 'trial_end_date' === $date_type && strtotime( $datetime ) <= strtotime( $dates_to_update['start'] ) ) {
+					if ( strtotime( $datetime ) <= strtotime( $dates_to_update['start'] ) ) {
 						$result['error'][] = sprintf( __( 'The %s must occur after the start date.', 'wcs-import-export' ), $date_type );
 					}
 			}
@@ -426,8 +420,7 @@ class WCS_Importer {
 					// Now that we've set all the meta data, reinit the object so the data is set
 					$subscription = wcs_get_subscription( $subscription_id );
 
-					// Set dates.
-					$subscription->update_dates( $dates_to_update );
+					$subscription->update_dates( array_filter( $dates_to_update ) );
 
 					if ( ! $set_manual && ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
