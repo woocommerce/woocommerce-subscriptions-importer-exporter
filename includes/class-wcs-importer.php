@@ -382,7 +382,7 @@ class WCS_Importer {
 							'created_via'      => 'importer',
 							'customer_note'    => ( ! empty( $data[ self::$fields['customer_note'] ] ) ) ? $data[ self::$fields['customer_note'] ] : '',
 							'currency'         => ( ! empty( $data[ self::$fields['order_currency'] ] ) ) ? $data[ self::$fields['order_currency'] ] : '',
-							'status'           => in_array( $status, wcs_get_subscription_ended_statuses() ) ? $status : 'pending', // Subsciption must be in pending status to auto-calculate next_payment_date, but must be a non-active status in order to apply a past end_date.
+							'status'           => in_array( $status, wcs_get_subscription_ended_statuses() ) ? $status : 'pending', // Subscription must be in pending status to auto-calculate next_payment_date, but must be a non-active status in order to apply cancelled_date and end_date.
 						)
 					);
 
