@@ -335,7 +335,7 @@ class WCS_Importer {
 						$result['error'][] = sprintf( __( 'Cannot set a %s date for an active subscription.', 'wcs-import-export' ), $date_type );
 					}
 					if ( ! empty( $dates_to_update['end_date'] ) && strtotime( $datetime ) > strtotime( $dates_to_update['end_date'] ) ) {
-						$result['error'][] = sprintf( __( 'The end date must occur after the cancelled date.', 'wcs-import-export' ), $date_type );
+						$result['error'][] = sprintf( __( 'The %s date must occur before the end date.', 'wcs-import-export' ), $date_type );
 					}
 				case 'end_date' :
 					if ( ! empty( $dates_to_update['next_payment_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['next_payment_date'] ) ) {
