@@ -334,12 +334,12 @@ class WCS_Importer {
 					if ( ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) {
 						$result['error'][] = sprintf( __( 'Cannot set a %s date for an active subscription.', 'wcs-import-export' ), $date_type );
 					}
-				case 'end_date' :
-					if ( 'end_date' === $date_type && ! empty( $dates_to_update['next_payment_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['next_payment_date'] ) ) {
-						$result['error'][] = sprintf( __( 'The %s date must occur after the next payment date.', 'wcs-import-export' ), $date_type );
+					if ( ! empty( $dates_to_update['end_date'] ) && strtotime( $datetime ) > strtotime( $dates_to_update['end_date'] ) ) {
+						$result['error'][] = sprintf( __( 'The end date must occur after the cancelled date.', 'wcs-import-export' ), $date_type );
 					}
-					if ( 'end_date' === $date_type && ! empty( $dates_to_update['cancelled_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['cancelled_date'] ) ) {
-						$result['error'][] = sprintf( __( 'The %s date must occur after the cancelled date.', 'wcs-import-export' ), $date_type );
+				case 'end_date' :
+					if ( ! empty( $dates_to_update['next_payment_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['next_payment_date'] ) ) {
+						$result['error'][] = sprintf( __( 'The %s date must occur after the next payment date.', 'wcs-import-export' ), $date_type );
 					}
 				case 'next_payment_date' :
 					if ( ! empty( $dates_to_update['trial_end_date'] ) && strtotime( $datetime ) < strtotime( $dates_to_update['trial_end_date'] ) ) {
@@ -374,9 +374,6 @@ class WCS_Importer {
 						}
 					}
 
-					add_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
-					add_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
-
 					$subscription = wcs_create_subscription( array(
 							'customer_id'      => $user_id,
 							'start_date'       => $dates_to_update['start'],
@@ -385,12 +382,9 @@ class WCS_Importer {
 							'created_via'      => 'importer',
 							'customer_note'    => ( ! empty( $data[ self::$fields['customer_note'] ] ) ) ? $data[ self::$fields['customer_note'] ] : '',
 							'currency'         => ( ! empty( $data[ self::$fields['order_currency'] ] ) ) ? $data[ self::$fields['order_currency'] ] : '',
-							'status'           => $status,
+							'status'           => in_array( $status, wcs_get_subscription_ended_statuses() ) ? $status : 'pending', // Subsciption must be in pending status to auto-calculate next_payment_date, but must be a non-active status in order to apply a past end_date.
 						)
 					);
-
-					remove_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
-					remove_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
 
 					if ( is_wp_error( $subscription ) ) {
 						throw new Exception( sprintf( esc_html__( 'Could not create subscription: %s', 'wcs-import-export' ), $subscription->get_error_message() ) );
@@ -420,7 +414,8 @@ class WCS_Importer {
 					// Now that we've set all the meta data, reinit the object so the data is set
 					$subscription = wcs_get_subscription( $subscription_id );
 
-					$subscription->update_dates( array_filter( $dates_to_update ) );
+					// Update dates while in "pending" status so missing next payment dates get auto-calculated.
+					$subscription->update_dates( $dates_to_update );
 
 					if ( ! $set_manual && ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
 						$result['warning'] = array_merge( $result['warning'], self::set_payment_meta( $subscription, $data ) );
@@ -505,6 +500,15 @@ class WCS_Importer {
 				}
 
 				if ( ! self::$test_mode ) {
+					add_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
+					add_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
+
+					// Update status again for active subscriptions.
+					$subscription->update_status( $status );
+
+					remove_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
+					remove_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
+
 					if ( self::$add_memberships ) {
 						foreach ( $order_items as $product_id ) {
 							self::maybe_add_memberships( $user_id, $subscription->get_id(), $product_id );
