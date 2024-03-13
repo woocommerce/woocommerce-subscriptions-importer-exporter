@@ -546,8 +546,9 @@ class WCS_Importer {
 			 *
 			 * @param WC_Subscription $subscription The subscription object created by the importer.
 			 * @param array $result The result of the import.
+			 * @paran array $data The raw data from the import CSV.
 			 */
-			do_action( 'woocommerce_subscription_imported_via_csv', $subscription, $result );
+			do_action( 'woocommerce_subscription_imported_via_csv', $subscription, $result, $data );
 		}
 
 		array_push( self::$results, $result );
