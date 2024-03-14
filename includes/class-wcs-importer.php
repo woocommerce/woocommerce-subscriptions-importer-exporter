@@ -310,8 +310,8 @@ class WCS_Importer {
 			}
 		}
 
+		$status = 'pending';
 		if ( empty( $data[ self::$fields['subscription_status'] ] ) ) {
-			$status              = 'pending';
 			$result['warning'][] = esc_html__( 'No subscription status was specified. The subscription will be created with the status "pending". ', 'wcs-import-export' );
 		} else {
 			$status = ( 'wc-' === substr( $data[ self::$fields['subscription_status'] ], 0, 3 ) ) ? substr( $data[ self::$fields['subscription_status'] ], 3 ) : $data[ self::$fields['subscription_status'] ];
@@ -319,7 +319,7 @@ class WCS_Importer {
 
 		$dates_to_update = array( 'start' => ( ! empty( $data[ self::$fields['start_date'] ] ) ) ? gmdate( 'Y-m-d H:i:s', strtotime( $data[ self::$fields['start_date'] ] ) ) : gmdate( 'Y-m-d H:i:s', time() - 1 ) );
 
-		foreach ( array( 'trial_end_date', 'next_payment_date', 'end_date', 'last_payment_date' ) as $date_type ) {
+		foreach ( array( 'trial_end_date', 'next_payment_date', 'cancelled_date', 'end_date', 'last_payment_date' ) as $date_type ) {
 			$dates_to_update[ $date_type ] = ( ! empty( $data[ self::$fields[ $date_type ] ] ) ) ? gmdate( 'Y-m-d H:i:s', strtotime( $data[ self::$fields[ $date_type ] ] ) ) : '';
 		}
 
@@ -330,6 +330,13 @@ class WCS_Importer {
 			}
 
 			switch ( $date_type ) {
+				case 'cancelled_date':
+					if ( ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) {
+						$result['error'][] = sprintf( __( 'Cannot set a %s date for an active subscription.', 'wcs-import-export' ), $date_type );
+					}
+					if ( ! empty( $dates_to_update['end_date'] ) && strtotime( $datetime ) > strtotime( $dates_to_update['end_date'] ) ) {
+						$result['error'][] = sprintf( __( 'The %s date must occur before the end date.', 'wcs-import-export' ), $date_type );
+					}
 				case 'end_date' :
 					if ( ! empty( $dates_to_update['next_payment_date'] ) && strtotime( $datetime ) <= strtotime( $dates_to_update['next_payment_date'] ) ) {
 						$result['error'][] = sprintf( __( 'The %s date must occur after the next payment date.', 'wcs-import-export' ), $date_type );
@@ -375,6 +382,7 @@ class WCS_Importer {
 							'created_via'      => 'importer',
 							'customer_note'    => ( ! empty( $data[ self::$fields['customer_note'] ] ) ) ? $data[ self::$fields['customer_note'] ] : '',
 							'currency'         => ( ! empty( $data[ self::$fields['order_currency'] ] ) ) ? $data[ self::$fields['order_currency'] ] : '',
+							'status'           => in_array( $status, wcs_get_subscription_ended_statuses() ) ? $status : 'pending', // Subscription must be in pending status to auto-calculate next_payment_date, but must be a non-active status in order to apply cancelled_date and end_date.
 						)
 					);
 
@@ -406,6 +414,7 @@ class WCS_Importer {
 					// Now that we've set all the meta data, reinit the object so the data is set
 					$subscription = wcs_get_subscription( $subscription_id );
 
+					// Update dates while in "pending" status so missing next payment dates get auto-calculated.
 					$subscription->update_dates( $dates_to_update );
 
 					if ( ! $set_manual && ! in_array( $status, wcs_get_subscription_ended_statuses() ) ) { // don't bother trying to set payment meta on a subscription that won't ever renew
@@ -494,6 +503,7 @@ class WCS_Importer {
 					add_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
 					add_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
 
+					// Update status again for active subscriptions.
 					$subscription->update_status( $status );
 
 					remove_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
@@ -504,9 +514,7 @@ class WCS_Importer {
 							self::maybe_add_memberships( $user_id, $subscription->get_id(), $product_id );
 						}
 					}
-				}
 
-				if ( ! self::$test_mode ) {
 					$subscription->save();
 				}
 
@@ -529,6 +537,15 @@ class WCS_Importer {
 				$result['status']  = 'failed';
 				WCS_Import_Logger::log( sprintf( 'Row #%s failed: %s', $result['row_number'], print_r( $result['error'], true ) ) );
 			}
+
+			/**
+			 * Action hook to allow for custom actions after a subscription has been imported and can be manipulated.
+			 *
+			 * @param WC_Subscription $subscription The subscription object created by the importer.
+			 * @param array $result The result of the import.
+			 * @paran array $data The raw data from the import CSV.
+			 */
+			do_action( 'woocommerce_subscription_imported_via_csv', $subscription, $result, $data );
 		}
 
 		array_push( self::$results, $result );

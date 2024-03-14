@@ -462,6 +462,7 @@ class WCS_Import_Admin {
 			'trial_end_date'           => '',
 			'next_payment_date'        => '',
 			'last_payment_date'        => '',
+			'cancelled_date'           => '',
 			'end_date'                 => '',
 			'billing_first_name'       => '',
 			'billing_last_name'        => '',
