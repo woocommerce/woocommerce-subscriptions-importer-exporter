@@ -38,6 +38,10 @@ To maximize your changes of success with an import, please read through this doc
 
 There is no substitution for this step. Fully understanding the details of the import process will save you time by avoiding mistakes that may become serious issues in the future.
 
+## Installation
+
+[Download the latest zip of the plugin using this link](https://github.com/woocommerce/woocommerce-subscriptions-importer-exporter/archive/refs/heads/master.zip). Install the zip as a WordPress plugin using the plugin uploader.
+
 ## Importer Usage Guide
 
 To import your subscriptions to WooCommerce via CSV, you need to:
