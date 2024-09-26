@@ -519,7 +519,7 @@ class WCS_Import_Admin {
 		}
 
 		foreach ( $mapping_rules as $key => $value ) {
-			if ( ! empty( $value ) && is_array( $mapped_fields[ $value ] ) ) {
+			if ( ! empty( $value ) && isset( $mapped_fields[ $value ] ) && is_array( $mapped_fields[ $value ] ) ) {
 				array_push( $mapped_fields[ $value ], $key );
 			}
 		}
