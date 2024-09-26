@@ -1,0 +1,10 @@
+{
+    "name": "woocommerce/woocommerce-subscriptions-importer-exporter",
+    "description": "Import your subscribers to WooCommerce from a CSV. Or export your subscription data from WooCommerce to CSV. ",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "woocommerce"
+        }
+    ]
+}
