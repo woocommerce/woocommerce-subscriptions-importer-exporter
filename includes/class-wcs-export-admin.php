@@ -292,6 +292,9 @@ class WCS_Export_Admin {
 			$upload_dir = wp_upload_dir();
 			$files_url  = $upload_dir['baseurl'] . '/woocommerce-subscriptions-importer-exporter/';
 
+			// Get the site's date and time format settings.
+			$datetime_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+
 			foreach ( $files as $file ) {
 
 				// set status
@@ -304,7 +307,7 @@ class WCS_Export_Admin {
 					'name'   => $file,
 					'url'    => $files_url . $file,
 					'status' => $status,
-					'date'   => date( 'd/m/Y G:i:s', absint( filectime( trailingslashit( WCS_Exporter_Cron::$cron_dir ) . $file ) ) ),
+					'date'   => date_i18n( $datetime_format, absint( filectime( trailingslashit( WCS_Exporter_Cron::$cron_dir ) . $file ) ) ),
 				);
 
 				$files_data[] = $file_data;

@@ -1,5 +1,11 @@
 *** WooCommerce Subscriptions CSV Importer and Exporter Changelog ***
 
+2024.07.08 - version 2.2.0
+* Add - Support for WooCommerce High Performance Order Storage. PR #262
+* Fix - Replace use of deprecated update_manual. PR #225
+* Fix - Replace direct access of subscription ID. PR #225
+* Fix - Allow importing of cancelled_date and fix handling of end_date. PR #278
+
 2020.04.20 - version 2.1.0
 * Fix fatal errors which occur during the subscription import process. PR#214
 * Add .htaccess and index.php files to the export directory. PR#218
