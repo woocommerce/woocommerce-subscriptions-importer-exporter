@@ -3,16 +3,16 @@
 	"title": "WooCommerce Subscriptions Importer and Exporter",
 	"author": "Prospress",
 	"license": "ISC",
-	"version": "1.0.0",
+	"version": "2.2.0",
 	"description": "",
-	"homepage": "https://github.com/Prospress/woocommerce-subscriptions-importer-exporter",
+	"homepage": "https://github.com/WooCommerce/woocommerce-subscriptions-importer-exporter",
 	"main": "Gruntfile.js",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Prospress/woocommerce-subscriptions-importer-exporter.git"
+		"url": "https://github.com/WooCommerce/woocommerce-subscriptions-importer-exporter.git"
 	},
 	"bugs": {
-		"url": "https://github.com/Prospress/woocommerce-subscriptions-importer-exporter/issues"
+		"url": "https://github.com/WooCommerce/woocommerce-subscriptions-importer-exporter/issues"
 	},
 	"directories": {
 		"test": "tests"
