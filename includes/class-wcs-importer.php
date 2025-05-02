@@ -352,11 +352,18 @@ class WCS_Importer {
 			}
 		}
 
-		// make the sure end of prepaid term exists for subscription that are about to be set to pending-cancellation - continue to use the next payment date if that exists
-		if ( 'pending-cancel' == $status && ( empty( $dates_to_update['next_payment_date'] ) || strtotime( $dates_to_update['next_payment_date'] ) < current_time( 'timestamp', true ) ) ) {
+		// ensure pending-cancellation subscriptions have an end date in the future.
+		if ( 'pending-cancel' == $status ) {
+			if ( empty( $dates_to_update['end_date'] ) || strtotime( $dates_to_update['end_date'] ) < current_time( 'timestamp', true ) ) {
+				// next payment date becomes the end date.
+				if ( ! empty( $dates_to_update['next_payment_date'] ) && strtotime( $dates_to_update['next_payment_date'] ) > current_time( 'timestamp', true ) ) {
+					$dates_to_update['end_date'] = $dates_to_update['next_payment_date'];
+				}
+			}
+
 			if ( ! empty( $dates_to_update['end_date'] ) && strtotime( $dates_to_update['end_date'] ) > current_time( 'timestamp', true ) ) {
-				$dates_to_update['next_payment_date'] = $dates_to_update['end_date'];
-				unset( $dates_to_update['end_date'] );
+				// pending-cancellation subs cannot have a next_payment date if they also have a cancelled date.
+				unset( $dates_to_update['next_payment_date'] );
 			} else {
 				$result['error'][] = __( 'Importing a pending cancelled subscription requires an end date in the future.', 'wcs-import-export' );
 			}
