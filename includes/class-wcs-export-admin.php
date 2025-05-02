@@ -134,6 +134,14 @@ class WCS_Export_Admin {
 						</td>
 					</tr>
 					<tr>
+						<td><label for="product"><?php esc_html_e( 'Product', 'wcs-import-export' ); ?>:</label></td>
+						<td>
+							<select class="wc-product-search" name="product" data-placeholder="<?php esc_attr_e( 'Search for a product&hellip;', 'wcs-import-export' ); ?>" data-allow_clear="true" style="min-width: 220px">
+								<option value="" selected="selected"><?php esc_attr_e( 'All products', 'wcs-import-export' ); ?><option>
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<td><label for="customer"><?php esc_html_e( 'Export for Customer', 'wcs-import-export' ); ?>:</label></td>
 						<td>
 							<select class="wc-customer-search" name="customer" data-placeholder="<?php esc_attr_e( 'Search for a customer&hellip;', 'wcs-import-export' ); ?>" data-allow_clear="true" style="min-width: 220px">
@@ -374,7 +382,7 @@ class WCS_Export_Admin {
 		$args = array(
 			'subscriptions_per_page' => ! empty( $_POST['limit'] ) ? absint( $_POST['limit'] ) : -1,
 			'offset'                 => isset( $_POST['offset'] ) ? $_POST['offset'] : 0,
-			'product'                => isset( $_POST['product'] ) ? $_POST['product'] : '',
+			'product_id'             => isset( $_POST['product'] ) ? $_POST['product'] : '',
 			'subscription_status'    => 'none', // don't default to 'any' status if no statuses were chosen
 		);
 
