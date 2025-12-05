@@ -88,6 +88,8 @@ class WCS_Importer_Exporter {
 	 */
 	public static function setup_importer() {
 
+		add_filter( 'woocommerce_subscription_get_last_payment_date', array(__CLASS__, 'last_payment' ), 10, 3 );
+
 		if ( is_admin() ) {
 			if ( class_exists( 'WC_Subscriptions' ) && version_compare( WC_Subscriptions::$version, self::$required_subscriptions_version, '>=' ) ) {
 				self::$wcs_exporter = new WCS_Export_Admin();
@@ -99,10 +101,32 @@ class WCS_Importer_Exporter {
 	}
 
 	/**
+	* This is to calculate last_payment when the last payment not set by import
+	* this is done by taking next interval and removing twice.
+	* Only change from 0 if it was an imported subscription
+	*
+	* @param string Or 0 $date A MySQL formatted date/time string in GMT/UTC timezone.
+	* @param $subscription WC_Subscription
+	* @param $timezone The timezone of the $datetime param, either 'gmt' or 'site'. Default 'gmt'.
+	* @return $date OR date of last payment calulation
+	*/
+	public static function last_payment($date, $subscription, $timezone ) {
+		if ( 0 == $date && "importer" === $subscription->created_via ) {
+			$next_payment  = wcs_date_to_time( $subscription->get_date( 'next_payment', $timezone ) );
+			$next_interval = wcs_add_time( $subscription->billing_interval, $subscription->billing_period, $next_payment );
+			$last_payment  = $next_payment - ( $next_interval - $next_payment );
+
+			return gmdate( 'Y-m-d H:i:s', $last_payment );
+		}
+		return $date;
+	}
+
+	/**
 	 * Include Docs & Settings links on the Plugins administration screen
 	 *
 	 * @since 1.0
 	 * @param mixed $links
+	 * @return array
 	 */
 	public static function action_links( $links ) {
 
