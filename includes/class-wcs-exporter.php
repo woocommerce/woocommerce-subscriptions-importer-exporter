@@ -134,7 +134,7 @@ class WCS_Exporter {
 					}
 					break;
 				case 'start_date':
-					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'date_created' ) : $subscription->start_date;
+					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'start' ) : $subscription->start_date;
 					break;
 				case 'trial_end_date':
 					$value = version_compare( WC()->version, '3.0', '>=' ) ? $subscription->get_date( 'trial_end' ) : $subscription->trial_end_date;
