@@ -10,6 +10,10 @@ class WCS_Import_Admin {
 
 	public $upload_error   = '';
 
+	public $admin_url = '';
+
+	public $rows_per_request = 10;
+
 	public function __construct() {
 
 		$this->admin_url        = admin_url( 'admin.php?page=import_subscription' );
